@@ -215,17 +215,15 @@ public asset was created. Rebuild from merged `main` before the later IPA
 republication so the public artifact and release notes point at the merge
 commit rather than this branch commit.
 
-The Preview 2 release candidate adds the corrected copy-based document picker
-and Files-visible SunPad-folder import from commit `5a16b2f`, then carries the
-accepted touch, diagnostics, lifecycle, and experimental-60-FPS work forward
-as app build 2. The fresh iPhoneOS core/module build, unsigned Release app,
-repository gate, and package audit passed. Two independent IPA packages were
-byte-identical at 26,179,123 bytes and SHA-256
-`a84579cc089f9afaf39a7e3b7c36d97bb9430549c9fca1dc49c6c375b7442e3e`.
+The refreshed Preview 2 package uses the Release app from current product
+source commit `37b9eba`, including the accepted compact-iPhone touch defaults,
+with the unchanged iPhoneOS core/module. The unsigned Release app, repository
+gate, and package audit passed. Two independent IPA packages were byte-identical
+at 26,178,108 bytes and SHA-256
+`7e3345b2c0556280b2a0814ae46dc8f61f026b65ff491444dd00c55b9ee05730`.
 The audit confirmed arm64 iPhoneOS binaries, iOS 16.0 minimum metadata, build
 2, both Files-import plist flags, the nested GMSE01 module, and exclusion of
-game data, saves, logs, signing material, and personal paths. Rebuild and
-re-audit once from merged `main` before attaching the public Preview 2 asset.
+game data, saves, logs, signing material, and personal paths.
 
 | Area | Current state | Required acceptance |
 |---|---|---|
