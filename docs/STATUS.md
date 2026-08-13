@@ -1,6 +1,6 @@
 # Status
 
-Last updated: 2026-08-11
+Last updated: 2026-08-13
 
 Current phase: **SunPad now boots Super Mario Sunshine on a physical iPad as
 well as the iPhone and iPad simulators** as an ahead-of-time statically
@@ -22,10 +22,10 @@ iOS Simulator; fresh physical-device audio re-acceptance remains open.
 
 Ahead-of-time statically recompiled game CPU code running through a
 Dolphin-derived GameCube compatibility runtime (ModernGekko / RecompCore
-lineage). Not a matching decompilation, not a pure high-level rewrite, and on
-Apple platforms no runtime PowerPC JIT (the static-recomp fallback uses the
-interpreter, and the generic vertex loader replaces Dolphin's ARM64
-code-generating loader).
+lineage). Not a matching decompilation or a pure high-level rewrite. macOS uses
+JitArm64 for uncovered fallback code and returns to the AOT module at covered
+addresses. iOS/iPadOS use interpreter fallback with no runtime PowerPC JIT, and
+the generic vertex loader replaces Dolphin's ARM64 code-generating loader.
 
 ## Stage gates
 
@@ -109,6 +109,9 @@ code-generating loader).
    defaults to Metal, exposes resolution/fullscreen settings, seeds WASD +
    keyboard controls, and allows a connected controller profile to replace
    them. The app bundle passes ad-hoc signing verification and launches.
+6. The repaired ARM64 fallback contract kept the AOT module active in focused
+   headless and Metal smoke runs: the prior 682 native dispatches increased to
+   more than 191 million before clean shutdown.
 
 ## What does not work / not yet proven
 
@@ -117,9 +120,6 @@ code-generating loader).
   Simulator app only. Note the surviving device DSP dump from 2026-08-06 was
   already continuous at music level, so any residual audible defect on
   device should be debugged in the iOS output/consumer chain.
-- Desktop caveat: on Apple Silicon the fallback JIT never yields back to the
-  recompiled module (yield hook is Jit64-only), so desktop static-recomp
-  evidence requires `STATICRECOMP_NO_FALLBACK_JIT=1`.
 - The recompiled module is provisioned from the Mac toolchain (iOS has no C
   compiler); import/extract/boot works on-device, but provisioning a module
   for a disc other than the dev-provisioned GMSE01 build is not implemented.

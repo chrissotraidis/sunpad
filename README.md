@@ -23,8 +23,10 @@
 SunPad packages a native Apple ARM64 app around a
 [DolRecomp](https://github.com/encounter/dolrecomp)-generated Super Mario
 Sunshine module and the ModernGekko/Dolphin-derived compatibility runtime.
-The original PowerPC code runs as ahead-of-time recompiled host code, without
-a runtime PowerPC JIT, while Dolphin's Metal backend renders into the iOS app.
+Covered PowerPC game-code regions run as ahead-of-time recompiled host code.
+iPhone and iPad use interpreter fallback with no runtime PowerPC JIT; Apple
+Silicon Mac uses JitArm64 only for code outside the recompiled module.
+Dolphin's Metal backend renders into the Apple apps.
 
 The mobile app imports a user-provided supported GameCube image through Files,
 extracts it on-device, and provides a landscape touch controller alongside
@@ -285,6 +287,13 @@ it is not a general-purpose loader for other GameCube games.
 No runtime PowerPC JIT is used. The supported game's PowerPC code is
 ahead-of-time recompiled for ARM64, with the runtime interpreter handling
 unrecompiled regions.
+
+### Does it use a JIT on Apple Silicon Mac?
+
+Only as a fallback. The ahead-of-time module executes covered game code, and
+JitArm64 handles code outside that module before yielding back to it. This
+ARM64 handoff includes the fix from
+[ExpansionPak/RecompCore PR #6](https://github.com/ExpansionPak/RecompCore/pull/6).
 
 ### Can I download an IPA?
 

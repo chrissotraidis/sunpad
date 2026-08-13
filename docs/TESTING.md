@@ -245,10 +245,9 @@ a PID, or a clean log alone does not satisfy hands-on input or gameplay rows.
 
 All rows use Dolphin's producer-side `[DSP] DumpAudio` capture
 (`dspdump.wav`, 32,028 Hz) analyzed as 250 ms RMS windows; "loud" =
-RMS > 40. Desktop rows run `moderngekko-run` in iOS-parity mode
-(`STATICRECOMP_NO_FALLBACK_JIT=1`), which is required on Apple Silicon
-because the fallback JIT otherwise takes over execution (yield hook is
-Jit64-only).
+RMS > 40. The 2026-08-08 desktop rows used `moderngekko-run` in iOS-parity
+mode (`STATICRECOMP_NO_FALLBACK_JIT=1`) because the then-unfixed fallback JIT
+took over execution. The ARM64 handoff was repaired on 2026-08-13.
 
 | Check | Result | Evidence |
 |---|---|---|
@@ -257,6 +256,16 @@ Jit64-only).
 | Desktop parity, unfixed, ~7% speed (E-cores) | Producer complete in virtual time | 20.7 s virtual captured over 300 s wall, content matches full-speed run |
 | iOS Simulator app, fixed core | **Pass** | 92.8% loud over 139 s, boot → title → attract; iPhone 17 Pro sim |
 | Physical iPad re-acceptance | **Open** | requires `scripts/ios-build-core-device.sh` rebuild + on-device run |
+
+## ARM64 static-recomp fallback repair (2026-08-13)
+
+The exact two-file backport of ExpansionPak/RecompCore PR #6 was compiled and
+linked against SunPad's pinned, patched Release runtime. Ten-second headless
+runs changed the shutdown signature from `native=682` to `native=191555041`;
+the no-JIT parity control recorded `native=192451095 fallback=128616`. A short
+Metal run loaded the GMSE01 module and shut down cleanly with
+`native=193808714`. These are execution-path smoke tests; plaza, objective,
+save/reload, controller, and extended-session acceptance remain open.
 
 ## Stage 1 desktop checklist
 

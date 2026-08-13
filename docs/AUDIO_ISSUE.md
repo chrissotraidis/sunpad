@@ -46,16 +46,21 @@ Producer-side captures via Dolphin's `[DSP] DumpAudio` (`dspdump.wav`,
 | Desktop, parity mode, unfixed, CPU throttled to ~7% real-time (E-cores) | module-dominant | producer stream still complete in virtual time — slowness alone does not silence the producer |
 | **iOS Simulator app, fixed core** (no JIT, full iOS audio stack) | module-dominant | **continuous audio, 92.8% loud over 139 s, boot → title → attract** |
 
-## Why desktop never showed this
+## Why desktop did not show this before the ARM64 handoff repair
 
-The fallback JIT's yield hook (`StaticRecompShouldYieldAt`) is only wired
-into the **Jit64 (x86)** dispatcher. On Apple Silicon, JitArm64 never yields
-back to the module, so every previous desktop "static recomp" run silently
-executed almost entirely in Dolphin's JIT — with the JIT's correct timebase.
-Only iOS (which builds no JIT) actually ran the module, which is why the
-symptom looked iOS-only. `STATICRECOMP_NO_FALLBACK_JIT=1` now exposes the
-honest module + interpreter contract on desktop. Wiring the yield hook into
-JitArm64 is separate follow-up work.
+The fallback JIT's yield hook (`StaticRecompShouldYieldAt`) was wired only
+into the **Jit64 (x86)** dispatcher. On Apple Silicon, JitArm64 did not yield
+back to the module, so earlier desktop "static recomp" runs silently executed
+almost entirely in Dolphin's JIT — with the JIT's correct timebase. Only iOS
+(which builds no JIT) actually ran the module, which is why the symptom looked
+iOS-only. `STATICRECOMP_NO_FALLBACK_JIT=1` exposed the honest module plus
+interpreter contract on desktop.
+
+This historical gap was repaired on 2026-08-13 by carrying the two-file fix
+from ExpansionPak/RecompCore PR #6. JitArm64 now disables fallback block
+linking, asks StaticRecomp whether the next address is covered, stores the live
+guest PC, and yields back to the AOT module. The no-JIT environment switch
+remains available for iOS-parity investigation.
 
 ## Reassessment of the 2026-08-06/07 device evidence
 

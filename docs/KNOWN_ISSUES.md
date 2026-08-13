@@ -1,6 +1,6 @@
 # Known Issues
 
-Last updated: 2026-08-11
+Last updated: 2026-08-13
 
 ## iOS / iPadOS
 
@@ -129,13 +129,6 @@ Last updated: 2026-08-11
 
 ## Desktop Stage 1 gaps
 
-0. **Fallback JIT hogs execution on Apple Silicon** — the JIT-to-module
-   yield hook (`StaticRecompShouldYieldAt`) is only wired into the Jit64
-   (x86) dispatcher, so on arm64 desktops the fallback JitArm64 takes over
-   at the first non-module address and never returns; prior desktop
-   "static recomp" evidence mostly exercised Dolphin's JIT. Run with
-   `STATICRECOMP_NO_FALLBACK_JIT=1` for the true module + interpreter
-   contract (matches iOS). Wiring the yield hook into JitArm64 is open work.
 1. **Input path not fully proven** — pipe input advances menus, but the
    file-select cursor interaction was worked around rather than cleanly
    understood; interactive plaza/objective/save gates remain open.
@@ -145,6 +138,11 @@ Last updated: 2026-08-11
 
 ## Resolved / non-blocking observations
 
+- **ARM64 fallback handoff repaired (2026-08-13)** — the two-file fix from
+  ExpansionPak/RecompCore PR #6 disables fallback block linking, checks
+  `StaticRecompShouldYieldAt` in the JitArm64 dispatcher, and stores the guest
+  PC before returning to the AOT module. Focused headless and Metal runs reached
+  more than 191 million native dispatches instead of the old 682 signature.
 - ModernGekko first configure needed dolphin Externals initialized.
 - Module C compile at `-O2` takes ~15-25 minutes (desktop and simulator).
 - Early "exit immediately" desktop launches were process-termination

@@ -84,7 +84,7 @@ Conclusion for SunPad planning:
 | Generated host code | Local DolRecomp output derived from a user disc; not redistributed |
 | Compatibility runtime / HLE services | Host replacements for GameCube hardware/OS services (GX, audio, disc, PAD, etc.) |
 | Emulation-derived runtime | Dolphin-lineage components still providing hardware/OS behavior |
-| JIT | Runtime translation of guest code; **forbidden** as the product CPU path on Apple targets |
+| JIT | Runtime translation of guest code; forbidden on iOS/iPadOS, and allowed only as fallback outside covered AOT regions on macOS |
 
 ## Selected Stage 1 path
 

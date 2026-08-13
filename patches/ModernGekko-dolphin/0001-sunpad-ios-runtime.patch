@@ -1,5 +1,5 @@
 From: SunPad contributors
-Subject: [PATCH] Add the complete SunPad iOS runtime integration
+Subject: [PATCH] Add the complete SunPad Apple runtime integration
 
 This snapshot captures every reviewed local Dolphin change required by SunPad.
 
@@ -980,4 +980,111 @@ index 0000000000..e87afbdc91
 +  return 0.0;
 +}
 +}  // namespace GCAdapter
-
+diff --git a/Source/Core/Core/PowerPC/JitArm64/JitArm64_Cache.cpp b/Source/Core/Core/PowerPC/JitArm64/JitArm64_Cache.cpp
+index b59915ab1b..83c21ce0ea 100644
+--- a/Source/Core/Core/PowerPC/JitArm64/JitArm64_Cache.cpp
++++ b/Source/Core/Core/PowerPC/JitArm64/JitArm64_Cache.cpp
+@@ -3,6 +3,8 @@
+ 
+ #include "Core/PowerPC/JitArm64/Jit.h"
+ 
++#include <cstdlib>
++
+ #include <cstdio>
+ #include <optional>
+ #include <span>
+@@ -79,9 +81,32 @@ void JitArm64::Init()
+   GenerateAsmAndResetFreeMemoryRanges();
+ }
+ 
++
++// On by default, matching x86-64 where StaticRecomp is already the default CPU
++// core. Set MODERNGEKKO_ARM64_STATICRECOMP=0 to run Dolphin's JitArm64 instead.
++// Shared with JitAsm.cpp: both the block-linking policy and the dispatcher hook
++// must agree, and reading the variable in each translation unit separately
++// would let them disagree if one were ever changed alone.
++bool JitArm64StaticRecompEnabled()
++{
++  static const bool enabled = [] {
++    const char* v = std::getenv("MODERNGEKKO_ARM64_STATICRECOMP");
++    return !v || !*v || *v != '0';
++  }();
++  return enabled;
++}
++
+ void JitArm64::SetBlockLinkingEnabled(bool enabled)
+ {
+-  jo.enableBlocklink = enabled && !SConfig::GetInstance().bJITNoBlockLinking;
++  // As the StaticRecomp fallback, blocks must not link to each other. Linked
++  // blocks chain without returning to the dispatcher, so control would never
++  // get back to StaticRecompCore to check whether the recompiled module covers
++  // the next address -- which is exactly why the module was entered once at
++  // boot and never again on arm64. Jit64 has always done this; JitArm64 did
++  // not, which made the whole static recompilation inert on Apple Silicon.
++  jo.enableBlocklink =
++      enabled && !SConfig::GetInstance().bJITNoBlockLinking &&
++      !(IsStaticRecompFallback() && JitArm64StaticRecompEnabled());
+ }
+ 
+ void JitArm64::SetOptimizationEnabled(bool enabled)
+diff --git a/Source/Core/Core/PowerPC/JitArm64/JitAsm.cpp b/Source/Core/Core/PowerPC/JitArm64/JitAsm.cpp
+index a65fd33a8f..c8def7a124 100644
+--- a/Source/Core/Core/PowerPC/JitArm64/JitAsm.cpp
++++ b/Source/Core/Core/PowerPC/JitArm64/JitAsm.cpp
+@@ -2,6 +2,9 @@
+ // SPDX-License-Identifier: GPL-2.0-or-later
+ 
+ #include "Core/PowerPC/JitArm64/Jit.h"
++#include "Core/PowerPC/StaticRecomp/StaticRecompCore.h"
++
++#include <cstdlib>
+ 
+ #include <bit>
+ #include <limits>
+@@ -28,6 +31,11 @@
+ 
+ using namespace Arm64Gen;
+ 
++
++// Defined in JitArm64_Cache.cpp. The block-linking policy there and the
++// dispatcher hook below must make the same decision, so they share one reader.
++bool JitArm64StaticRecompEnabled();
++
+ void JitArm64::GenerateAsm()
+ {
+   const Common::ScopedJITPageWriteAndNoExecute enable_jit_page_writes;
+@@ -96,6 +104,25 @@ void JitArm64::GenerateAsm()
+ 
+   dispatcher_no_check = GetCodePtr();
+ 
++  // Ask StaticRecompCore whether the recompiled module wants this address
++  // before falling into the JIT's own block lookup. A non-zero answer leaves
++  // the dispatcher so the module can run it. DISPATCHER_PC (W26) and PPC_REG
++  // (X29) are callee-saved under AAPCS64, so they survive the call.
++  FixupBranch static_recomp_exit;
++  const bool static_recomp_yield = IsStaticRecompFallback() && JitArm64StaticRecompEnabled();
++  if (static_recomp_yield)
++  {
++    ABI_CallFunction(&StaticRecompShouldYieldAt, DISPATCHER_PC);
++    // Write the PC back before we can leave. JitArm64 keeps the PC in
++    // DISPATCHER_PC (W26) and only spills it to PPCSTATE at do_timing, which
++    // this exit path bypasses -- so StaticRecompCore was resuming from a stale
++    // ppcState.pc and dispatching the module at the wrong address. Jit64's
++    // identical hook is safe only because x86 keeps the PC in memory
++    // throughout. This is the one place the two JITs are not interchangeable.
++    STR(IndexType::Unsigned, DISPATCHER_PC, PPC_REG, PPCSTATE_OFF(pc));
++    static_recomp_exit = CBNZ(ARM64Reg::W0);
++  }
++
+   bool assembly_dispatcher = true;
+ 
+   if (assembly_dispatcher)
+@@ -225,6 +252,8 @@ void JitArm64::GenerateAsm()
+ 
+   dispatcher_exit = GetCodePtr();
+   SetJumpTarget(exit);
++  if (static_recomp_yield)
++    SetJumpTarget(static_recomp_exit);
+ 
+   // Reset the stack pointer, since the BLR optimization may have pushed things onto the stack
+   // without popping them.

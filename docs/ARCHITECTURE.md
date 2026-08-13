@@ -43,9 +43,11 @@ sunpad/
 - Preferred: AOT statically recompiled guest code module (DolRecomp C →
   host-native module).
 - Allowed: Dolphin-derived compatibility services for hardware/OS.
-- Forbidden on Apple platforms: runtime PowerPC JIT. On iOS the static-recomp
-  fallback uses the interpreter, and the generic software vertex loader
-  replaces Dolphin's ARM64 code-generating loader.
+- macOS: JitArm64 may execute uncovered fallback code, but its dispatcher must
+  yield back whenever the AOT module covers the next address.
+- iOS/iPadOS: runtime PowerPC JIT is forbidden. Static-recomp fallback uses the
+  interpreter, and the generic software vertex loader replaces Dolphin's ARM64
+  code-generating loader.
 
 ## iOS host layering
 
