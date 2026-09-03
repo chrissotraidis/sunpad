@@ -26,6 +26,7 @@ plutil -lint apple/ios/Info.plist apple/macos/Info.plist
 ./tests/test-ios-staticrecomp-config.sh
 ./tests/test-tvos-core-config.sh
 ./tests/test-tvos-shell.sh
+./tests/test-tvos-controller.sh
 ./tests/test-tvos-runtime-app.sh
 ./tests/test-generated-gmse01-audit.sh
 ./tests/test-widescreen-heatwave-fix.sh

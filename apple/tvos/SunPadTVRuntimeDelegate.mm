@@ -3,6 +3,7 @@
 
 #import "SunPadCoreHost.h"
 #import "SunPadDiagnostics.h"
+#import "SunPadTVControllerManager.h"
 
 @interface SunPadTVViewController : UIViewController
 @property(nonatomic, strong) UILabel *statusLabel;
@@ -16,6 +17,7 @@
 @end
 
 static SunPadCoreHost *SunPadTVRuntimeHost;
+static SunPadTVControllerManager *SunPadTVControllerInput;
 
 static NSString *SunPadTVSupportRoot(void) {
     NSArray<NSString *> *paths = NSSearchPathForDirectoriesInDomains(
@@ -39,6 +41,8 @@ static void SunPadTVSetStatus(SunPadTVViewController *controller,
 }
 
 static void SunPadTVStopRuntime(void) {
+    [SunPadTVControllerInput stop];
+    SunPadTVControllerInput = nil;
     SunPadCoreHost *host = SunPadTVRuntimeHost;
     SunPadTVRuntimeHost = nil;
     [host stop];
@@ -76,6 +80,8 @@ static void SunPadTVStartRuntime(SunPadTVViewController *controller) {
     SunPadCoreHost *host = [[SunPadCoreHost alloc]
         initWithLayer:(CAMetalLayer *)layer];
     SunPadTVRuntimeHost = host;
+    SunPadTVControllerInput = [[SunPadTVControllerManager alloc] initWithHost:host];
+    [SunPadTVControllerInput start];
     __weak SunPadTVViewController *weakController = controller;
     [host startWithGameRoot:gameRoot
               discImagePath:@""
@@ -103,15 +109,18 @@ static void SunPadTVStartRuntime(SunPadTVViewController *controller) {
 - (void)sceneDidBecomeActive:(UIScene *)scene {
     (void)scene;
     [SunPadTVRuntimeHost resumeRuntimeAfterSystemEvent];
+    [SunPadTVControllerInput activate];
 }
 
 - (void)sceneWillResignActive:(UIScene *)scene {
     (void)scene;
+    [SunPadTVControllerInput deactivate];
     [SunPadTVRuntimeHost pauseRuntimeForSystemEvent];
 }
 
 - (void)sceneDidEnterBackground:(UIScene *)scene {
     (void)scene;
+    [SunPadTVControllerInput deactivate];
     [SunPadTVRuntimeHost pauseRuntimeForSystemEvent];
 }
 

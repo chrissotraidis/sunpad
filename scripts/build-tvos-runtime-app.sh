@@ -75,7 +75,9 @@ COMPILE_FLAGS=(
 SOURCES=(
   "$ROOT/apple/tvos/SunPadTVAppDelegate.mm"
   "$ROOT/apple/tvos/SunPadTVRuntimeDelegate.mm"
+  "$ROOT/apple/tvos/SunPadTVControllerManager.mm"
   "$ROOT/apple/ios/SunPadCoreHost.mm"
+  "$ROOT/apple/shared/SunPadControllerMapping.mm"
   "$ROOT/apple/shared/SunPadDiagnostics.mm"
   "$ROOT/apple/shared/SunPadInputPipeEncoder.mm"
   "$ROOT/apple/shared/SunPadSettings.mm"
@@ -113,6 +115,12 @@ xcrun --sdk "$SDK" clang++ \
   -Xlinker -weak_framework -Xlinker CoreHaptics \
   -lz -lbz2 -liconv -lresolv -lcompression -lm \
   -o "$APP/SunPadTV"
+
+personal_path_prefix="/Users"
+if strings -a "$APP/SunPadTV" | grep -Fq "$personal_path_prefix/"; then
+  echo "tvOS runtime app contains a personal absolute path" >&2
+  exit 1
+fi
 
 cp "$ROOT/apple/tvos/Info.plist" "$APP/Info.plist"
 cp "$ROOT/apple/tvos/PrivacyInfo.xcprivacy" "$APP/PrivacyInfo.xcprivacy"
