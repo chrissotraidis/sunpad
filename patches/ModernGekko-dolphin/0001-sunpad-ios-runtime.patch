@@ -8,8 +8,8 @@ index 9f837eca31..355fe8f86b 100644
  
 -if(NOT (WIN32 AND _M_ARM_64))
 -  # OpenGL is available on all platforms except windows-arm64
-+if(NOT (WIN32 AND _M_ARM_64) AND NOT CMAKE_SYSTEM_NAME STREQUAL "iOS")
-+  # OpenGL is available on all platforms except windows-arm64 and iOS
++if(NOT (WIN32 AND _M_ARM_64) AND NOT (CMAKE_SYSTEM_NAME STREQUAL "iOS" OR CMAKE_SYSTEM_NAME STREQUAL "tvOS"))
++  # OpenGL is available on all platforms except windows-arm64 and Apple mobile
 +  # (Metal-only there; the AGL/EGL interfaces are not built).
    add_definitions(-DHAS_OPENGL)
  endif()
@@ -19,7 +19,7 @@ index 9f837eca31..355fe8f86b 100644
  endif()
  
 -if(NOT ANDROID)
-+if(NOT ANDROID AND NOT CMAKE_SYSTEM_NAME STREQUAL "iOS")
++if(NOT ANDROID AND NOT (CMAKE_SYSTEM_NAME STREQUAL "iOS" OR CMAKE_SYSTEM_NAME STREQUAL "tvOS"))
    dolphin_find_optional_system_library(LibUSB Externals/libusb)
    add_definitions(-D__LIBUSB__)
  endif()
@@ -28,7 +28,7 @@ index 9f837eca31..355fe8f86b 100644
  dolphin_find_optional_system_library(CURL Externals/curl)
  
 -if(NOT ANDROID)
-+if(NOT ANDROID AND NOT CMAKE_SYSTEM_NAME STREQUAL "iOS")
++if(NOT ANDROID AND NOT (CMAKE_SYSTEM_NAME STREQUAL "iOS" OR CMAKE_SYSTEM_NAME STREQUAL "tvOS"))
    dolphin_find_optional_system_library(HIDAPI Externals/hidapi)
  endif()
  
@@ -40,7 +40,7 @@ index 8ec653ac76..a622c9daaf 100644
  #include <fmt/format.h>
  
  #include "AudioCommon/AlsaSoundStream.h"
-+#if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
++#if defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) || defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__)
 +#include "AudioCommon/CoreAudioSoundStream.h"
 +#endif
  #include "AudioCommon/CubebStream.h"
@@ -50,7 +50,7 @@ index 8ec653ac76..a622c9daaf 100644
  
  static std::unique_ptr<SoundStream> CreateSoundStreamForBackend(std::string_view backend)
  {
-+#if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
++#if defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) || defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__)
 +  if (backend == BACKEND_COREAUDIO && CoreAudioSound::IsValid())
 +    return std::make_unique<CoreAudioSound>();
 +  else
@@ -62,7 +62,7 @@ index 8ec653ac76..a622c9daaf 100644
  
  std::string GetDefaultSoundBackend()
  {
-+#if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
++#if defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) || defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__)
 +  return BACKEND_COREAUDIO;
 +#endif
  #if defined(ANDROID)
@@ -72,7 +72,7 @@ index 8ec653ac76..a622c9daaf 100644
    std::vector<std::string> backends;
  
    backends.emplace_back(BACKEND_NULLSOUND);
-+#if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
++#if defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) || defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__)
 +  if (CoreAudioSound::IsValid())
 +    backends.emplace_back(BACKEND_COREAUDIO);
 +#endif
@@ -87,7 +87,7 @@ index 2564448380..1e3a5de933 100644
    WaveFile.h
  )
  
-+if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
++if(CMAKE_SYSTEM_NAME STREQUAL "iOS" OR CMAKE_SYSTEM_NAME STREQUAL "tvOS")
 +  target_sources(audiocommon PRIVATE
 +    CoreAudioSoundStream.cpp
 +    CoreAudioSoundStream.h
@@ -114,7 +114,7 @@ index a57b6024b7..a3a89d59be 100644
 +                 static_cast<std::size_t>(MAX_GRANULE_QUEUE_SIZE));
 +  m_granule_queue_size.store(buffer_size_granules, std::memory_order_relaxed);
 +
-+#if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
++#if defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) || defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__)
 +  // Static-recompiled games can deliver DSP samples a fraction slower than
 +  // wall clock during brief CPU/GPU contention. Keep the iOS DSP queue near
 +  // half full by making a very small resampling correction instead of
@@ -171,7 +171,7 @@ index a57b6024b7..a3a89d59be 100644
    std::size_t next_tail = (tail + 1) & GRANULE_QUEUE_MASK;
    if (next_tail == head)
    {
-+#if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
++#if defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) || defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__)
 +    // Preserve the true queue position on iOS so the adaptive rate above can
 +    // recover. Rewinding into old granules makes music sound selectively
 +    // muted as Dolphin's gap filler repeatedly fades the replayed data.
@@ -217,7 +217,7 @@ index 807dca300d..6a8db9ca26 100644
    WorkQueueThread.h
  )
  
-+if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
++if(CMAKE_SYSTEM_NAME STREQUAL "iOS" OR CMAKE_SYSTEM_NAME STREQUAL "tvOS")
 +  # e-dant/watcher uses macOS-only FSEvents on Apple platforms, which is not
 +  # available on the iOS device SDK; provide a linkable no-op.
 +  target_sources(common PRIVATE FilesystemWatcher_iOS.cpp)
@@ -233,7 +233,7 @@ index 807dca300d..6a8db9ca26 100644
      target_sources(common PRIVATE CompatPatches.cpp)
    endif()
 -elseif(APPLE)
-+elseif(APPLE AND NOT CMAKE_SYSTEM_NAME STREQUAL "iOS")
++elseif(APPLE AND NOT (CMAKE_SYSTEM_NAME STREQUAL "iOS" OR CMAKE_SYSTEM_NAME STREQUAL "tvOS"))
    target_sources(common PRIVATE
      GL/GLInterface/AGL.h
      GL/GLInterface/AGL.mm
@@ -254,7 +254,7 @@ index 6d2853b42f..a4fe205e6b 100644
    //
    // The headers can be found under "Security" on opensource.apple.com:
    // Security/OSX/libsecurity_translocate/lib/SecTranslocate.h
-+#if !defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
++#if !defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) && !defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__)
    if (!s_security_framework.IsOpen())
    {
      s_security_framework.Open("/System/Library/Frameworks/Security.framework/Security");
@@ -270,7 +270,7 @@ index 6d2853b42f..a4fe205e6b 100644
  {
  #if defined(_WIN32) || defined(LINUX_LOCAL_DEV)
  #define SYSDATA_DIR "Sys"
-+#elif defined(__APPLE__) && defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
++#elif defined(__APPLE__) && (defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) || defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__))
 +#define SYSDATA_DIR "Sys"
  #elif defined __APPLE__
  #define SYSDATA_DIR "Contents/Resources/Sys"
@@ -284,7 +284,7 @@ index eef689616e..2414a9ed7f 100644
  {
    std::unique_ptr<GLContext> context;
 -#if defined(__APPLE__)
-+#if defined(__APPLE__) && !defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
++#if defined(__APPLE__) && !defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) && !defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__)
    if (wsi.type == WindowSystemType::MacOS || wsi.type == WindowSystemType::Headless)
      context = std::make_unique<GLContextAGL>();
  #endif
@@ -367,7 +367,7 @@ index 0d66890d2b..6bd19ea728 100644
  #include <stdio.h>
  #include <sys/mman.h>
 -#if defined(_M_ARM_64) && defined(__APPLE__)
-+#if defined(_M_ARM_64) && defined(__APPLE__) && !defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
++#if defined(_M_ARM_64) && defined(__APPLE__) && !defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) && !defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__)
  #include <pthread.h>
  #endif
  #if defined __APPLE__ || defined __FreeBSD__ || defined __OpenBSD__ || defined __NetBSD__
@@ -376,7 +376,7 @@ index 0d66890d2b..6bd19ea728 100644
  void JITPageWriteEnableExecuteDisable()
  {
 -#if defined(_M_ARM_64) && defined(__APPLE__)
-+#if defined(_M_ARM_64) && defined(__APPLE__) && !defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
++#if defined(_M_ARM_64) && defined(__APPLE__) && !defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) && !defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__)
    if (JITPageWriteNestCounter() == 0)
    {
      pthread_jit_write_protect_np(0);
@@ -385,10 +385,52 @@ index 0d66890d2b..6bd19ea728 100644
      PanicAlertFmt("JITPageWriteNestCounter() underflowed");
  
 -#if defined(_M_ARM_64) && defined(__APPLE__)
-+#if defined(_M_ARM_64) && defined(__APPLE__) && !defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
++#if defined(_M_ARM_64) && defined(__APPLE__) && !defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) && !defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__)
    if (JITPageWriteNestCounter() == 0)
    {
      pthread_jit_write_protect_np(1);
+diff --git a/Source/Core/Core/MemTools.cpp b/Source/Core/Core/MemTools.cpp
+index f66aca2e0e..f8f4c84cb1 100644
+--- a/Source/Core/Core/MemTools.cpp
++++ b/Source/Core/Core/MemTools.cpp
+@@ -22,7 +22,8 @@
+ #ifdef _WIN32
+ #include "Common/Assert.h"
+ #endif
+-#if defined(__APPLE__) && !defined(USE_SIGACTION_ON_APPLE)
++#if defined(__APPLE__) && !defined(USE_SIGACTION_ON_APPLE) && \
++    !defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__)
+ #include "Common/Thread.h"
+ #endif
+ 
+@@ -120,7 +121,8 @@ bool IsExceptionHandlerSupported()
+   return true;
+ }
+ 
+-#elif defined(__APPLE__) && !defined(USE_SIGACTION_ON_APPLE)
++#elif defined(__APPLE__) && !defined(USE_SIGACTION_ON_APPLE) && \
++    !defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__)
+ 
+ static void CheckKR(const char* name, kern_return_t kr)
+ {
++@@ -256,6 +258,21 @@ bool IsExceptionHandlerSupported()
++
++#elif defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__)
++
++void InstallExceptionHandler()
++{
++}
++
++void UninstallExceptionHandler()
++{
++}
++
++bool IsExceptionHandlerSupported()
++{
++  return false;
++}
++
+ #elif defined(_POSIX_VERSION) && !defined(_M_GENERIC)
 diff --git a/Source/Core/Core/CMakeLists.txt b/Source/Core/Core/CMakeLists.txt
 index e087034ca6..099f891f6e 100644
 --- a/Source/Core/Core/CMakeLists.txt
@@ -406,7 +448,7 @@ index e087034ca6..099f891f6e 100644
    Wii/WiiUtils.h
  )
  
-+if(NOT CMAKE_SYSTEM_NAME STREQUAL "iOS")
++if(NOT (CMAKE_SYSTEM_NAME STREQUAL "iOS" OR CMAKE_SYSTEM_NAME STREQUAL "tvOS"))
 +  target_sources(core PRIVATE
 +    USB/LibusbUtils.cpp
 +    USB/LibusbUtils.h
@@ -447,7 +489,7 @@ index ed47204d2f..743bd5c6d3 100644
 +  // (module + interpreter only) on desktop for parity testing.
 +  if (!std::getenv("STATICRECOMP_NO_FALLBACK_JIT"))
 +  {
-+#if defined(_M_ARM_64) && !defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
++#if defined(_M_ARM_64) && !defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) && !defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__)
 +    m_fallback_jit = std::make_unique<JitArm64>(m_system);
  #elif defined(_M_X86_64)
 -  m_fallback_jit = std::make_unique<Jit64>(m_system);
@@ -542,7 +584,7 @@ index ddf8c30cf4..e70d6364e4 100644
    DynamicInputTextures/DITSpecification.h
  )
  
-+if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
++if(CMAKE_SYSTEM_NAME STREQUAL "iOS" OR CMAKE_SYSTEM_NAME STREQUAL "tvOS")
 +  target_sources(inputcommon PRIVATE GCAdapter_iOS.cpp)
 +else()
 +  target_sources(inputcommon PRIVATE GCAdapter.cpp)
@@ -556,7 +598,7 @@ index ddf8c30cf4..e70d6364e4 100644
    endif()
    target_link_libraries(inputcommon PRIVATE cfgmgr32.lib dinput8.lib dxguid.lib)
 -elseif(APPLE)
-+elseif(APPLE AND NOT CMAKE_SYSTEM_NAME STREQUAL "iOS")
++elseif(APPLE AND NOT (CMAKE_SYSTEM_NAME STREQUAL "iOS" OR CMAKE_SYSTEM_NAME STREQUAL "tvOS"))
    target_sources(inputcommon PRIVATE
      ControllerInterface/Quartz/Quartz.h
      ControllerInterface/Quartz/Quartz.mm
@@ -578,7 +620,7 @@ index 8f7f4baf40..62cdc9183d 100644
  #define CIFACE_USE_XLIB
  #endif
 -#if defined(__APPLE__)
-+#if defined(__APPLE__) && !defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
++#if defined(__APPLE__) && !defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) && !defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__)
  #define CIFACE_USE_OSX
  #endif
  #if defined(HAVE_LIBEVDEV) && defined(HAVE_LIBUDEV)
@@ -591,7 +633,7 @@ index 01dc87bc1e..3bf649aaf1 100644
  #endif
  
 -#ifdef __APPLE__
-+#if defined(__APPLE__) && !defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
++#if defined(__APPLE__) && !defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) && !defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__)
  #include <IOKit/pwr_mgt/IOPMLib.h>
  #endif
  
@@ -600,7 +642,7 @@ index 01dc87bc1e..3bf649aaf1 100644
  #endif
  
 -#ifdef __APPLE__
-+#if defined(__APPLE__) && !defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
++#if defined(__APPLE__) && !defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) && !defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__)
    static IOPMAssertionID s_power_assertion = kIOPMNullAssertionID;
    if (inhibit)
    {
@@ -688,6 +730,14 @@ index 9298c5b8ac..4b076be9f3 100644
  }
  
  void Metal::Util::PopulateBackendInfoAdapters(BackendInfo* backend_info,
+@@ -553,6 +557,6 @@
+ #if TARGET_OS_OSX
+   options.platform = spirv_cross::CompilerMSL::Options::macOS;
+-#elif TARGET_OS_IOS
++#elif TARGET_OS_IOS || TARGET_OS_TV
+   options.platform = spirv_cross::CompilerMSL::Options::iOS;
+   // Otherwise SPIRV-Cross will try to compile subgroup ops to quad ops instead
+   // (And crash because there's no quad_min or quad_max)
 diff --git a/Source/Core/AudioCommon/CoreAudioSoundStream.cpp b/Source/Core/AudioCommon/CoreAudioSoundStream.cpp
 new file mode 100644
 index 0000000000..88b6e5cd29

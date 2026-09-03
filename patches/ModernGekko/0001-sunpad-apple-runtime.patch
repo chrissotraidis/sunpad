@@ -9,9 +9,9 @@ index bedf947..9c0413c 100644
 -    # Cubeb is Dolphin's only audio backend on macOS
 -    if(APPLE OR WIN32)
 +    # Cubeb is Dolphin's only audio backend on macOS; its audiounit backend
-+    # uses macOS-only CoreAudio APIs, so iOS builds (SunPad provides its own
++    # uses macOS-only CoreAudio APIs, so Apple mobile builds (SunPad provides its own
 +    # AVAudioEngine backend) keep cubeb off.
-+    if((APPLE AND NOT CMAKE_SYSTEM_NAME STREQUAL "iOS") OR WIN32)
++    if((APPLE AND NOT (CMAKE_SYSTEM_NAME STREQUAL "iOS" OR CMAKE_SYSTEM_NAME STREQUAL "tvOS")) OR WIN32)
          set(ENABLE_CUBEB ON CACHE BOOL "" FORCE)
      else()
          set(ENABLE_CUBEB OFF CACHE BOOL "" FORCE)
@@ -20,8 +20,8 @@ index bedf947..9c0413c 100644
          target_link_libraries(moderngekko PRIVATE dwmapi)
      endif()
 -    if(APPLE)
-+    if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
-+        # SunPad's CAMetalLayer platform for iOS (no macOS windowing APIs)
++    if(CMAKE_SYSTEM_NAME STREQUAL "iOS" OR CMAKE_SYSTEM_NAME STREQUAL "tvOS")
++        # SunPad's CAMetalLayer platform for Apple mobile targets (no macOS windowing APIs)
 +        target_sources(moderngekko PRIVATE
 +            vendor/dolphin/Source/Core/DolphinNoGUI/PlatformIOS.mm)
 +        set_source_files_properties(
@@ -102,7 +102,7 @@ index af75a25..fd9c1a1 100644
 +  // below 1.0 reduces emulated CPU work and may change guest timing.
 +  std::optional<float> emulated_cpu_clock_scale;
    std::optional<std::string> window_title;
-+  // Host-provided render surface (a CAMetalLayer on iOS). The platform hands
++  // Host-provided render surface (a CAMetalLayer on Apple mobile). The platform hands
 +  // this to the video backend as WindowSystemInfo::render_surface.
 +  void* render_surface = nullptr;
 +  // Optional bounded warning/error sink supplied by an embedding frontend.
@@ -383,7 +383,7 @@ index 981e098..e0c7bfc 100644
                    ShaderCompilationMode::AsynchronousUberShaders);
    Config::SetBase(Config::GFX_WAIT_FOR_SHADERS_BEFORE_STARTING, true);
 +#ifdef MODERNGEKKO_HAVE_IOS
-+  // Dolphin's ARM64 vertex loader generates executable host code. iOS forbids
++  // Dolphin's ARM64 vertex loader generates executable host code. Apple mobile forbids
 +  // that JIT path, so use the portable software vertex loader.
 +  Config::SetBase(Config::GFX_VERTEX_LOADER_TYPE, VertexLoaderType::Software);
 +  // Favor uninterrupted playback over the lower-latency desktop default.

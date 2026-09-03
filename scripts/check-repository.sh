@@ -24,6 +24,7 @@ plutil -lint apple/ios/Info.plist apple/macos/Info.plist
 ./tests/test-experimental-60fps-config.sh
 ./tests/test-experimental-performance-config.sh
 ./tests/test-ios-staticrecomp-config.sh
+./tests/test-tvos-core-config.sh
 ./tests/test-generated-gmse01-audit.sh
 ./tests/test-widescreen-heatwave-fix.sh
 ./tests/test-diagnostics.sh
