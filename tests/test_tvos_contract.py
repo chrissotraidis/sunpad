@@ -40,7 +40,15 @@ class TvOSContractTests(unittest.TestCase):
         self.assertIn('stringByAppendingPathComponent:@"gGMSE01_recomp.dylib"', host)
         self.assertIn("13934c863d649b1ddca1ca4d7748f49d28a571685cbee5fb1542545c32869955", host)
         self.assertIn("settings.renderScale = 1", host)
-        self.assertIn("settings.aspectRatioMode = SunPadAspectRatioOriginal", host)
+        self.assertIn("settings.aspectRatioMode = SunPadAspectRatioWidescreen", host)
+        self.assertIn(
+            "config.enable_gmse01_widescreen = savedAspect != SunPadAspectRatioOriginal",
+            self.text("apple/ios/SunPadCoreHost.mm"),
+        )
+        self.assertIn(
+            "Config::SetCurrent(Config::GFX_WIDESCREEN_HACK, false)",
+            self.text("apple/ios/SunPadCoreHost.mm"),
+        )
         self.assertIn("settings.experimental60FPS = NO", host)
         self.assertIn("settings.experimentalPerformanceMode = NO", host)
         self.assertIn("SunPadInputMixer.sharedMixer", host)

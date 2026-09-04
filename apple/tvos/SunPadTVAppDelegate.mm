@@ -381,7 +381,7 @@ BOOL SunPadTVHasExtendedController(void) {
         withIntermediateDirectories:YES attributes:nil error:nil];
     SunPadSettings *settings = SunPadSettings.sharedSettings;
     settings.renderScale = 1;
-    settings.aspectRatioMode = SunPadAspectRatioOriginal;
+    settings.aspectRatioMode = SunPadAspectRatioWidescreen;
     settings.experimental60FPS = NO;
     settings.experimentalPerformanceMode = NO;
     [settings synchronize];
