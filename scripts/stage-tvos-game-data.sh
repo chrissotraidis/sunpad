@@ -24,8 +24,12 @@ done
   echo "sys/main.dol does not match GMSE01 USA revision 0" >&2
   exit 65
 }
-xcrun devicectl device copy to --device "$DEVICE" --source "$SOURCE_ROOT" \
-  --destination "Library/Caches/SunPad/GameData/GMSE01" \
+STAGING="$(mktemp -d "${TMPDIR:-/tmp}/sunpad-tvos-stage.XXXXXX")"
+trap 'rm -rf "$STAGING"' EXIT
+mkdir -p "$STAGING/SunPad/GameData"
+cp -cR "$SOURCE_ROOT" "$STAGING/SunPad/GameData/GMSE01"
+xcrun devicectl device copy to --device "$DEVICE" --source "$STAGING" \
+  --destination "Library/Caches" \
   --domain-type appDataContainer --domain-identifier "$BUNDLE_IDENTIFIER" \
   --remove-existing-content false
 echo "Staged validated GMSE01 data for SunPad on $DEVICE."
