@@ -529,6 +529,7 @@ extern "C" bool SunPadTVSetRumble(bool enabled) {
                  buttons:@[]];
         return;
     }
+#if !defined(SUNPAD_TVOS_ALLOW_CONTROLLERLESS_DIAGNOSTICS)
     [self reconcileController];
     if (!SunPadTVHasExtendedController()) {
         UIButton *find = [self buttonWithTitle:@"Find Controller" action:^{
@@ -544,6 +545,7 @@ extern "C" bool SunPadTVSetRumble(bool enabled) {
                  buttons:@[find]];
         return;
     }
+#endif
     [NSFileManager.defaultManager createDirectoryAtPath:SunPadTVSupportRoot()
         withIntermediateDirectories:YES attributes:nil error:nil];
     SunPadSettings *settings = SunPadSettings.sharedSettings;

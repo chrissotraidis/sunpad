@@ -67,6 +67,10 @@ class TvOSContractTests(unittest.TestCase):
         self.assertIn("status.triggerRight = input.trigger_r", patch)
         self.assertIn("status.isConnected = input.connected != 0", patch)
         self.assertIn("0002-sunpad-tvos-controller.patch", prepare)
+        self.assertIn(
+            "SUNPAD_TVOS_ALLOW_CONTROLLERLESS_DIAGNOSTICS",
+            self.text("apple/tvos/SunPadTVAppDelegate.mm"),
+        )
 
     def test_build_produces_core_and_tvos_module(self):
         build = self.text("scripts/tvos-build-core-device.sh")
