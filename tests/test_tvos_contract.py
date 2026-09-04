@@ -61,6 +61,7 @@ class TvOSContractTests(unittest.TestCase):
 
     def test_device_workflow_preserves_scope(self):
         stage = self.text("scripts/stage-tvos-game-data.sh")
+        smb_stage = self.text("scripts/stage-tvos-game-from-smb.sh")
         backup = self.text("scripts/backup-tvos-state.sh")
         diagnostics = self.text("scripts/collect-tvos-diagnostics.sh")
         self.assertIn("Library/Caches/SunPad/GameData/GMSE01", stage)
@@ -71,6 +72,10 @@ class TvOSContractTests(unittest.TestCase):
         self.assertNotIn("GameData", backup)
         self.assertIn("Library/Caches/SunPad/Logs", diagnostics)
         self.assertIn("<app-container>", diagnostics)
+        self.assertIn("mount_smbfs -N -o nobrowse,ro", smb_stage)
+        self.assertIn('"$ROOT/scripts/prepare-game.sh" "$disc"', smb_stage)
+        self.assertIn('"$ROOT/scripts/stage-tvos-game-data.sh"', smb_stage)
+        self.assertNotIn("192.168.", smb_stage)
 
     def test_layered_assets_have_expected_dimensions(self):
         base = Path("apple/tvos/Assets.xcassets/App Icon.brandassets")

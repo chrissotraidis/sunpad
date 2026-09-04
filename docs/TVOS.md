@@ -40,6 +40,21 @@ xcodebuild -project SunPad.xcodeproj -scheme SunPadTV -configuration Release \
 
 Package and audit the unsigned preview only after the app build succeeds.
 
+## Guest SMB staging
+
+To prepare and stage the supported image from a read-only guest SMB directory,
+use the same validated pipeline through the SMB wrapper:
+
+```sh
+./scripts/stage-tvos-game-from-smb.sh \
+  '<device-id-or-name>' \
+  'smb://nas/emulation/roms/gamecube'
+```
+
+The script mounts the share without credentials, copies the GMSE01 image
+locally, unmounts the share, and then invokes `prepare-game.sh` and
+`stage-tvos-game-data.sh`. It never writes to the share.
+
 ## Physical acceptance still required
 
 - Signed app installs and opens on a physical Apple TV.

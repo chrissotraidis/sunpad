@@ -36,6 +36,7 @@ test -x scripts/tvos-build-core-device.sh
 test -x scripts/prepare-tvos-dependencies.sh
 test -x scripts/tvos-provision-device.sh
 test -x scripts/stage-tvos-game-data.sh
+test -x scripts/stage-tvos-game-from-smb.sh
 test -x scripts/backup-tvos-state.sh
 test -x scripts/collect-tvos-diagnostics.sh
 test -x scripts/package-tvos.sh
