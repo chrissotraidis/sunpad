@@ -59,6 +59,24 @@ class TvOSContractTests(unittest.TestCase):
         self.assertNotIn("Xcode-27", build + provision)
         self.assertIn("platform +TVOS", provision)
 
+    def test_tvos_audio_decodes_dpl2_to_surround(self):
+        prepare = self.text("scripts/prepare-tvos-dependencies.sh")
+        runtime_patch = self.text(
+            "patches/ModernGekko/0002-sunpad-tvos-surround.patch"
+        )
+        audio_patch = self.text(
+            "patches/ModernGekko-dolphin/0002-sunpad-tvos-surround.patch"
+        )
+        self.assertIn("0002-sunpad-tvos-surround.patch", prepare)
+        self.assertIn("apply_patchset", prepare)
+        self.assertIn(".moderngekko-patchset", prepare)
+        self.assertIn(".dolphin-patchset", prepare)
+        self.assertIn("Config::MAIN_DPL2_DECODER, true", runtime_patch)
+        self.assertIn("MixSurround", audio_patch)
+        self.assertIn("kAudioChannelLayoutTag_MPEG_5_1_A", audio_patch)
+        self.assertIn("kAudioChannelLayoutTag_MPEG_5_0_A", audio_patch)
+        self.assertIn("m_channels >= 5", audio_patch)
+
     def test_device_workflow_preserves_scope(self):
         stage = self.text("scripts/stage-tvos-game-data.sh")
         backup = self.text("scripts/backup-tvos-state.sh")

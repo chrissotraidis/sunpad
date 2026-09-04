@@ -43,15 +43,32 @@ git -C "$MG/vendor/dolphin/Externals/cubeb/cubeb" submodule update --init --recu
   exit 1
 }
 
-apply_once() {
-  local checkout=$1 patch=$2
-  if git -C "$checkout" apply --reverse --check "$patch" >/dev/null 2>&1; then
+apply_patchset() {
+  local checkout=$1 marker=$2
+  shift 2
+  local patches=("$@")
+  local fingerprint current
+  fingerprint="$(shasum -a 256 "${patches[@]}" | shasum -a 256 | awk '{print $1}')"
+  current="$(git -C "$checkout" diff --ignore-submodules=all | shasum -a 256 | awk '{print $1}')"
+  if [[ -f "$marker" && "$(<"$marker")" = "$fingerprint $current" ]]; then
     return
   fi
-  git -C "$checkout" apply --check "$patch"
-  git -C "$checkout" apply "$patch"
+  if ! git -C "$checkout" diff --ignore-submodules=all --quiet; then
+    echo "unexpected local changes in $checkout; remove $DEPENDENCY_ROOT and retry" >&2
+    exit 1
+  fi
+  local patch
+  for patch in "${patches[@]}"; do
+    git -C "$checkout" apply --check "$patch"
+    git -C "$checkout" apply "$patch"
+  done
+  current="$(git -C "$checkout" diff --ignore-submodules=all | shasum -a 256 | awk '{print $1}')"
+  printf '%s %s\n' "$fingerprint" "$current" >"$marker"
 }
-apply_once "$MG" "$ROOT/patches/ModernGekko/0001-sunpad-apple-runtime.patch"
-apply_once "$MG/vendor/dolphin" \
-  "$ROOT/patches/ModernGekko-dolphin/0001-sunpad-ios-runtime.patch"
+apply_patchset "$MG" "$DEPENDENCY_ROOT/.moderngekko-patchset" \
+  "$ROOT/patches/ModernGekko/0001-sunpad-apple-runtime.patch" \
+  "$ROOT/patches/ModernGekko/0002-sunpad-tvos-surround.patch"
+apply_patchset "$MG/vendor/dolphin" "$DEPENDENCY_ROOT/.dolphin-patchset" \
+  "$ROOT/patches/ModernGekko-dolphin/0001-sunpad-ios-runtime.patch" \
+  "$ROOT/patches/ModernGekko-dolphin/0002-sunpad-tvos-surround.patch"
 echo "Isolated tvOS dependencies are pinned and patched: $DEPENDENCY_ROOT"
