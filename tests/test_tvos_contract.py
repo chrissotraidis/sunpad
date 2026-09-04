@@ -70,6 +70,15 @@ class TvOSContractTests(unittest.TestCase):
 
     def test_tvos_rumble_teardown_is_owner_safe(self):
         host = self.text("apple/tvos/SunPadTVAppDelegate.mm")
+        setup = host.split(
+            "- (void)configureRumbleForController:(GCController *)controller {", 1
+        )[1].split(
+            "- (void)teardownRumble", 1
+        )[0]
+        self.assertLess(
+            setup.index("startAndReturnError"),
+            setup.index("createAdvancedPlayerWithPattern"),
+        )
         teardown = host.split("- (void)teardownRumble {", 1)[1].split(
             "- (BOOL)setRumbleEnabled:", 1
         )[0]

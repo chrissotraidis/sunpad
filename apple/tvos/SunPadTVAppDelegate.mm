@@ -406,7 +406,17 @@ extern "C" bool SunPadTVSetRumble(bool enabled) {
         NSError *error = nil;
         CHHapticEngine *engine = [controller.haptics
             createEngineWithLocality:GCHapticsLocalityDefault];
+        if (engine == nil) {
+            SunPadLog(@"controller haptics engine unavailable");
+            return;
+        }
         engine.playsHapticsOnly = YES;
+        if (![engine startAndReturnError:&error]) {
+            SunPadLog(@"controller haptics engine start failed domain=%@ code=%ld error=%@",
+                      error.domain ?: @"unknown", (long)error.code,
+                      error.localizedDescription ?: @"unknown");
+            return;
+        }
         NSArray<CHHapticEventParameter *> *eventParameters = @[
             [[CHHapticEventParameter alloc]
                 initWithParameterID:CHHapticEventParameterIDHapticIntensity
@@ -429,11 +439,12 @@ extern "C" bool SunPadTVSetRumble(bool enabled) {
         id<CHHapticAdvancedPatternPlayer> player = pattern == nil
             ? nil
             : [engine createAdvancedPlayerWithPattern:pattern error:&error];
-        if (engine == nil || player == nil ||
-            ![engine startAndReturnError:&error] ||
+        if (player == nil ||
             ![player startAtTime:CHHapticTimeImmediate error:&error]) {
-            SunPadLog(@"controller haptics unavailable error=%@",
+            SunPadLog(@"controller haptics player start failed domain=%@ code=%ld error=%@",
+                      error.domain ?: @"unknown", (long)error.code,
                       error.localizedDescription ?: @"unknown");
+            [engine stopWithCompletionHandler:nil];
             return;
         }
 
