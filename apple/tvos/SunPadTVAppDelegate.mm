@@ -474,6 +474,8 @@ extern "C" bool SunPadTVSetRumble(bool enabled) {
     __weak SunPadTVViewController *weakSelf = self;
     dispatch_async(_hapticsQueue, ^{
         SunPadTVViewController *strongSelf = weakSelf;
+        if (strongSelf == nil)
+            return;
         strongSelf->_hapticEngine.stoppedHandler =
             ^(CHHapticEngineStoppedReason reason) { (void)reason; };
         [strongSelf->_rumblePlayer stopAtTime:CHHapticTimeImmediate error:nil];

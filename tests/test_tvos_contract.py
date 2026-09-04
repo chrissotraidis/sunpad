@@ -72,6 +72,16 @@ class TvOSContractTests(unittest.TestCase):
             self.text("apple/tvos/SunPadTVAppDelegate.mm"),
         )
 
+    def test_tvos_rumble_teardown_is_owner_safe(self):
+        host = self.text("apple/tvos/SunPadTVAppDelegate.mm")
+        teardown = host.split("- (void)teardownRumble {", 1)[1].split(
+            "- (BOOL)setRumbleEnabled:", 1
+        )[0]
+        self.assertLess(
+            teardown.index("if (strongSelf == nil)"),
+            teardown.index("strongSelf->_hapticEngine"),
+        )
+
     def test_build_produces_core_and_tvos_module(self):
         build = self.text("scripts/tvos-build-core-device.sh")
         toolchain = self.text("scripts/tvos-device-toolchain.cmake")
