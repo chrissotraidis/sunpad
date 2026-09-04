@@ -3,9 +3,15 @@ set -euo pipefail
 
 ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
 MG="${SUNPAD_TVOS_MODERNGEKKO_ROOT:-$ROOT/build/tvos-deps/ModernGekko}"
-TVOS_BUILD="${SUNPAD_TVOS_BUILD:-$MG/build-tvos-appletvos-public}"
-MODULE="${SUNPAD_TVOS_MODULE_PATH:-/tmp/sunpad-module-tvos/gGMSE01_recomp.dylib}"
-OUT="${SUNPAD_TVOS_PROVISIONED_OUT:-$ROOT/apple/tvos/Provisioned/appletvos}"
+SDK="${SUNPAD_TVOS_SDK:-appletvos}"
+[[ "$SDK" = appletvos || "$SDK" = appletvsimulator ]] || {
+  echo "unsupported tvOS SDK: $SDK" >&2
+  exit 64
+}
+TVOS_BUILD="${SUNPAD_TVOS_BUILD:-$MG/build-tvos-$SDK-public}"
+MODULE_BUILD="${SUNPAD_TVOS_MODULE_BUILD:-/tmp/sunpad-module-tvos}"
+MODULE="${SUNPAD_TVOS_MODULE_PATH:-$MODULE_BUILD/gGMSE01_recomp.dylib}"
+OUT="${SUNPAD_TVOS_PROVISIONED_OUT:-$ROOT/apple/tvos/Provisioned/$SDK}"
 LIBS_DIR="$OUT/libs"
 
 [[ -d "$TVOS_BUILD" ]] || { echo "missing tvOS core build: $TVOS_BUILD" >&2; exit 1; }
@@ -60,5 +66,7 @@ done
 
 libtool -static -o "$LIBS_DIR/libSunPadCore.a" "${LIBS[@]}"
 cp "$MODULE" "$OUT/gGMSE01_recomp.dylib"
-vtool -show-build "$OUT/gGMSE01_recomp.dylib" | grep -Eq 'platform +TVOS$'
+platform=TVOS
+[[ "$SDK" = appletvsimulator ]] && platform=TVOSSIMULATOR
+vtool -show-build "$OUT/gGMSE01_recomp.dylib" | grep -Eq "platform +$platform$"
 echo "tvOS core and GMSE01 module provisioned: $OUT"

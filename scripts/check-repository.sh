@@ -33,6 +33,7 @@ python3 tests/test_tvos_contract.py
 test -x scripts/package-ios.sh
 test -x scripts/audit-ios-package.sh
 test -x scripts/tvos-build-core-device.sh
+test -x scripts/tvos-build-core-simulator.sh
 test -x scripts/prepare-tvos-dependencies.sh
 test -x scripts/tvos-provision-device.sh
 test -x scripts/stage-tvos-game-data.sh

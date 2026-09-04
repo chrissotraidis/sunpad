@@ -114,7 +114,7 @@
 		BB0000000000000000000202 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BB0000000000000000000203 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BB0000000000000000000204 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		BB0000000000000000000205 /* gGMSE01_recomp.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = gGMSE01_recomp.dylib; path = Provisioned/appletvos/gGMSE01_recomp.dylib; sourceTree = "<group>"; };
+		BB0000000000000000000205 /* gGMSE01_recomp.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = gGMSE01_recomp.dylib; path = "Provisioned/$(PLATFORM_NAME)/gGMSE01_recomp.dylib"; sourceTree = "<group>"; };
 		BB0000000000000000000206 /* SunPadTV.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SunPadTV.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB0000000000000000000207 /* tvOS Sys */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Sys; path = build/tvos-deps/ModernGekko/vendor/dolphin/Data/Sys; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -598,7 +598,7 @@
 					"$(SRCROOT)/build/tvos-deps/ModernGekko/include",
 					"$(SRCROOT)/build/tvos-deps/ModernGekko/vendor/dolphin/Source/Core",
 					"$(SRCROOT)/build/tvos-deps/ModernGekko/vendor/dolphin/GXRuntime/include",
-					"$(SRCROOT)/build/tvos-deps/ModernGekko/build-tvos-appletvos-public",
+					"$(SRCROOT)/build/tvos-deps/ModernGekko/build-tvos-$(PLATFORM_NAME)-public",
 					"$(SRCROOT)/build/tvos-deps/ModernGekko/vendor/fmt/fmt/include",
 					"$(SRCROOT)/build/tvos-deps/ModernGekko/vendor/dolphin/Externals/picojson",
 				);
@@ -609,7 +609,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(SRCROOT)/apple/tvos/Provisioned/appletvos/libs",
+					"$(SRCROOT)/apple/tvos/Provisioned/$(PLATFORM_NAME)/libs",
 				);
 				MARKETING_VERSION = 0.1.0;
 				OTHER_LDFLAGS = (
@@ -632,7 +632,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.sunpad.SunPad.tv;
 				PRODUCT_NAME = SunPadTV;
 				SDKROOT = appletvos;
-				SUPPORTED_PLATFORMS = appletvos;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator";
 				TARGETED_DEVICE_FAMILY = 3;
 				TVOS_DEPLOYMENT_TARGET = 17.0;
 			};
@@ -653,7 +653,7 @@
 					"$(SRCROOT)/build/tvos-deps/ModernGekko/include",
 					"$(SRCROOT)/build/tvos-deps/ModernGekko/vendor/dolphin/Source/Core",
 					"$(SRCROOT)/build/tvos-deps/ModernGekko/vendor/dolphin/GXRuntime/include",
-					"$(SRCROOT)/build/tvos-deps/ModernGekko/build-tvos-appletvos-public",
+					"$(SRCROOT)/build/tvos-deps/ModernGekko/build-tvos-$(PLATFORM_NAME)-public",
 					"$(SRCROOT)/build/tvos-deps/ModernGekko/vendor/fmt/fmt/include",
 					"$(SRCROOT)/build/tvos-deps/ModernGekko/vendor/dolphin/Externals/picojson",
 				);
@@ -664,7 +664,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(SRCROOT)/apple/tvos/Provisioned/appletvos/libs",
+					"$(SRCROOT)/apple/tvos/Provisioned/$(PLATFORM_NAME)/libs",
 				);
 				MARKETING_VERSION = 0.1.0;
 				OTHER_LDFLAGS = (
@@ -687,7 +687,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.sunpad.SunPad.tv;
 				PRODUCT_NAME = SunPadTV;
 				SDKROOT = appletvos;
-				SUPPORTED_PLATFORMS = appletvos;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator";
 				TARGETED_DEVICE_FAMILY = 3;
 				TVOS_DEPLOYMENT_TARGET = 17.0;
 			};

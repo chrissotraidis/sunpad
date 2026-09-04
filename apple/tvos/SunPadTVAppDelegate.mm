@@ -2,6 +2,7 @@
 #import <GameController/GameController.h>
 #import <Metal/Metal.h>
 #import <QuartzCore/CAMetalLayer.h>
+#import <TargetConditionals.h>
 #import <UIKit/UIKit.h>
 
 #import "SunPadControllerMapping.h"
@@ -362,6 +363,7 @@ BOOL SunPadTVHasExtendedController(void) {
                  buttons:@[]];
         return;
     }
+#if !TARGET_OS_SIMULATOR
     [self reconcileController];
     if (!SunPadTVHasExtendedController()) {
         UIButton *find = [self buttonWithTitle:@"Find Controller" action:^{
@@ -377,6 +379,7 @@ BOOL SunPadTVHasExtendedController(void) {
                  buttons:@[find]];
         return;
     }
+#endif
     [NSFileManager.defaultManager createDirectoryAtPath:SunPadTVSupportRoot()
         withIntermediateDirectories:YES attributes:nil error:nil];
     SunPadSettings *settings = SunPadSettings.sharedSettings;

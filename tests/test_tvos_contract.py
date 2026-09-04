@@ -27,6 +27,9 @@ class TvOSContractTests(unittest.TestCase):
         with (ROOT / "apple/tvos/Info.plist").open("rb") as handle:
             info = plistlib.load(handle)
         self.assertIn("TARGETED_DEVICE_FAMILY = 3;", project)
+        self.assertIn('SUPPORTED_PLATFORMS = "appletvos appletvsimulator";', project)
+        self.assertIn("Provisioned/$(PLATFORM_NAME)/libs", project)
+        self.assertIn("Provisioned/$(PLATFORM_NAME)/gGMSE01_recomp.dylib", project)
         self.assertTrue(info["GCSupportsControllerUserInteraction"])
         self.assertEqual(
             info["GCSupportedGameControllers"], [{"ProfileName": "ExtendedGamepad"}]
@@ -57,7 +60,12 @@ class TvOSContractTests(unittest.TestCase):
         self.assertIn("-DCMAKE_SYSTEM_NAME=tvOS", build)
         self.assertIn("gGMSE01_recomp.dylib", provision)
         self.assertNotIn("Xcode-27", build + provision)
-        self.assertIn("platform +TVOS", provision)
+        self.assertIn("platform=TVOS", provision)
+        simulator = self.text("scripts/tvos-build-core-simulator.sh")
+        self.assertIn("SUNPAD_TVOS_SDK=appletvsimulator", simulator)
+        self.assertIn('SDK="${SUNPAD_TVOS_SDK:-appletvos}"', build)
+        self.assertIn("TVOSSIMULATOR", provision)
+        self.assertIn("#if !TARGET_OS_SIMULATOR", self.text("apple/tvos/SunPadTVAppDelegate.mm"))
 
     def test_device_workflow_preserves_scope(self):
         stage = self.text("scripts/stage-tvos-game-data.sh")

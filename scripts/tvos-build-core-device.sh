@@ -5,7 +5,12 @@ ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
 MG="${SUNPAD_TVOS_MODERNGEKKO_ROOT:-$ROOT/build/tvos-deps/ModernGekko}"
 TPL="$ROOT/ref/ModernGekko-Template"
 TOOLCHAIN="$ROOT/scripts/tvos-device-toolchain.cmake"
-BUILD="$MG/build-tvos-appletvos-public"
+SDK="${SUNPAD_TVOS_SDK:-appletvos}"
+[[ "$SDK" = appletvos || "$SDK" = appletvsimulator ]] || {
+  echo "unsupported tvOS SDK: $SDK" >&2
+  exit 64
+}
+BUILD="$MG/build-tvos-$SDK-public"
 MODULE_BUILD="${SUNPAD_TVOS_MODULE_BUILD:-/tmp/sunpad-module-tvos}"
 
 "$ROOT/scripts/prepare-tvos-dependencies.sh"
@@ -13,7 +18,7 @@ MODULE_BUILD="${SUNPAD_TVOS_MODULE_BUILD:-/tmp/sunpad-module-tvos}"
 CMAKE_COMMON=(
   -DCMAKE_TOOLCHAIN_FILE="$TOOLCHAIN"
   -DCMAKE_SYSTEM_NAME=tvOS -DCMAKE_SYSTEM_PROCESSOR=arm64
-  -DCMAKE_OSX_SYSROOT=appletvos -DCMAKE_OSX_ARCHITECTURES=arm64
+  -DCMAKE_OSX_SYSROOT="$SDK" -DCMAKE_OSX_ARCHITECTURES=arm64
   -DCMAKE_OSX_DEPLOYMENT_TARGET=17.0 -DCMAKE_BUILD_TYPE=Release
   -DUSE_SYSTEM_FMT=OFF -DENABLE_QT=OFF -DENABLE_TESTS=OFF
   -DUSE_DISCORD_PRESENCE=OFF -DUSE_MGBA=OFF
@@ -56,7 +61,7 @@ fi
 cmake -S "$MG/vendor/dolphin/module-template" -B "$MODULE_BUILD" -G Ninja \
   -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="$TOOLCHAIN" \
   -DCMAKE_SYSTEM_NAME=tvOS -DCMAKE_SYSTEM_PROCESSOR=arm64 \
-  -DCMAKE_OSX_SYSROOT=appletvos -DCMAKE_OSX_ARCHITECTURES=arm64 \
+  -DCMAKE_OSX_SYSROOT="$SDK" -DCMAKE_OSX_ARCHITECTURES=arm64 \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=17.0 -DGAME_ID=GMSE01 \
   -DGENERATED_DIR="$GEN" -DGXRUNTIME_DIR="$MG/vendor/dolphin/GXRuntime" \
   -DCHASSIS_ABI_DIR="$MG/vendor/dolphin/Source/Core/Core/PowerPC/StaticRecomp"

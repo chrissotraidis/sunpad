@@ -40,6 +40,18 @@ xcodebuild -project SunPad.xcodeproj -scheme SunPadTV -configuration Release \
 
 Package and audit the unsigned preview only after the app build succeeds.
 
+For the simulator gate, build and provision the same core and GMSE01 module for
+the tvOS Simulator before building the `SunPadTV` target:
+
+```sh
+./scripts/tvos-build-core-simulator.sh
+xcodebuild -project SunPad.xcodeproj -scheme SunPadTV -configuration Release \
+  -destination 'platform=tvOS Simulator,name=Apple TV 4K (3rd generation) (at 1080p)' \
+  -derivedDataPath /tmp/SunPadTVSimulatorDerivedData build
+```
+
+The simulator bypasses only the physical Extended Gamepad requirement. Device
+builds still fail closed until an Extended Gamepad is connected.
 ## Physical acceptance still required
 
 - Signed app installs and opens on a physical Apple TV.
