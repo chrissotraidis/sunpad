@@ -25,8 +25,14 @@ NSString *SunPadTVSupportRoot(void) {
 }
 
 NSString *SunPadTVGameRoot(void) {
-    return [SunPadTVSupportRoot()
+    NSString *containerRoot = [SunPadTVSupportRoot()
         stringByAppendingPathComponent:@"GameData/GMSE01"];
+    if ([NSFileManager.defaultManager fileExistsAtPath:containerRoot])
+        return containerRoot;
+    NSString *bundledRoot = [NSBundle.mainBundle.bundlePath
+        stringByAppendingPathComponent:@"BundledGameData/GMSE01"];
+    return [NSFileManager.defaultManager fileExistsAtPath:bundledRoot]
+        ? bundledRoot : containerRoot;
 }
 
 NSString *SunPadTVSHA256(NSString *path, NSError **error) {

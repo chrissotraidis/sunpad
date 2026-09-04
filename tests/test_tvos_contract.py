@@ -37,6 +37,7 @@ class TvOSContractTests(unittest.TestCase):
         self.assertIn("NSCachesDirectory", host)
         self.assertNotIn("NSApplicationSupportDirectory", host)
         self.assertIn('stringByAppendingPathComponent:@"GameData/GMSE01"', host)
+        self.assertIn('stringByAppendingPathComponent:@"BundledGameData/GMSE01"', host)
         self.assertIn('stringByAppendingPathComponent:@"gGMSE01_recomp.dylib"', host)
         self.assertIn("13934c863d649b1ddca1ca4d7748f49d28a571685cbee5fb1542545c32869955", host)
         self.assertIn("settings.renderScale = 1", host)
