@@ -43,10 +43,30 @@ class TvOSContractTests(unittest.TestCase):
         self.assertIn("settings.aspectRatioMode = SunPadAspectRatioOriginal", host)
         self.assertIn("settings.experimental60FPS = NO", host)
         self.assertIn("settings.experimentalPerformanceMode = NO", host)
-        self.assertIn("SunPadInputMixer.sharedMixer", host)
+        self.assertIn("SunPadTVReadPadSnapshot", host)
+        self.assertIn("SunPadTVSetRumble", host)
+        self.assertIn("CHHapticAdvancedPatternPlayer", host)
+        self.assertIn("sendParameters", host)
+        self.assertIn("dispatch_queue_create", host)
+        self.assertNotIn("inputTimer", host)
+        self.assertNotIn("SunPadInputMixer.sharedMixer", host)
         self.assertIn("GCControllerDidConnectNotification", host)
         self.assertIn("GCControllerDidDisconnectNotification", host)
         self.assertNotIn("UIDocumentPicker", host)
+
+    def test_tvos_controller_bridge_is_native_and_direct(self):
+        core_host = self.text("apple/ios/SunPadCoreHost.mm")
+        patch = self.text(
+            "patches/ModernGekko-dolphin/0002-sunpad-tvos-controller.patch"
+        )
+        prepare = self.text("scripts/prepare-tvos-dependencies.sh")
+        self.assertIn("#if !TARGET_OS_TV", core_host)
+        self.assertIn("SunPadTVReadPadSnapshot", patch)
+        self.assertIn("SunPadTVSetRumble", patch)
+        self.assertIn("status.substickX = input.c_stick_x", patch)
+        self.assertIn("status.triggerRight = input.trigger_r", patch)
+        self.assertIn("status.isConnected = input.connected != 0", patch)
+        self.assertIn("0002-sunpad-tvos-controller.patch", prepare)
 
     def test_build_produces_core_and_tvos_module(self):
         build = self.text("scripts/tvos-build-core-device.sh")

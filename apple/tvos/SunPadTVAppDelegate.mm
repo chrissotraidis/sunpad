@@ -1,4 +1,5 @@
 #import <CommonCrypto/CommonDigest.h>
+#import <CoreHaptics/CoreHaptics.h>
 #import <GameController/GameController.h>
 #import <Metal/Metal.h>
 #import <QuartzCore/CAMetalLayer.h>
@@ -7,16 +8,32 @@
 #import "SunPadControllerMapping.h"
 #import "SunPadCoreHost.h"
 #import "SunPadDiagnostics.h"
-#import "SunPadInputMixer.h"
 #import "SunPadSettings.h"
 
+#include <atomic>
 #include <cmath>
+#include <cstdint>
 #include <cstring>
+#include <mutex>
 
 namespace {
 
 NSString *const SunPadTVMainDOLSHA256 =
     @"13934c863d649b1ddca1ca4d7748f49d28a571685cbee5fb1542545c32869955";
+
+struct SunPadTVPadSnapshot {
+    uint16_t buttons;
+    uint8_t stickX;
+    uint8_t stickY;
+    uint8_t cStickX;
+    uint8_t cStickY;
+    uint8_t triggerL;
+    uint8_t triggerR;
+    uint8_t analogA;
+    uint8_t analogB;
+    int32_t connected;
+};
+static_assert(sizeof(SunPadTVPadSnapshot) == 16);
 
 NSString *SunPadTVSupportRoot(void) {
     NSArray<NSString *> *paths = NSSearchPathForDirectoriesInDomains(
@@ -142,6 +159,23 @@ SunPadInputState SunPadTVInputStateFromGamepad(GCExtendedGamepad *gamepad) {
     return state;
 }
 
+SunPadTVPadSnapshot SunPadTVSnapshotFromInputState(
+    SunPadInputState state, BOOL modernCStickHorizontal) {
+    SunPadTVPadSnapshot snapshot = {};
+    snapshot.buttons = state.buttons;
+    snapshot.stickX = static_cast<uint8_t>(128 + state.stickX);
+    snapshot.stickY = static_cast<uint8_t>(128 + state.stickY);
+    snapshot.cStickX = static_cast<uint8_t>(
+        128 + (modernCStickHorizontal ? -state.cStickX : state.cStickX));
+    snapshot.cStickY = static_cast<uint8_t>(128 + state.cStickY);
+    snapshot.triggerL = state.triggerL;
+    snapshot.triggerR = state.triggerR;
+    snapshot.analogA = (state.buttons & SunPadButtonA) != 0 ? 255 : 0;
+    snapshot.analogB = (state.buttons & SunPadButtonB) != 0 ? 255 : 0;
+    snapshot.connected = state.connected;
+    return snapshot;
+}
+
 BOOL SunPadTVHasExtendedController(void) {
     for (GCController *controller in GCController.controllers) {
         if (controller.extendedGamepad != nil)
@@ -176,23 +210,52 @@ BOOL SunPadTVHasExtendedController(void) {
 }
 @end
 
-@interface SunPadTVViewController : UIViewController
+@interface SunPadTVViewController : UIViewController {
+@private
+    std::mutex _padMutex;
+    SunPadTVPadSnapshot _padSnapshot;
+    dispatch_queue_t _hapticsQueue;
+    CHHapticEngine *_hapticEngine;
+    id<CHHapticAdvancedPatternPlayer> _rumblePlayer;
+    std::atomic<bool> _rumbleSupported;
+    std::atomic<bool> _rumbleRequested;
+    std::atomic<bool> _rumbleBridgeLogged;
+    BOOL _modernCStickHorizontal;
+}
 @property(nonatomic, strong) UILabel *titleLabel;
 @property(nonatomic, strong) UILabel *statusLabel;
 @property(nonatomic, strong) UIStackView *actions;
 @property(nonatomic, strong) SunPadCoreHost *coreHost;
 @property(nonatomic, strong) GCController *controller;
-@property(nonatomic, strong) dispatch_source_t inputTimer;
 @property(nonatomic, assign) BOOL controllerInputActive;
 - (void)attemptStart;
+- (void)updatePadSnapshot:(SunPadInputState)state;
+- (void)configureRumbleForController:(GCController *)controller;
+- (void)teardownRumble;
+- (BOOL)readPadSnapshot:(void *)buffer size:(size_t)size;
+- (BOOL)setRumbleEnabled:(BOOL)enabled;
 - (void)pauseRuntime;
 - (void)resumeRuntime;
 - (void)stopRuntime;
 @end
 
+static __weak SunPadTVViewController *SunPadTVActiveController;
+
+extern "C" bool SunPadTVReadPadSnapshot(void *buffer, size_t size) {
+    return [SunPadTVActiveController readPadSnapshot:buffer size:size];
+}
+
+extern "C" bool SunPadTVSetRumble(bool enabled) {
+    return [SunPadTVActiveController setRumbleEnabled:enabled];
+}
+
 @implementation SunPadTVViewController
 
 - (void)loadView {
+    _hapticsQueue = dispatch_queue_create(
+        "com.sunpad.tv.controller-haptics", DISPATCH_QUEUE_SERIAL);
+    _modernCStickHorizontal =
+        SunPadSettings.sharedSettings.modernCStickHorizontal;
     SunPadTVMetalView *root = [[SunPadTVMetalView alloc] initWithFrame:CGRectZero];
     self.view = root;
     UILabel *title = [[UILabel alloc] init];
@@ -265,6 +328,7 @@ BOOL SunPadTVHasExtendedController(void) {
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
+    SunPadTVActiveController = self;
     [self startControllerInput];
     [self attemptStart];
 }
@@ -279,22 +343,6 @@ BOOL SunPadTVHasExtendedController(void) {
                       name:GCControllerDidDisconnectNotification object:nil];
     }
     [self reconcileController];
-    if (self.inputTimer == nil) {
-        dispatch_source_t timer = dispatch_source_create(
-            DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_main_queue());
-        dispatch_source_set_timer(timer, dispatch_time(DISPATCH_TIME_NOW, 0),
-                                  NSEC_PER_SEC / 60, NSEC_PER_MSEC);
-        __weak SunPadTVViewController *weakSelf = self;
-        dispatch_source_set_event_handler(timer, ^{
-            SunPadTVViewController *strongSelf = weakSelf;
-            if (strongSelf.coreHost != nil) {
-                [strongSelf.coreHost publishInput:
-                    [SunPadInputMixer.sharedMixer consumeMergedState]];
-            }
-        });
-        dispatch_resume(timer);
-        self.inputTimer = timer;
-    }
 }
 
 - (void)controllerChanged:(NSNotification *)notification {
@@ -308,36 +356,155 @@ BOOL SunPadTVHasExtendedController(void) {
     if (self.controller != nil &&
         [GCController.controllers indexOfObjectIdenticalTo:self.controller] != NSNotFound &&
         self.controller.extendedGamepad != nil) {
-        [SunPadInputMixer.sharedMixer
-            setInputState:SunPadTVInputStateFromGamepad(self.controller.extendedGamepad)
-                 fromTouch:NO];
+        [self updatePadSnapshot:
+            SunPadTVInputStateFromGamepad(self.controller.extendedGamepad)];
         return;
     }
+    [self teardownRumble];
     self.controller.extendedGamepad.valueChangedHandler = nil;
     self.controller.playerIndex = GCControllerPlayerIndexUnset;
     self.controller = nil;
-    [SunPadInputMixer.sharedMixer clearInputFromTouch:NO];
+    [self updatePadSnapshot:(SunPadInputState){0}];
     for (GCController *candidate in GCController.controllers) {
         if (candidate.extendedGamepad == nil)
             continue;
         self.controller = candidate;
         candidate.playerIndex = GCControllerPlayerIndex1;
+        [self configureRumbleForController:candidate];
+        SunPadLog(@"controller selected vendor=%@ haptics=%d",
+                  candidate.vendorName ?: @"unknown", candidate.haptics != nil);
         __weak SunPadTVViewController *weakSelf = self;
         candidate.extendedGamepad.valueChangedHandler =
             ^(GCExtendedGamepad *gamepad, GCControllerElement *element) {
                 (void)element;
                 SunPadTVViewController *strongSelf = weakSelf;
                 if (strongSelf != nil && strongSelf.controllerInputActive) {
-                    [SunPadInputMixer.sharedMixer
-                        setInputState:SunPadTVInputStateFromGamepad(gamepad)
-                             fromTouch:NO];
+                    [strongSelf updatePadSnapshot:
+                        SunPadTVInputStateFromGamepad(gamepad)];
                 }
             };
-        [SunPadInputMixer.sharedMixer
-            setInputState:SunPadTVInputStateFromGamepad(candidate.extendedGamepad)
-                 fromTouch:NO];
+        [self updatePadSnapshot:
+            SunPadTVInputStateFromGamepad(candidate.extendedGamepad)];
         break;
     }
+}
+
+- (void)updatePadSnapshot:(SunPadInputState)state {
+    SunPadTVPadSnapshot snapshot =
+        SunPadTVSnapshotFromInputState(state, _modernCStickHorizontal);
+    std::lock_guard<std::mutex> lock(_padMutex);
+    _padSnapshot = snapshot;
+}
+
+- (BOOL)readPadSnapshot:(void *)buffer size:(size_t)size {
+    if (buffer == nullptr || size != sizeof(SunPadTVPadSnapshot))
+        return NO;
+    std::lock_guard<std::mutex> lock(_padMutex);
+    std::memcpy(buffer, &_padSnapshot, sizeof(_padSnapshot));
+    return YES;
+}
+
+- (void)configureRumbleForController:(GCController *)controller {
+    _rumbleSupported.store(false);
+    _rumbleRequested.store(false);
+    dispatch_async(_hapticsQueue, ^{
+        if (controller.haptics == nil)
+            return;
+
+        NSError *error = nil;
+        CHHapticEngine *engine = [controller.haptics
+            createEngineWithLocality:GCHapticsLocalityDefault];
+        engine.playsHapticsOnly = YES;
+        NSArray<CHHapticEventParameter *> *eventParameters = @[
+            [[CHHapticEventParameter alloc]
+                initWithParameterID:CHHapticEventParameterIDHapticIntensity
+                             value:1.0f],
+            [[CHHapticEventParameter alloc]
+                initWithParameterID:CHHapticEventParameterIDHapticSharpness
+                             value:0.1f],
+        ];
+        CHHapticEvent *event = [[CHHapticEvent alloc]
+            initWithEventType:CHHapticEventTypeHapticContinuous
+                   parameters:eventParameters
+                 relativeTime:0.0
+                     duration:GCHapticDurationInfinite];
+        CHHapticDynamicParameter *silence = [[CHHapticDynamicParameter alloc]
+            initWithParameterID:CHHapticDynamicParameterIDHapticIntensityControl
+                         value:0.0f
+                  relativeTime:0.0];
+        CHHapticPattern *pattern = [[CHHapticPattern alloc]
+            initWithEvents:@[event] parameters:@[silence] error:&error];
+        id<CHHapticAdvancedPatternPlayer> player = pattern == nil
+            ? nil
+            : [engine createAdvancedPlayerWithPattern:pattern error:&error];
+        if (engine == nil || player == nil ||
+            ![engine startAndReturnError:&error] ||
+            ![player startAtTime:CHHapticTimeImmediate error:&error]) {
+            SunPadLog(@"controller haptics unavailable error=%@",
+                      error.localizedDescription ?: @"unknown");
+            return;
+        }
+
+        __weak SunPadTVViewController *weakSelf = self;
+        __weak CHHapticEngine *weakEngine = engine;
+        engine.stoppedHandler = ^(CHHapticEngineStoppedReason reason) {
+            SunPadTVViewController *strongSelf = weakSelf;
+            if (strongSelf == nil)
+                return;
+            dispatch_async(strongSelf->_hapticsQueue, ^{
+                if (strongSelf->_hapticEngine == weakEngine) {
+                    strongSelf->_rumbleSupported.store(false);
+                    SunPadLog(@"controller haptics stopped reason=%ld",
+                              (long)reason);
+                }
+            });
+        };
+        _hapticEngine = engine;
+        _rumblePlayer = player;
+        _rumbleSupported.store(true);
+        SunPadLog(@"controller haptics ready");
+    });
+}
+
+- (void)teardownRumble {
+    _rumbleSupported.store(false);
+    _rumbleRequested.store(false);
+    if (_hapticsQueue == nil)
+        return;
+    __weak SunPadTVViewController *weakSelf = self;
+    dispatch_async(_hapticsQueue, ^{
+        SunPadTVViewController *strongSelf = weakSelf;
+        strongSelf->_hapticEngine.stoppedHandler =
+            ^(CHHapticEngineStoppedReason reason) { (void)reason; };
+        [strongSelf->_rumblePlayer stopAtTime:CHHapticTimeImmediate error:nil];
+        [strongSelf->_hapticEngine stopWithCompletionHandler:nil];
+        strongSelf->_rumblePlayer = nil;
+        strongSelf->_hapticEngine = nil;
+    });
+}
+
+- (BOOL)setRumbleEnabled:(BOOL)enabled {
+    if (!_rumbleSupported.load())
+        return NO;
+    if (_rumbleRequested.exchange(enabled) == enabled)
+        return YES;
+    dispatch_async(_hapticsQueue, ^{
+        CHHapticDynamicParameter *intensity = [[CHHapticDynamicParameter alloc]
+            initWithParameterID:CHHapticDynamicParameterIDHapticIntensityControl
+                         value:enabled ? 1.0f : 0.0f
+                  relativeTime:0.0];
+        NSError *error = nil;
+        if (![self->_rumblePlayer sendParameters:@[intensity]
+                                          atTime:CHHapticTimeImmediate
+                                           error:&error]) {
+            self->_rumbleSupported.store(false);
+            SunPadLog(@"controller rumble failed error=%@",
+                      error.localizedDescription ?: @"unknown");
+        } else if (enabled && !self->_rumbleBridgeLogged.exchange(true)) {
+            SunPadLog(@"controller rumble bridge active");
+        }
+    });
+    return YES;
 }
 
 - (void)attemptStart {
@@ -407,8 +574,8 @@ BOOL SunPadTVHasExtendedController(void) {
 
 - (void)pauseRuntime {
     self.controllerInputActive = NO;
-    [SunPadInputMixer.sharedMixer clearInputFromTouch:NO];
-    [self.coreHost publishInput:(SunPadInputState){0}];
+    [self updatePadSnapshot:(SunPadInputState){0}];
+    [self setRumbleEnabled:NO];
     [self.coreHost pauseRuntimeForSystemEvent];
 }
 
@@ -421,16 +588,18 @@ BOOL SunPadTVHasExtendedController(void) {
 }
 
 - (void)stopRuntime {
+    [self setRumbleEnabled:NO];
     [self.coreHost stop];
     self.coreHost = nil;
-    [SunPadInputMixer.sharedMixer clearInputFromTouch:NO];
+    [self updatePadSnapshot:(SunPadInputState){0}];
 }
 
 - (void)dealloc {
     [NSNotificationCenter.defaultCenter removeObserver:self];
-    if (self.inputTimer != nil)
-        dispatch_source_cancel(self.inputTimer);
     self.controller.extendedGamepad.valueChangedHandler = nil;
+    if (SunPadTVActiveController == self)
+        SunPadTVActiveController = nil;
+    [self teardownRumble];
     [self stopRuntime];
 }
 

@@ -1,0 +1,95 @@
+diff --git a/Source/Core/Core/HW/GCPad.cpp b/Source/Core/Core/HW/GCPad.cpp
+index 1e16650239..8b6e2213f8 100644
+--- a/Source/Core/Core/HW/GCPad.cpp
++++ b/Source/Core/Core/HW/GCPad.cpp
+@@ -2,6 +2,11 @@
+ // SPDX-License-Identifier: GPL-2.0-or-later
+ 
+ #include "Core/HW/GCPad.h"
++#include <cstddef>
++
++#ifdef __APPLE__
++#include <TargetConditionals.h>
++#endif
+ 
+ #include "Common/Common.h"
+ #include "Core/HW/GCPadEmu.h"
+@@ -9,6 +14,30 @@
+ #include "InputCommon/GCPadStatus.h"
+ #include "InputCommon/InputConfig.h"
+ 
++#if defined(__APPLE__) && TARGET_OS_TV
++namespace
++{
++struct SunPadTVPadSnapshot
++{
++  u16 buttons;
++  u8 stick_x;
++  u8 stick_y;
++  u8 c_stick_x;
++  u8 c_stick_y;
++  u8 trigger_l;
++  u8 trigger_r;
++  u8 analog_a;
++  u8 analog_b;
++  s32 connected;
++};
++static_assert(sizeof(SunPadTVPadSnapshot) == 16);
++
++extern "C" bool SunPadTVReadPadSnapshot(void* buffer, std::size_t size)
++    __attribute__((weak_import));
++extern "C" bool SunPadTVSetRumble(bool enabled) __attribute__((weak_import));
++}  // namespace
++#endif
++
+ namespace Pad
+ {
+ static InputConfig s_config("GCPadNew", _trans("Pad"), "GCPad", "Pad");
+@@ -54,6 +83,27 @@ bool IsInitialized()
+ 
+ GCPadStatus GetStatus(int pad_num)
+ {
++#if defined(__APPLE__) && TARGET_OS_TV
++  if (pad_num == 0 && SunPadTVReadPadSnapshot != nullptr)
++  {
++    SunPadTVPadSnapshot input{};
++    if (SunPadTVReadPadSnapshot(&input, sizeof(input)))
++    {
++      GCPadStatus status{};
++      status.button = input.buttons;
++      status.stickX = input.stick_x;
++      status.stickY = input.stick_y;
++      status.substickX = input.c_stick_x;
++      status.substickY = input.c_stick_y;
++      status.triggerLeft = input.trigger_l;
++      status.triggerRight = input.trigger_r;
++      status.analogA = input.analog_a;
++      status.analogB = input.analog_b;
++      status.isConnected = input.connected != 0;
++      return status;
++    }
++  }
++#endif
+   return static_cast<GCPad*>(s_config.GetController(pad_num))->GetInput();
+ }
+ 
+@@ -64,11 +114,19 @@ ControllerEmu::ControlGroup* GetGroup(int pad_num, PadGroup group)
+ 
+ void Rumble(const int pad_num, const ControlState strength)
+ {
++#if defined(__APPLE__) && TARGET_OS_TV
++  if (pad_num == 0 && SunPadTVSetRumble != nullptr && SunPadTVSetRumble(strength > 0.0))
++    return;
++#endif
+   static_cast<GCPad*>(s_config.GetController(pad_num))->SetOutput(strength);
+ }
+ 
+ void ResetRumble(const int pad_num)
+ {
++#if defined(__APPLE__) && TARGET_OS_TV
++  if (pad_num == 0 && SunPadTVSetRumble != nullptr && SunPadTVSetRumble(false))
++    return;
++#endif
+   static_cast<GCPad*>(s_config.GetController(pad_num))->SetOutput(0.0);
+ }
+ 

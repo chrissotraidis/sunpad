@@ -4,6 +4,7 @@
 
 #import <AVFAudio/AVFAudio.h>
 #import <Metal/Metal.h>
+#import <TargetConditionals.h>
 #import <fcntl.h>
 #import <pthread.h>
 #import <sys/stat.h>
@@ -130,6 +131,7 @@ static void SunPadRuntimeLogCallback(
     else
         SunPadLog(@"audio session active route=%@", audioSession.currentRoute.outputs.firstObject.portType ?: @"none");
 
+#if !TARGET_OS_TV
     NSString *pipeDir = [userDirectory stringByAppendingPathComponent:@"Pipes"];
     NSString *pipePath = [pipeDir stringByAppendingPathComponent:@"sunpad"];
     [[NSFileManager defaultManager] createDirectoryAtPath:pipeDir
@@ -180,6 +182,7 @@ static void SunPadRuntimeLogCallback(
                  atomically:YES
                    encoding:NSUTF8StringEncoding
                       error:nil];
+#endif
 
     SunPadLog(@"runtime thread starting discImage=%d moduleExists=%d",
               discImagePath.length > 0,
@@ -340,6 +343,7 @@ static void SunPadRuntimeLogCallback(
                            source:stableBaseline ? @"stable baseline launch argument" :
                                                    @"persisted"];
 
+#if !TARGET_OS_TV
         // Open the input FIFO for writing (blocks until the runtime reads it).
         NSString *pipePath = [[userDirectory stringByAppendingPathComponent:@"Pipes"]
             stringByAppendingPathComponent:@"sunpad"];
@@ -354,6 +358,7 @@ static void SunPadRuntimeLogCallback(
         if (_pipeFd < 0)
             SunPadLog(@"input pipe unavailable after wait errno=%d stopRequested=%d", errno,
                       _stopRequested->load());
+#endif
 
         // Run() marks the ModernGekko runtime active before booting. Re-apply
         // any lifecycle state on the main queue so a resign-active event that
@@ -385,6 +390,9 @@ static void SunPadRuntimeLogCallback(
 }
 
 - (void)publishInput:(SunPadInputState)input {
+#if TARGET_OS_TV
+    (void)input;
+#else
     if (_pipeFd < 0)
         return;
     static uint16_t lastButtons = 0;
@@ -404,6 +412,7 @@ static void SunPadRuntimeLogCallback(
                       (unsigned long)commands.size());
         }
     }
+#endif
 }
 
 - (void)setRenderScale:(NSInteger)scale {

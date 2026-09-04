@@ -54,4 +54,6 @@ apply_once() {
 apply_once "$MG" "$ROOT/patches/ModernGekko/0001-sunpad-apple-runtime.patch"
 apply_once "$MG/vendor/dolphin" \
   "$ROOT/patches/ModernGekko-dolphin/0001-sunpad-ios-runtime.patch"
+apply_once "$MG/vendor/dolphin" \
+  "$ROOT/patches/ModernGekko-dolphin/0002-sunpad-tvos-controller.patch"
 echo "Isolated tvOS dependencies are pinned and patched: $DEPENDENCY_ROOT"
