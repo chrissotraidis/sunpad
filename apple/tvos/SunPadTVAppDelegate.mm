@@ -208,7 +208,7 @@ SunPadTVPadSnapshot SunPadTVSnapshotFromInputState(
     SunPadTVPadSnapshot _padSnapshot;
     dispatch_queue_t _hapticsQueue;
     CHHapticEngine *_hapticEngine;
-    id<CHHapticAdvancedPatternPlayer> _rumblePlayer;
+    id<CHHapticPatternPlayer> _rumblePlayer;
     std::atomic<bool> _rumbleSupported;
     std::atomic<bool> _rumbleRequested;
     std::atomic<bool> _rumbleBridgeLogged;
@@ -430,18 +430,13 @@ extern "C" bool SunPadTVSetRumble(bool enabled) {
                    parameters:eventParameters
                  relativeTime:0.0
                      duration:GCHapticDurationInfinite];
-        CHHapticDynamicParameter *silence = [[CHHapticDynamicParameter alloc]
-            initWithParameterID:CHHapticDynamicParameterIDHapticIntensityControl
-                         value:0.0f
-                  relativeTime:0.0];
         CHHapticPattern *pattern = [[CHHapticPattern alloc]
-            initWithEvents:@[event] parameters:@[silence] error:&error];
-        id<CHHapticAdvancedPatternPlayer> player = pattern == nil
+            initWithEvents:@[event] parameters:@[] error:&error];
+        id<CHHapticPatternPlayer> player = pattern == nil
             ? nil
-            : [engine createAdvancedPlayerWithPattern:pattern error:&error];
-        if (player == nil ||
-            ![player startAtTime:CHHapticTimeImmediate error:&error]) {
-            SunPadLog(@"controller haptics player start failed domain=%@ code=%ld error=%@",
+            : [engine createPlayerWithPattern:pattern error:&error];
+        if (player == nil) {
+            SunPadLog(@"controller haptics player unavailable domain=%@ code=%ld error=%@",
                       error.domain ?: @"unknown", (long)error.code,
                       error.localizedDescription ?: @"unknown");
             [engine stopWithCompletionHandler:nil];
@@ -494,14 +489,11 @@ extern "C" bool SunPadTVSetRumble(bool enabled) {
     if (_rumbleRequested.exchange(enabled) == enabled)
         return YES;
     dispatch_async(_hapticsQueue, ^{
-        CHHapticDynamicParameter *intensity = [[CHHapticDynamicParameter alloc]
-            initWithParameterID:CHHapticDynamicParameterIDHapticIntensityControl
-                         value:enabled ? 1.0f : 0.0f
-                  relativeTime:0.0];
         NSError *error = nil;
-        if (![self->_rumblePlayer sendParameters:@[intensity]
-                                          atTime:CHHapticTimeImmediate
-                                           error:&error]) {
+        BOOL success = enabled
+            ? [self->_rumblePlayer startAtTime:CHHapticTimeImmediate error:&error]
+            : [self->_rumblePlayer stopAtTime:CHHapticTimeImmediate error:&error];
+        if (!success) {
             self->_rumbleSupported.store(false);
             SunPadLog(@"controller rumble failed error=%@",
                       error.localizedDescription ?: @"unknown");

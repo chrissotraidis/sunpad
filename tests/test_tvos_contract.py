@@ -45,8 +45,10 @@ class TvOSContractTests(unittest.TestCase):
         self.assertIn("settings.experimentalPerformanceMode = NO", host)
         self.assertIn("SunPadTVReadPadSnapshot", host)
         self.assertIn("SunPadTVSetRumble", host)
-        self.assertIn("CHHapticAdvancedPatternPlayer", host)
-        self.assertIn("sendParameters", host)
+        self.assertIn("id<CHHapticPatternPlayer>", host)
+        self.assertIn("createPlayerWithPattern", host)
+        self.assertNotIn("CHHapticAdvancedPatternPlayer", host)
+        self.assertNotIn("sendParameters", host)
         self.assertIn("dispatch_queue_create", host)
         self.assertNotIn("inputTimer", host)
         self.assertNotIn("SunPadInputMixer.sharedMixer", host)
@@ -77,7 +79,7 @@ class TvOSContractTests(unittest.TestCase):
         )[0]
         self.assertLess(
             setup.index("startAndReturnError"),
-            setup.index("createAdvancedPlayerWithPattern"),
+            setup.index("createPlayerWithPattern"),
         )
         teardown = host.split("- (void)teardownRumble {", 1)[1].split(
             "- (BOOL)setRumbleEnabled:", 1
