@@ -32,16 +32,7 @@ Apple and tvOS versions.
 
 ## Download the preview
 
-| Platform | Download / setup |
-| --- | --- |
-| iPhone / iPad | [Preview 13 IPA](https://github.com/chrissotraidis/sunpad/releases/download/v0.1.0-preview.13/SunPad-0.1.0-preview.13-unsigned.ipa) · [Installation guide](docs/INSTALL_IPA.md) |
-| Apple TV — experimental | [Preview 13 IPA](https://github.com/chrissotraidis/sunpad/releases/download/v0.1.0-preview.13/SunPad-0.1.0-preview.13-tvos-unsigned.ipa) · [Installation and staging](docs/INSTALL_TVOS.md) |
-| Apple silicon Mac | [Build and run locally](docs/MACOS.md) |
-
-The IPAs require signing **both the app and its nested module** with your own
-Apple identity. They include the AOT executable module, but no game image,
-extracted game assets, saves, or signing material. These are experimental
-previews, not App Store or TestFlight releases.
+Previous builds have been retired; a new version is in progress. Apple silicon Macs can [build and run locally](docs/MACOS.md).
 
 Apple TV requires Mac-side game-data staging and an Extended Gamepad. Its storage
 is purgeable, so [back up your saves](docs/TVOS.md) before replacing the app.
