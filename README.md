@@ -36,8 +36,8 @@ The app on the [releases page](https://github.com/chrissotraidis/sunpad/releases
 game code. On an Apple silicon Mac with Xcode, download
 [PadMint](https://github.com/chrissotraidis/padmint/releases/latest), unzip it, double-click
 `PadMint.command`, choose SunPad and drag in your own GMSE01 disc image. PadMint translates the
-game from your disc, adds it to the published app and saves your SunPad IPA in the folder you
-choose; install it with AltStore Classic, SideStore or Sideloadly. The IPA it makes contains code
+game from your disc, adds it to the published app and saves your SunPad IPA in your Downloads
+folder; install it with AltStore Classic, SideStore or Sideloadly. The IPA it makes contains code
 translated from your disc: keep it for yourself. Apple silicon Macs can also
 [build and run locally](docs/MACOS.md).
 
