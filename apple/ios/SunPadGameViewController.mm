@@ -837,14 +837,14 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
               settings.extractedGameRoot ?: @"none");
 
 #if !TARGET_OS_SIMULATOR
-    // The published app carries no game code: PadForge adds the module
+    // The published app carries no game code: PadMint adds the module
     // translated from the player's own disc.
     NSString *requiredModulePath = [self modulePathFromConfiguration:config];
     if (requiredModulePath.length > 0 && ![fileManager fileExistsAtPath:requiredModulePath]) {
         SunPadLog(@"boot waiting for the game module");
-        _bootStatusLabel.text = @"This copy of SunPad has no game code yet. PadForge makes it on a Mac "
+        _bootStatusLabel.text = @"This copy of SunPad has no game code yet. PadMint makes it on a Mac "
                                  "from your own disc and adds it to SunPad; install the SunPad it makes "
-                                 "(github.com/chrissotraidis/padforge).";
+                                 "(github.com/chrissotraidis/padmint).";
         _bootStatusLabel.accessibilityLabel = _bootStatusLabel.text;
         [_bootActivityIndicator stopAnimating];
         return;

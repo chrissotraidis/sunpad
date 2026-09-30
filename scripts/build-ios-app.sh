@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build the publishable SunPad app: no game code. PadForge adds the module
+# Build the publishable SunPad app: no game code. PadMint adds the module
 # translated from the player's own disc (scripts/package-ios.sh PUBLISHED.ipa).
 # Usage: scripts/build-ios-app.sh [OUTPUT.ipa]
 set -euo pipefail

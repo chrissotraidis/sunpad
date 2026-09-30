@@ -34,8 +34,8 @@ Apple and tvOS versions.
 
 The app on the [releases page](https://github.com/chrissotraidis/sunpad/releases/latest) contains no
 game code. On an Apple silicon Mac with Xcode, download
-[PadForge](https://github.com/chrissotraidis/padforge/releases/latest), unzip it, double-click
-`PadForge.command`, choose SunPad and drag in your own GMSE01 disc image. PadForge translates the
+[PadMint](https://github.com/chrissotraidis/padmint/releases/latest), unzip it, double-click
+`PadMint.command`, choose SunPad and drag in your own GMSE01 disc image. PadMint translates the
 game from your disc, adds it to the published app and saves your SunPad IPA in the folder you
 choose; install it with AltStore Classic, SideStore or Sideloadly. The IPA it makes contains code
 translated from your disc: keep it for yourself. Apple silicon Macs can also
