@@ -10,7 +10,7 @@
 @end
 
 @interface SunPadAppDelegate : UIResponder <UIApplicationDelegate>
-@property(nonatomic, weak) UIWindow *window;
+@property(nonatomic, strong) UIWindow *window;
 @property(nonatomic) UIBackgroundTaskIdentifier saveFlushTask;
 - (void)beginSaveFlushGraceForApplication:(UIApplication *)application;
 - (void)endSaveFlushGraceForApplication:(UIApplication *)application reason:(NSString *)reason;
@@ -185,6 +185,14 @@ static void SunPadApplyExperimentSafetyMigration(void) {
     ((SunPadAppDelegate *)UIApplication.sharedApplication.delegate).window = self.window;
     [self.window makeKeyAndVisible];
     SunPadLog(@"lifecycle scene connected");
+}
+
+- (void)sceneDidDisconnect:(UIScene *)scene {
+    (void)scene;
+    SunPadAppDelegate *delegate = (SunPadAppDelegate *)UIApplication.sharedApplication.delegate;
+    if (delegate.window == self.window)
+        delegate.window = nil;
+    self.window = nil;
 }
 
 // Keep the existing pause/resume and save-flush path as the single owner of
