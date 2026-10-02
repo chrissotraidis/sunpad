@@ -5,8 +5,12 @@
 #import "SunPadGameViewController.h"
 #import "SunPadSettings.h"
 
-@interface SunPadAppDelegate : UIResponder <UIApplicationDelegate>
+@interface SunPadSceneDelegate : UIResponder <UIWindowSceneDelegate>
 @property(nonatomic, strong) UIWindow *window;
+@end
+
+@interface SunPadAppDelegate : UIResponder <UIApplicationDelegate>
+@property(nonatomic, weak) UIWindow *window;
 @property(nonatomic) UIBackgroundTaskIdentifier saveFlushTask;
 - (void)beginSaveFlushGraceForApplication:(UIApplication *)application;
 - (void)endSaveFlushGraceForApplication:(UIApplication *)application reason:(NSString *)reason;
@@ -76,11 +80,18 @@ static void SunPadApplyExperimentSafetyMigration(void) {
               NSStringFromCGRect(screen.bounds), NSStringFromCGRect(screen.nativeBounds),
               screen.scale, screen.nativeScale, (long)screen.maximumFramesPerSecond);
 
-    self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
-    SunPadGameViewController *root = [[SunPadGameViewController alloc] init];
-    self.window.rootViewController = root;
-    [self.window makeKeyAndVisible];
     return YES;
+}
+
+- (UISceneConfiguration *)application:(UIApplication *)application
+    configurationForConnectingSceneSession:(UISceneSession *)session
+    options:(UISceneConnectionOptions *)options {
+    (void)application;
+    (void)options;
+    UISceneConfiguration *configuration =
+        [[UISceneConfiguration alloc] initWithName:@"SunPad" sessionRole:session.role];
+    configuration.delegateClass = SunPadSceneDelegate.class;
+    return configuration;
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
@@ -156,6 +167,50 @@ static void SunPadApplyExperimentSafetyMigration(void) {
 - (void)applicationWillTerminate:(UIApplication *)application {
     (void)application;
     SunPadLog(@"lifecycle willTerminate");
+}
+
+@end
+
+@implementation SunPadSceneDelegate
+
+- (void)scene:(UIScene *)scene willConnectToSession:(UISceneSession *)session
+    options:(UISceneConnectionOptions *)options {
+    (void)session;
+    (void)options;
+    if (![scene isKindOfClass:UIWindowScene.class])
+        return;
+
+    self.window = [[UIWindow alloc] initWithWindowScene:(UIWindowScene *)scene];
+    self.window.rootViewController = [[SunPadGameViewController alloc] init];
+    ((SunPadAppDelegate *)UIApplication.sharedApplication.delegate).window = self.window;
+    [self.window makeKeyAndVisible];
+    SunPadLog(@"lifecycle scene connected");
+}
+
+// Keep the existing pause/resume and save-flush path as the single owner of
+// runtime lifecycle work. UIKit delivers these events to the scene on iOS 27.
+- (void)sceneDidBecomeActive:(UIScene *)scene {
+    (void)scene;
+    [(SunPadAppDelegate *)UIApplication.sharedApplication.delegate
+        applicationDidBecomeActive:UIApplication.sharedApplication];
+}
+
+- (void)sceneWillResignActive:(UIScene *)scene {
+    (void)scene;
+    [(SunPadAppDelegate *)UIApplication.sharedApplication.delegate
+        applicationWillResignActive:UIApplication.sharedApplication];
+}
+
+- (void)sceneDidEnterBackground:(UIScene *)scene {
+    (void)scene;
+    [(SunPadAppDelegate *)UIApplication.sharedApplication.delegate
+        applicationDidEnterBackground:UIApplication.sharedApplication];
+}
+
+- (void)sceneWillEnterForeground:(UIScene *)scene {
+    (void)scene;
+    [(SunPadAppDelegate *)UIApplication.sharedApplication.delegate
+        applicationWillEnterForeground:UIApplication.sharedApplication];
 }
 
 @end

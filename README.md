@@ -32,6 +32,11 @@ Apple and tvOS versions.
 
 ## Get SunPad
 
+**iOS/iPadOS 27:** the public v0.2.0 base app was built with SDK 27 without
+UIKit scene startup, which that OS/SDK combination requires. Current source
+adds scene startup; the published download still needs a separately verified
+update. See [startup evidence and remaining checks](docs/IOS27_STARTUP.md).
+
 The app on the [releases page](https://github.com/chrissotraidis/sunpad/releases/latest) contains no
 game code. On an Apple silicon Mac with Xcode, download
 [PadMint](https://github.com/chrissotraidis/padmint/releases/latest), unzip it, double-click
