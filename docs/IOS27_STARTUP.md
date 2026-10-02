@@ -17,6 +17,16 @@ pause/resume and two-second save-flush path. Settings, save locations, game
 module loading and the tvOS lane are unchanged.
 
 The public v0.2.0 download is unchanged. SDK 27 syntax and repository/source
-checks pass; full app compilation and a ROM-free scene/lifecycle probe are
-pending. Physical iOS 27 startup, gameplay, audio, save/relaunch and the
-reporter's acceptance remain separate gates.
+checks pass. A ROM-free probe compiled the exact app delegate from candidate
+`1811b68` with a stub game controller, settings and diagnostic sink, using the
+real UIKit scene and background-task APIs. On a dedicated iOS 26.5 Simulator,
+the window attached to a scene and rendered in landscape. Two background and
+foreground round trips retained one controller, delivered two pause and three
+resume callbacks, and exercised both timer expiry and foreground cancellation
+of the existing save-flush grace period. The temporary Simulator was removed
+after preserving its trace and screenshot; other devices were untouched.
+
+This probe did not load a game module or write a real save. Full app compilation
+results are recorded in [PR #55](https://github.com/chrissotraidis/sunpad/pull/55).
+Physical iOS 27 startup, gameplay, audio, save/relaunch and the reporter's
+acceptance remain separate gates.
