@@ -53,6 +53,28 @@ A connected SDL-compatible controller can replace the keyboard profile from
 the launcher. Configuration, extracted game data, saves, logs, and controller
 profiles live under `~/Library/Application Support/SunPad`.
 
+### DSU (Cemuhook) controllers
+
+Player 1 also reads the first controller from a DSU server on
+`127.0.0.1:26760`, such as NSO GC Driver. Keyboard and DSU inputs work side by
+side; start the DSU server before or after SunPad.
+
+| GameCube | DSU control |
+| --- | --- |
+| A / B / X / Y | Circle / Cross / Triangle / Square |
+| Z / Start | R3 / Options |
+| L / R (digital) | L1 / R1 |
+| L / R (analog) | L2 / R2 |
+| Main stick / C-stick / D-pad | Left stick / right stick / D-pad |
+
+This matches the slot layout NSO GC Driver sends. For another server address
+or port, edit `Entries = DSU:127.0.0.1:26760;` in
+`Config/DSUClient.ini`; set `Enabled = False` to stop polling. These defaults
+are written only when the files are missing, so an existing
+`Config/GCPadNew.ini` keeps its mapping: move it aside and relaunch to get the
+keyboard-plus-DSU profile. Choosing an SDL controller in the launcher
+replaces the profile without DSU bindings.
+
 ## Current properties
 
 - ARM64 process, no Rosetta; AOT module with JitArm64 fallback for uncovered code

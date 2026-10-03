@@ -12,5 +12,8 @@ fi
 if [[ ! -f "$USER_DIR/Config/GCPadNew.ini" ]]; then
   cp "$CONTENTS/Resources/default-GCPadNew.ini" "$USER_DIR/Config/GCPadNew.ini"
 fi
+if [[ ! -f "$USER_DIR/Config/DSUClient.ini" ]]; then
+  cp "$CONTENTS/Resources/default-DSUClient.ini" "$USER_DIR/Config/DSUClient.ini"
+fi
 
 exec "$CONTENTS/MacOS/SunPadFrontend"

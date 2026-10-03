@@ -35,6 +35,7 @@ python3 tests/test_tvos_contract.py
 ./tests/test-widescreen-heatwave-fix.sh
 ./tests/test-diagnostics.sh
 ./tests/test-game-data-setup.sh
+./tests/test-macos-user-defaults.sh
 
 test -x scripts/package-ios.sh
 test -x scripts/audit-ios-package.sh

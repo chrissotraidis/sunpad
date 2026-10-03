@@ -71,6 +71,7 @@ cp "$ACTIVE_MODULE" "$OUTPUT/Contents/MacOS/gGMSE01_recomp.dylib"
 cp -R "$BUILD/Sys" "$OUTPUT/Contents/MacOS/Sys"
 cp "$ROOT/apple/macos/default-config.ini" "$OUTPUT/Contents/Resources/default-config.ini"
 cp "$ROOT/apple/macos/default-GCPadNew.ini" "$OUTPUT/Contents/Resources/default-GCPadNew.ini"
+cp "$ROOT/apple/macos/default-DSUClient.ini" "$OUTPUT/Contents/Resources/default-DSUClient.ini"
 chmod +x "$OUTPUT/Contents/MacOS/SunPad"
 
 SOURCE_ICON="$ROOT/apple/ios/Assets.xcassets/AppIcon.appiconset/AppIcon.png"
