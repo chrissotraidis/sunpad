@@ -18,16 +18,23 @@
   "targets": {
     "ios": {
       "hosts": {
-        "macos-arm64": "experimental"
+        "macos-arm64": "experimental",
+        "linux-x86_64": "experimental",
+        "linux-arm64": "experimental"
       },
       "tools": [
         "git",
         "cmake",
-        "ninja"
+        "ninja",
+        "libcxx"
       ],
       "published_app": "SunPad-v{version}-ios-unsigned.ipa",
       "output": "ipa",
       "check": "ipa",
+      "ios_module": {
+        "file": "{repo}/build/ios-module-padmint/gGMSE01_recomp.dylib",
+        "into": "gGMSE01_recomp.dylib"
+      },
       "steps": [
         {
           "stage": "dependencies",
@@ -43,19 +50,15 @@
           ]
         },
         {
-          "stage": "translate",
+          "stage": "module",
           "command": [
-            "{repo}/scripts/ios-build-core-device.sh"
-          ]
-        },
-        {
-          "stage": "package",
-          "command": [
-            "{repo}/scripts/package-ios.sh",
-            "{app}",
-            "{repo}/build/ios-module-device/gGMSE01_recomp.dylib",
-            "{output}"
-          ]
+            "{repo}/scripts/build-ios-module.sh",
+            "{ios_toolchain}",
+            "{repo}/build/ios-module-padmint"
+          ],
+          "env": {
+            "SUNPAD_JOBS": "{jobs}"
+          }
         }
       ]
     },
