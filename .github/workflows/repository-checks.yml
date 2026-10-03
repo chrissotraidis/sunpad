@@ -30,3 +30,15 @@ jobs:
         run: ./scripts/bootstrap-dependencies.sh
       - name: Compile runtime and app without game inputs
         run: ./scripts/check-apple-build.sh ${{ matrix.lane }}
+
+  macos-build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare pinned dependencies
+        run: ./scripts/bootstrap-dependencies.sh
+      # Compile and portability check only: no game module, app bundle or artifact.
+      - name: Compile macOS runner and launcher without game inputs
+        run: ./scripts/package-macos-app.sh --build-only
+        env:
+          SUNPAD_JOBS: 4

@@ -13,8 +13,9 @@ runtime or silently reset an existing modified checkout.
 For behavioral fixes, reproduce the failure and add a focused regression where
 feasible. Run `scripts/bootstrap-dependencies.sh --sources-only` followed by
 `scripts/check-repository.sh`. Runtime/API changes also need a clean Apple runtime
-and host build. CI builds both the iOS and tvOS Simulator lanes without game data.
-Private generated-module and physical-gameplay validation are separate gates.
+and host build. CI builds the iOS and tvOS Simulator lanes and the macOS runner
+and launcher without game data. Private generated-module and physical-gameplay
+validation are separate gates.
 Experiments stay opt-in until justified by measured correctness and hardware tests.
 
 New releases must record the app commit, recursive dependency commits, toolchain,

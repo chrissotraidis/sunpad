@@ -1,7 +1,22 @@
 #!/usr/bin/env bash
 # Builds a local Apple Silicon SunPad.app. The generated game module is copied
 # only into the ignored local bundle and must never be committed or distributed.
+# --build-only compiles and checks the runner and launcher without game inputs
+# and assembles no app.
 set -euo pipefail
+
+BUILD_ONLY=false
+if [[ "${1:-}" = --build-only && $# = 1 ]]; then
+  BUILD_ONLY=true
+elif [[ $# != 0 ]]; then
+  echo "usage: $0 [--build-only]" >&2
+  exit 2
+fi
+BUILD_JOBS="${SUNPAD_JOBS:-${CMAKE_BUILD_PARALLEL_LEVEL:-8}}"
+if [[ ! "$BUILD_JOBS" =~ ^[1-9][0-9]*$ ]]; then
+  echo "Build job limit must be a positive whole number without leading zeros: $BUILD_JOBS" >&2
+  exit 2
+fi
 
 ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
 MG="$ROOT/ref/ModernGekko"
@@ -28,34 +43,42 @@ cmake -S "$MG" -B "$BUILD" -G Ninja \
   -DUSE_SYSTEM_LIBS=OFF \
   -DENABLE_VULKAN=OFF \
   -DENABLE_QT=OFF -DENABLE_TESTS=OFF
-cmake --build "$BUILD" --target moderngekko-run moderngekko-launcher -j8
+cmake --build "$BUILD" --target moderngekko-run moderngekko-launcher -j"$BUILD_JOBS"
 
-ACTIVE_MODULE="$(cat "$TPL/build/modules-macos14/GMSE01/active-module.txt")"
-if [[ "$ACTIVE_MODULE" != /* ]]; then
-  if [[ -e "$ROOT/$ACTIVE_MODULE" ]]; then
-    ACTIVE_MODULE="$ROOT/$ACTIVE_MODULE"
-  else
-    ACTIVE_MODULE="$TPL/$ACTIVE_MODULE"
+BINARIES=("$BUILD/SunPadFrontend" "$BUILD/SunPadRunner")
+if [[ "$BUILD_ONLY" = false ]]; then
+  ACTIVE_MODULE="$(cat "$TPL/build/modules-macos14/GMSE01/active-module.txt")"
+  if [[ "$ACTIVE_MODULE" != /* ]]; then
+    if [[ -e "$ROOT/$ACTIVE_MODULE" ]]; then
+      ACTIVE_MODULE="$ROOT/$ACTIVE_MODULE"
+    else
+      ACTIVE_MODULE="$TPL/$ACTIVE_MODULE"
+    fi
   fi
-fi
-if [[ ! -f "$ACTIVE_MODULE" ]]; then
-  echo "Generated GMSE01 desktop module not found: $ACTIVE_MODULE" >&2
-  exit 1
-fi
-MODULE_MINOS=$(vtool -show-build "$ACTIVE_MODULE" | awk '/minos/ {print $2; exit}')
-if [[ -z "$MODULE_MINOS" || "${MODULE_MINOS%%.*}" -gt 14 ]]; then
-  echo "GMSE01 module does not target macOS 14: ${MODULE_MINOS:-unknown}" >&2
-  echo "Move the ignored module cache aside and rerun scripts/prepare-game.sh." >&2
-  exit 1
+  if [[ ! -f "$ACTIVE_MODULE" ]]; then
+    echo "Generated GMSE01 desktop module not found: $ACTIVE_MODULE" >&2
+    exit 1
+  fi
+  MODULE_MINOS=$(vtool -show-build "$ACTIVE_MODULE" | awk '/minos/ {print $2; exit}')
+  if [[ -z "$MODULE_MINOS" || "${MODULE_MINOS%%.*}" -gt 14 ]]; then
+    echo "GMSE01 module does not target macOS 14: ${MODULE_MINOS:-unknown}" >&2
+    echo "Move the ignored module cache aside and rerun scripts/prepare-game.sh." >&2
+    exit 1
+  fi
+  BINARIES+=("$ACTIVE_MODULE")
 fi
 
-for binary in "$BUILD/SunPadFrontend" "$BUILD/SunPadRunner" "$ACTIVE_MODULE"; do
+for binary in "${BINARIES[@]}"; do
   if otool -L "$binary" | grep -Eq '/opt/homebrew|/usr/local'; then
     echo "non-portable package dependency in $binary" >&2
     otool -L "$binary" >&2
     exit 1
   fi
 done
+if [[ "$BUILD_ONLY" = true ]]; then
+  echo "macOS runner and launcher build passed. This is not a playable or releasable package."
+  exit 0
+fi
 
 APP_PARENT="$(dirname -- "$OUTPUT")"
 mkdir -p "$APP_PARENT"

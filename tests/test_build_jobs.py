@@ -22,7 +22,7 @@ class BuildJobsTests(unittest.TestCase):
         self.bin = self.root / "bin"
         self.bin.mkdir()
         self.log = self.root / "calls.jsonl"
-        for name in ("prepare-game.sh", "ios-build-core-device.sh"):
+        for name in ("prepare-game.sh", "ios-build-core-device.sh", "package-macos-app.sh"):
             shutil.copy2(SOURCE / "scripts" / name, self.scripts / name)
         self.disc = self.root / "synthetic empty input.iso"
         self.disc.touch()
@@ -38,7 +38,12 @@ class BuildJobsTests(unittest.TestCase):
 import json, os, sys
 with open(os.environ['JOB_LOG'], 'a') as stream:
     stream.write(json.dumps(['cmake'] + sys.argv[1:]) + '\\n')
-sys.exit(73 if '--build' in sys.argv else 0)
+sys.exit(int(os.environ.get('CMAKE_BUILD_EXIT', '73')) if '--build' in sys.argv else 0)
+""")
+        self.write_tool("otool", """#!/usr/bin/env python3
+import json, os, sys
+with open(os.environ['JOB_LOG'], 'a') as stream:
+    stream.write(json.dumps(['otool'] + sys.argv[1:]) + '\\n')
 """)
         self.write_tool("ninja", """#!/usr/bin/env python3
 import json, os, sys
@@ -68,11 +73,12 @@ print(os.environ['DISC_SHA'] + '  synthetic')
         path.write_text(content)
         path.chmod(0o755)
 
-    def run_script(self, name, **settings):
+    def run_script(self, name, *args, **settings):
         env = os.environ.copy()
         for key in ("SUNPAD_JOBS", "CMAKE_BUILD_PARALLEL_LEVEL", "SUNPAD_CORE_ONLY",
                     "SUNPAD_IOS_MODULE_BUILD", "BASH_ENV", "BOOTSTRAP_EXIT",
-                    "AUDIT_EXIT", "PROVISION_EXIT", "DISC_SHA"):
+                    "AUDIT_EXIT", "PROVISION_EXIT", "DISC_SHA", "CMAKE_BUILD_EXIT",
+                    "SUNPAD_MACOS_BUILD_DIR", "SUNPAD_MACOS_OUTPUT"):
             env.pop(key, None)
         env.update(PATH=str(self.bin) + os.pathsep + env.get("PATH", ""),
                    JOB_LOG=str(self.log), DISC_SHA=self.disc_sha)
@@ -82,6 +88,7 @@ print(os.environ['DISC_SHA'] + '  synthetic')
         argv = ["/bin/bash", str(self.scripts / name)]
         if name == "prepare-game.sh":
             argv.append(str(self.disc))
+        argv.extend(args)
         result = subprocess.run(argv, env=env, text=True, capture_output=True)
         calls = [json.loads(line) for line in self.log.read_text().splitlines()] \
             if self.log.exists() else []
@@ -119,6 +126,45 @@ print(os.environ['DISC_SHA'] + '  synthetic')
         self.prepare_jobs("2", SUNPAD_JOBS="", CMAKE_BUILD_PARALLEL_LEVEL="2")
         self.prepare_jobs("8", SUNPAD_JOBS="", CMAKE_BUILD_PARALLEL_LEVEL="")
 
+    def package_jobs(self, expected, **env):
+        result, calls = self.run_script("package-macos-app.sh", **env)
+        self.assertEqual(result.returncode, 73, result.stderr)
+        build = [call for call in calls if call[:2] == ["cmake", "--build"]]
+        self.assertEqual(build, [["cmake", "--build",
+                                str(self.root / "ref/ModernGekko/build-desktop-app-public"),
+                                "--target", "moderngekko-run", "moderngekko-launcher",
+                                "-j" + expected]])
+
+    def test_package_limits(self):
+        self.package_jobs("8")
+        self.package_jobs("2", CMAKE_BUILD_PARALLEL_LEVEL="2")
+        self.package_jobs("4", SUNPAD_JOBS="4", CMAKE_BUILD_PARALLEL_LEVEL="invalid")
+
+    def test_package_build_only_needs_no_game_inputs(self):
+        result, calls = self.run_script("package-macos-app.sh", "--build-only",
+                                       CMAKE_BUILD_EXIT="0", SUNPAD_JOBS="4")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("not a playable or releasable package", result.stdout)
+        build = self.root / "ref/ModernGekko/build-desktop-app-public"
+        self.assertEqual([call for call in calls if call[0] == "otool"],
+                         [["otool", "-L", str(build / "SunPadFrontend")],
+                          ["otool", "-L", str(build / "SunPadRunner")]])
+        self.assertFalse((self.root / "build-macos").exists())
+
+    def test_package_still_requires_the_module(self):
+        result, calls = self.run_script("package-macos-app.sh", CMAKE_BUILD_EXIT="0")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse(any(call[0] == "otool" for call in calls))
+        self.assertFalse((self.root / "build-macos").exists())
+
+    def test_package_rejects_unknown_arguments(self):
+        for args in (("--release",), ("--build-only", "extra")):
+            with self.subTest(args=args):
+                result, calls = self.run_script("package-macos-app.sh", *args)
+                self.assertEqual(result.returncode, 2)
+                self.assertIn("usage:", result.stderr)
+                self.assertEqual(calls, [])
+
     def test_core_standard_limit(self):
         self.core_jobs("2", CMAKE_BUILD_PARALLEL_LEVEL="2")
 
@@ -127,7 +173,7 @@ print(os.environ['DISC_SHA'] + '  synthetic')
         self.core_jobs("8", CMAKE_BUILD_PARALLEL_LEVEL="")
 
     def test_invalid_limits_stop_before_tools(self):
-        for name in ("prepare-game.sh", "ios-build-core-device.sh"):
+        for name in ("prepare-game.sh", "ios-build-core-device.sh", "package-macos-app.sh"):
             for value in ("0", "-1", "02", "1.5", "2 3", "abc", " 2", "2\n"):
                 with self.subTest(name=name, value=value):
                     result, calls = self.run_script(name, CMAKE_BUILD_PARALLEL_LEVEL=value)
@@ -147,7 +193,7 @@ print(os.environ['DISC_SHA'] + '  synthetic')
         self.assertEqual(calls, [["shasum"]])
 
     def test_bootstrap_failure_is_fail_closed(self):
-        for name in ("prepare-game.sh", "ios-build-core-device.sh"):
+        for name in ("prepare-game.sh", "ios-build-core-device.sh", "package-macos-app.sh"):
             with self.subTest(name=name):
                 result, calls = self.run_script(name, BOOTSTRAP_EXIT="23",
                                                CMAKE_BUILD_PARALLEL_LEVEL="2")
