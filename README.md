@@ -40,7 +40,8 @@ update. See [startup evidence and remaining checks](docs/IOS27_STARTUP.md).
 The app on the [releases page](https://github.com/chrissotraidis/sunpad/releases/latest) contains no
 game code. On an Apple silicon Mac with Xcode, download
 [PadMint](https://github.com/chrissotraidis/padmint/releases/latest), unzip it, double-click
-`PadMint.command`, choose SunPad and drag in your own GMSE01 disc image. PadMint translates the
+`PadMint.command`, then in the PadMint page that opens in your browser choose SunPad and your own GMSE01
+disc image and click **Make my copy**. PadMint translates the
 game from your disc, adds it to the published app and saves your SunPad IPA in your Downloads
 folder; install it with AltStore Classic, SideStore or Sideloadly. The IPA it makes contains code
 translated from your disc: keep it for yourself. Apple silicon Macs can also
