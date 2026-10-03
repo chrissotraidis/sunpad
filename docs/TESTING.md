@@ -541,3 +541,32 @@ the full source suite, output/module rejection checks and separate clean iOS/tvO
 Simulator runtime/app builds passed locally. Dependency sources remained clean.
 No generated game module, new release or physical gameplay was validated by this
 source-only pass. Existing Preview 10/12 device and release evidence is unchanged.
+
+## macOS DSU controller evidence (2026-10-04)
+
+Local `SunPad.app` built from `dd68ad8` plus the DSU defaults change, with the
+pinned ModernGekko `8f49c55` / RecompCore `da96175`. Apple M3 Pro, macOS
+27.0.1, Xcode 27.0, Apple clang 21.0.0 for the desktop tools, app and GMSE01
+module (`-flto=thin`). Disc as above. Fresh user folder; game data extracted
+with `SunPadFrontend --extract`.
+
+| Check | Result | Evidence |
+|---|---|---|
+| Module and app package | Pass | `prepare-game.sh`, then `package-macos-app.sh`; no `/opt/homebrew` or `/usr/local` links; ad-hoc signature verifies |
+| First-launch defaults | Pass | `config.ini`, `Config/GCPadNew.ini` and `Config/DSUClient.ini` seeded from the bundle |
+| DSU registration | Pass | NSO GC Driver `ad6165b` on `127.0.0.1:26760` held two flows from `SunPadRunner`: port listing and slot 0 pad data |
+| Boot | Pass | title screen to file select at 30.0 FPS |
+| Hands-on DSU input | Pass (player report) | NSO GameCube controller over Bluetooth through NSO GC Driver operated the game; per-control, FLUDD pressure and extended-session coverage not itemized |
+
+SHA-256 of the local, undistributed bundle executables:
+
+| File | SHA-256 |
+|---|---|
+| `SunPad` | `35b30af04f285da7e806d567c5707190059011694401c3b5547424dd845215cf` |
+| `SunPadFrontend` | `a1eb5f4c4816d5d6f1957a42fb68734d1d300fc7e5dc4a465e86f15e0f13abb5` |
+| `SunPadRunner` | `a0cc95f334dec6de827817351d9eb465853adde6b14a5671a9ff31770af1389b` |
+| `gGMSE01_recomp.dylib` | `d30781d0a9acf1788adf56b0104fe71f6fdcedb5f2f23367706899acbac6f77f` |
+
+A non-Apple `clang` earlier in `PATH` (llvm-mingw) made the module build
+disable IPO and broke `check-repository.sh`'s Objective-C++ test compile;
+these runs removed it from `PATH`.
