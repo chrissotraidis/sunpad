@@ -8,6 +8,8 @@
   <img alt="Ahead-of-time game code" src="https://img.shields.io/badge/game%20code-ahead--of--time-FF9F0A">
   <img alt="Experimental preview" src="https://img.shields.io/badge/preview-experimental-FFD60A">
   <img alt="Game image not included" src="https://img.shields.io/badge/game%20image-not%20included-FF453A">
+  <a href="https://github.com/chrissotraidis/padmint"><img alt="Build SunPad with PadMint" src="https://img.shields.io/badge/PadMint-build%20your%20own-3EB489"></a>
+  <a href="https://discord.gg/xwHfUD2bxW"><img alt="Join the SunPad Discord" src="https://img.shields.io/badge/Discord-Join%20the%20community-5865F2?logo=discord&amp;logoColor=white"></a>
 </p>
 
 **Super Mario Sunshine on iPhone, iPad, Apple silicon Mac, and experimental Apple TV through ahead-of-time recompilation.**
@@ -29,6 +31,13 @@ Runtime and compiler dependencies use pinned submodules. The
 Apple and tvOS versions.
 
 ![SunPad running Super Mario Sunshine in Delfino Plaza on iPad](docs/readme/sunpad-delfino-plaza.jpg)
+
+> [!NOTE]
+> **AI disclosure:** SunPad uses substantial AI assistance for code, tests,
+> documentation, debugging and maintenance. Some support replies and maintenance
+> tasks are automated. There is no audited percentage of AI-generated code.
+> Build, test and device records describe what was checked. This disclosure
+> concerns SunPad's workflow, not the authorship of its upstream projects.
 
 ## Get SunPad
 
@@ -192,6 +201,16 @@ game inputs, use `--sources-only`, then run `./scripts/check-repository.sh`.
 
 Owner-supplied development screenshots. Individual frames do not establish
 sustained performance or full-game compatibility.
+
+## Community and support
+
+[Join the Discord](https://discord.gg/xwHfUD2bxW) for help and news. It is one
+community for SunPad and its sibling projects, such as KartPad, BlueWake and
+MeleePad: ask about setup, building with PadMint, and installing, share how it
+runs on your device, and hear about new releases first.
+
+Found a bug? [Open an issue](https://github.com/chrissotraidis/sunpad/issues)
+with your device, its OS version, and the steps that led to it.
 
 ## License
 
