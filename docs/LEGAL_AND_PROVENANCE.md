@@ -1,6 +1,6 @@
 # Legal and Provenance
 
-Last updated: 2026-09-14
+Last updated: 2026-10-07
 
 ## Project license
 
@@ -43,6 +43,17 @@ boundary; users still provide their own supported image.
 
 - “ReShine” is referenced only as community-reported evidence via ModernGekko credits; no public Sunshine ReShine tree was located at research time.
 - Matching decompilation progress is tracked separately from SunPad’s static-recompilation product path.
+
+## Research references
+
+- [sms-pc-port](https://github.com/chasem-dev/sms-pc-port) has no license file,
+  so its code is all rights reserved by default. SunPad cites its documented
+  findings and does not copy its code, patches or assets. See the
+  [research review](SMS-PC-PORT-REVIEW.md).
+- [sms-english](https://github.com/chasem-dev/sms-english) is CC0-1.0. Its GMSE01
+  symbol map may become a pinned, hash-checked build input that is fetched at
+  build time and never committed here, like the other game-derived build
+  outputs. This is a provenance rule, not a legal determination.
 
 ## Source maintenance and release traceability
 

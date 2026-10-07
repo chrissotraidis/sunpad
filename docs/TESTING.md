@@ -1,6 +1,6 @@
 # Testing
 
-Last updated: 2026-09-01
+Last updated: 2026-10-07
 
 ## Principles
 
@@ -8,6 +8,8 @@ Last updated: 2026-09-01
 - Capture dated evidence: target, OS, build config, git revision, game
   version, commands, logs, screenshots, result, remaining defects.
 - Run only one Simulator at a time on this machine.
+- Each pass in the [improvement plan](IMPROVEMENT-PLAN.md) names its own unit,
+  lockstep and device gates. Record results here by date as they run.
 
 ## Game under test
 

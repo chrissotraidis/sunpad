@@ -7,6 +7,12 @@
 - **DolRecomp source assessed:** `93b881c8f73df1d64a88491f2aa50c7c9ed2384d`
 - **Assessment type:** source, architecture, and toolchain review; no Android APK was built or run
 
+October 2026 note: the module and runtime passes in the
+[improvement plan](IMPROVEMENT-PLAN.md) (safe direct calls, exact native math,
+specialized vertex loaders and atomic saves) live in the shared DolRecomp and
+RecompCore code, so an Android port would inherit them. The GPU readback pass
+targets the Metal backend and would need an equivalent for OpenGL ES or Vulkan.
+
 ## Executive verdict
 
 SunPad can be brought to Android from the existing macOS development stack.

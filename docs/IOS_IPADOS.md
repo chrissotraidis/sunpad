@@ -1,6 +1,9 @@
 # iOS and iPadOS
 
-Last updated: 2026-09-01
+Last updated: 2026-10-07
+
+Planned performance and save-durability work for iPhone and iPad is in the
+[improvement plan](IMPROVEMENT-PLAN.md).
 
 ## Current status
 
@@ -100,6 +103,9 @@ headlessly for verification.
   runtime on return. The iPad Simulator passed a background/foreground cycle on
   one process with continued 30 FPS/full-speed telemetry. Physical save
   readback and a real audio-interruption replay remain acceptance gates.
+  The flush itself rewrites each save in place, so a termination mid-write can
+  hide the save ([known issue 22](KNOWN_ISSUES.md)); atomic writes are
+  [pass 1](IMPROVEMENT-PLAN.md#pass-1-save-durability) of the plan.
 - The app frontend uses Apple's GameController framework. Current controllers
   are enumerated and reconciled on notifications, periodically while active,
   and after foreground resume. Valid instances retain their player slots,

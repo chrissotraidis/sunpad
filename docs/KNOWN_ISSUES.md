@@ -1,6 +1,6 @@
 # Known Issues
 
-Last updated: 2026-09-04
+Last updated: 2026-10-07
 
 ## iOS / iPadOS
 
@@ -172,6 +172,18 @@ Last updated: 2026-09-04
     Pro, and Eclipse/general mods have no accepted product path yet. Apple TV
     now has a separate experimental tester build, but generic Dolphin or
     GameController capability is not SunPad hardware acceptance.
+    The pinned runtime already contains Dolphin's custom-texture loader; a
+    player-facing texture-pack path is planned as
+    [pass 7](IMPROVEMENT-PLAN.md#pass-7-hd-texture-packs).
+22. **Save writes are not atomic** — Dolphin's GCI folder rewrites a save file
+    in place, and its loader silently skips any GCI whose size does not match
+    its header. If iOS terminates SunPad or the app crashes during the
+    roughly one-second flush window, the save can disappear from the game's
+    view and the game may offer a new file. No player report has been traced
+    to this yet. Until
+    [pass 1](IMPROVEMENT-PLAN.md#pass-1-save-durability) lands, back up saves
+    before risky sessions and wait a few seconds after an in-game save before
+    leaving the app.
 
 ## tvOS (experimental)
 
