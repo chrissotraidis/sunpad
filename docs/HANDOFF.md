@@ -64,6 +64,9 @@ performance diagnostics.
 The ordered work plan is [IMPROVEMENT-PLAN.md](IMPROVEMENT-PLAN.md). It uses
 [sms-pc-port](https://github.com/chasem-dev/sms-pc-port) as a research
 reference only; do not copy its code ([review](SMS-PC-PORT-REVIEW.md)).
+Agents continuing that work follow its
+[goal loop](IMPROVEMENT-PLAN.md#the-goal-loop) and append results to
+[IMPROVEMENT-LOG.md](IMPROVEMENT-LOG.md).
 
 ## Public-release gates still open
 
