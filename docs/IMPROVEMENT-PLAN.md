@@ -13,8 +13,41 @@ This plan makes SunPad faster on older hardware and safer with saves without
 changing what it is: the retail Sunshine program, translated ahead of time, on
 the Dolphin-derived runtime. It is written so an agent can pick up one task,
 finish it, prove it, record it, and stop. Read the whole document once before
-starting. After that, the [goal loop](#the-goal-loop) is the procedure for every
-session.
+starting, beginning with [Start here](#start-here). After that, the
+[goal loop](#the-goal-loop) is the procedure for every session.
+
+## Start here
+
+Use this plan when asked to continue the improvement plan, improve SunPad's
+performance or save safety, or pick up SunPad engineering work without a more
+specific request.
+
+**First session:**
+
+1. Read [AGENTS.md](../AGENTS.md), [CONTRIBUTING.md](../CONTRIBUTING.md), this
+   plan, and the newest entries in [IMPROVEMENT-LOG.md](IMPROVEMENT-LOG.md).
+2. Check access: `gh auth status`, and push rights to the forks you will touch,
+   for example `gh api repos/chrissotraidis/RecompCore --jq .permissions.push`.
+3. Check inputs. Ask the maintainer where the GMSE01 disc image and the primary
+   checkout's prepared game workspace are. Without them, work only on tasks
+   marked **S** in the [status table](#status).
+4. Create a worktree from current `origin/main` ([environment](#environment)).
+5. Run the [goal loop](#the-goal-loop) for one task.
+
+**End of every session:**
+
+- Append a log entry, even when the result is `blocked` or `reverted`.
+- Update the status table in the same PR.
+- Leave the repositories with no unpushed work. If a human step is next, write
+  exactly what the human needs to do in the log entry's `Next:` line.
+
+**Two tasks can start immediately:** 1.1 (save fault test, RecompCore) and 2.1
+(symbol map script, SunPad). They do not depend on each other.
+
+**Releases are paused.** [AGENTS.md](../AGENTS.md) forbids publishing or
+restoring any release, IPA or download link until the maintainer's release
+audit clears this repository. "Candidate build" in this plan means an internal
+build for testing only.
 
 ## Goals
 
@@ -236,36 +269,40 @@ Never use a removing CoreDevice copy for updates ([known issue 12](KNOWN_ISSUES.
 
 ## Status
 
-Update this table in the same PR as the work. Values: `ready`, `in progress`,
-`done`, `skipped`, `rejected`, `blocked`.
+Update this table in the same PR as the work. Status values: `ready`,
+`in progress`, `done`, `skipped`, `rejected`, `blocked`.
 
-| Task | Title | Status | Needs |
-| --- | --- | --- | --- |
-| 1.1 | Save fault-injection test | ready | none |
-| 1.2 | Atomic GCI and header writes | ready | 1.1 |
-| 1.3 | Last-good backup and load repair | ready | 1.2 |
-| 1.4 | Pin and device save session | ready | 1.3, human device session |
-| 2.1 | Symbol map fetch and verify | ready | none |
-| 2.2 | Profile symbolizer | ready | 2.1 |
-| 2.3 | Frame breakdown counters | ready | none |
-| 2.4 | Unlimited-speed desktop benchmark | ready | none |
-| 2.5 | Developer warp and the three routes | ready | 2.1 |
-| 2.6 | Baseline measurement and ranking | ready | 2.2-2.5, human device session |
-| 3.1 | Chunk-validation flag for direct calls | ready | 2.6 entry gate |
-| 3.2 | Hook and mod bitmap | ready | 3.1 |
-| 3.3 | Enable safe direct calls | ready | 3.2 |
-| 3.4 | Quantized load/store fast path | ready | 2.6 entry gate |
-| 4.1 | Replacement harness | ready | 2.1, 2.6 entry gate |
-| 4.2 | First replacement: top-ranked routine | ready | 4.1 |
-| 4.3 | Remaining ranked routines | ready | 4.2 |
-| 5.1 | Vertex format census | ready | 2.6 entry gate |
-| 5.2 | Specialized loaders | ready | 5.1 |
-| 6.1 | Readback settings A/B | ready | 2.6 entry gate |
-| 6.2 | Deferred peek and pixel-metric answers | ready | 6.1 |
-| 7.1 | HD texture packs | ready | goal 2 met or human approval |
-| 8.1 | 60 FPS timing audit | ready | 4.1, headroom gate |
-| 8.2 | 60 FPS mod | ready | 8.1 |
-| 9.1 | Widescreen polish | ready | 8.2 or human approval |
+Inputs: **S** needs only the source checkouts and a Mac toolchain; **D** also
+needs the maintainer's GMSE01 disc image and a generated module; **H** needs a
+human for a device session or a hands-on verdict.
+
+| Task | Title | Status | Needs | Inputs |
+| --- | --- | --- | --- | --- |
+| 1.1 | Save fault-injection test | ready | none | S |
+| 1.2 | Atomic GCI and header writes | ready | 1.1 | S |
+| 1.3 | Last-good backup and load repair | ready | 1.2 | S |
+| 1.4 | Pin and device save session | ready | 1.3 | D, H |
+| 2.1 | Symbol map fetch and verify | ready | none | S (fixture); D for the real hash check |
+| 2.2 | Profile symbolizer | ready | 2.1 | S |
+| 2.3 | Frame breakdown counters | ready | none | D |
+| 2.4 | Unlimited-speed desktop benchmark | ready | none | D |
+| 2.5 | Developer warp and the three routes | ready | 2.1 | D |
+| 2.6 | Baseline measurement and ranking | ready | 2.2-2.5 | D, H |
+| 3.1 | Chunk-validation flag for direct calls | ready | 2.6 entry gate | D |
+| 3.2 | Hook and mod bitmap | ready | 3.1 | D |
+| 3.3 | Enable safe direct calls | ready | 3.2 | D, H |
+| 3.4 | Quantized load/store fast path | ready | 2.6 entry gate | D, H |
+| 4.1 | Replacement harness | ready | 2.1, 2.6 entry gate | D |
+| 4.2 | First replacement: top-ranked routine | ready | 4.1 | D |
+| 4.3 | Remaining ranked routines | ready | 4.2 | D, H |
+| 5.1 | Vertex format census | ready | 2.6 entry gate | D |
+| 5.2 | Specialized loaders | ready | 5.1 | D, H |
+| 6.1 | Readback settings A/B | ready | 2.6 entry gate | D |
+| 6.2 | Deferred peek and pixel-metric answers | ready | 6.1 | D, H |
+| 7.1 | HD texture packs | ready | goal 2 met or human approval | D, H |
+| 8.1 | 60 FPS timing audit | ready | 4.1, headroom gate | S |
+| 8.2 | 60 FPS mod | ready | 8.1 | D, H |
+| 9.1 | Widescreen polish | ready | 8.2 or human approval | D, H |
 
 ## Pass 1: save durability
 
@@ -603,7 +640,7 @@ waiting for device sessions.
 | --- | --- | --- | --- |
 | 1 | 1-3 | 1.1-1.4, 2.1-2.6 | Saves cannot be cut short; ranked, repeatable numbers |
 | 2 | 4-10 | 3.x and 4.x; 6.x in parallel if its entry gate passes | Faster module and runtime |
-| 3 | 11-13 | 5.x, full scene matrix on iPhone 14, iPhone 15 Pro and iPad | Candidate preview with evidence |
+| 3 | 11-13 | 5.x, full scene matrix on iPhone 14, iPhone 15 Pro and iPad | Internal candidate build with evidence (no public release while releases are paused) |
 | 4 | 14-22 | 7.1, 8.x, 9.1 | Optional features on hardware with headroom |
 
 Each phase ends with merged, pinned and documented work, so the plan can stop

@@ -42,3 +42,13 @@ Notes: Symbol map hash matches the extracted main.dol. The pinned DolRecomp
   is off. ModernGekko supports code mods, but SunPad does not set
   mod_directories. Dolphin's GCI folder writes saves in place.
 Next: task 1.1 and task 2.1 (independent).
+
+### 2026-10-07 plan: agent entry points
+Result: done
+Pins: unchanged
+Checkpoints: documentation only
+Evidence: AGENTS.md, CLAUDE.md, plan "Start here" section
+Notes: AGENTS.md now points agents to the plan; CLAUDE.md imports AGENTS.md so
+  Claude-based agents get the same instructions. The status table marks what
+  each task needs (source only, disc image, or a human). Releases stay paused.
+Next: task 1.1 and task 2.1 (independent).
