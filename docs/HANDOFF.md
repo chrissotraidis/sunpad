@@ -1,6 +1,6 @@
 # Maintainer Notes
 
-Last updated: 2026-09-02
+Last updated: 2026-10-07
 
 This is a public maintainer summary, not a machine-specific handoff. SunPad is
 an experimental developer preview for `GMSE01` USA revision 0. Its unsigned
@@ -15,11 +15,11 @@ From the repository root:
 ./scripts/prepare-game.sh /path/to/GMSE01.iso
 ```
 
-The first command recreates the ignored public dependency tree at exact
-reviewed commits and applies the two complete SunPad patch snapshots. The
-second verifies the supported image SHA-256, builds the desktop tools, extracts
-the image locally, and produces the generated module inputs. Neither command
-downloads or commits game data.
+The first command checks out the maintained forks at the exact commits in
+`config/dependencies.lock.json` without applying patches or discarding local
+work. The second verifies the supported image SHA-256, builds the desktop tools,
+extracts the image locally, and produces the generated module inputs. Neither
+command downloads or commits game data.
 
 Build the desired development target after preparation:
 
@@ -60,6 +60,10 @@ The evidence-ranked performance diagnosis and future implementation queue live
 in [TECH-DEBT.md](TECH-DEBT.md). Start there before changing 60 FPS, AOT
 generation, fallback behavior, vertex loading, renderer synchronization, or
 performance diagnostics.
+
+The ordered work plan is [IMPROVEMENT-PLAN.md](IMPROVEMENT-PLAN.md). It uses
+[sms-pc-port](https://github.com/chasem-dev/sms-pc-port) as a research
+reference only; do not copy its code ([review](SMS-PC-PORT-REVIEW.md)).
 
 ## Public-release gates still open
 

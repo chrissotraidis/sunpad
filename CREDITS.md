@@ -11,6 +11,8 @@ Their tools and hardware implementations make it possible.
 | [Dolphin Emulator contributors](https://github.com/dolphin-emu/dolphin) | GameCube/Wii graphics, audio, input and hardware implementation, including Metal |
 | [ModernGekko-Template](https://github.com/ExpansionPak/ModernGekko-Template) | Extraction, generation and module-build pipeline |
 | [doldecomp/sms](https://github.com/doldecomp/sms) | Sunshine research reference, not the executable runtime |
+| [sms-english: GMSE01 decompilation](https://github.com/chasem-dev/sms-english) | CC0 GMSE01 symbol map and decompiled source used as a research reference; planned hash-checked build input for profiling and native replacements |
+| [sms-pc-port: chasem-dev and contributors](https://github.com/chasem-dev/sms-pc-port) | Research reference for the [improvement plan](docs/IMPROVEMENT-PLAN.md). No code is used; the repository has no license |
 | [StrikersRecomp](https://github.com/aharonahdoot/StrikersRecomp) | Recompilation and packaging research reference |
 | [Douglas Whittingham](https://github.com/ExpansionPak/RecompCore/pull/6) | ARM64 StaticRecomp fallback-contract repair |
 | [joeblack2k](https://github.com/chrissotraidis/sunpad/pull/32) | Apple TV feasibility and subsequent widescreen, audio, controller, Simulator and staging contributions |

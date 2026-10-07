@@ -65,6 +65,19 @@ Older public IPAs retain their own source and device-evidence limitations.
 
 ## Historical baseline and research inventory
 
+### Research references (not build inputs)
+
+| Reference | Revision reviewed | License | Use |
+|---|---|---|---|
+| [sms-pc-port](https://github.com/chasem-dev/sms-pc-port) | `89e9fd01602bfa9735cdb1d5713d39edff91d9e7` | none declared | Research only; no code used ([review](SMS-PC-PORT-REVIEW.md)) |
+| [sms-english](https://github.com/chasem-dev/sms-english) `config/GMSE01/symbols.txt` | `d5f4eb3eb54ac49638b5513efb1fc368068805da` (file SHA-256 `c75a8f35c1d51e7978cc66aeaa86c1d4e2d16c5603576183e0cd49e66a8d98ff`) | CC0-1.0 | Planned hash-checked input for profiling and native replacements ([plan](IMPROVEMENT-PLAN.md#pass-2-measurement)) |
+
+If the symbol map becomes a build input, pin its commit and hash in
+`config/dependencies.lock.json` and verify it against the extracted
+`main.dol` before use.
+
+### Original records
+
 The following records predate the fork migration. They describe the original
 upstream bases and research setup, not current pins or current host versions.
 

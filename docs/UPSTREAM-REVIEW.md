@@ -83,3 +83,14 @@ Notices generation succeeded for all 57 initialized dependency checkouts.
 The unchanged extractor also passed the delayed-main-callback ASan/UBSan harness.
 This bounded synthetic result is deliberately recorded as non-reproduction of
 GalaxyPad's failure, not proof of every import path.
+
+## Later review: sms-pc-port (October 2026)
+
+A separate [research review](SMS-PC-PORT-REVIEW.md) compared SunPad with the
+decompilation-based [sms-pc-port](https://github.com/chasem-dev/sms-pc-port).
+It found no SunPad defect that the port's code fixes directly, because the two
+projects share no runtime. It did identify work for SunPad's own forks: atomic
+GCI save writes in RecompCore, a safe form of DolRecomp's existing direct-call
+path, and deferred GPU readbacks. Those changes follow this document's fork and
+pinning rules and are scheduled in the [improvement plan](IMPROVEMENT-PLAN.md).
+The port has no license, so none of its code is used.

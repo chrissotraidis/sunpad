@@ -17,6 +17,11 @@ The companion [Apple-platform performance research](APPLE-PERFORMANCE-RESEARCH.m
 turns the iPhone/iPad findings into an offline-first measurement and experiment
 plan. It does not authorize another device install or a release.
 
+The [improvement plan](IMPROVEMENT-PLAN.md) (October 2026) orders the next work
+into nine passes with scope, effort and device gates. It draws on the
+[sms-pc-port research review](SMS-PC-PORT-REVIEW.md). The queue below remains
+the record of evidence and acceptance rules that the plan builds on.
+
 ## Executive verdict
 
 SunPad has two related but distinct problems:
@@ -118,6 +123,11 @@ must be measured rather than dismissed.
 
 - Why the hands-on 60 FPS session was unusable. The test record did not classify
   animation, physics, dialogue, cutscene, audio, input, save, or camera defects.
+  sms-pc-port needed 35 game-side timing fixes beyond reporting the higher rate
+  (wipes, gates, timers, flocks, sway, rides, bosses, ripples, particles and
+  sound). The six-line Gecko code cannot make those fixes, so objects running
+  at the wrong rate are a likely cause. This is an inference until a run
+  classifies the failures.
 - Which optimizations can safely recover the reproduced original-30-FPS
   iPhone 14 deficit. August 13 captures at native 1x reproduced both
   nominal-thermal 25.7-27.1 FPS / 0.872-0.910 speed and serious-thermal
@@ -198,6 +208,14 @@ must be measured rather than dismissed.
   removes misleading diagnostic noise without changing game execution.
 
 ## Work queue
+
+### P0: make save writes atomic
+
+Dolphin's GCI folder rewrites each save in place with a truncating open, and
+its loader skips any GCI whose size does not match its header. A termination
+during a write can therefore hide a save from the game. Write through a
+temporary file and rename, keep one last-good backup, and repair or restore
+short files on load. See [pass 1](IMPROVEMENT-PLAN.md#pass-1-save-durability).
 
 ### P0: make the next reproduction decisive
 
@@ -376,12 +394,15 @@ warned, and excluded from support claims.
 - `apple/ios/SunPadCoreHost.mm`: Metal, module, render-scale, and 60 FPS setup.
 - `scripts/prepare-game.sh`: production portable-C module generation.
 - `scripts/ios-build-core-device.sh`: iPhoneOS module cross-build.
-- `patches/ModernGekko/0001-sunpad-apple-runtime.patch`: 60 FPS activation,
+- Maintained ModernGekko fork (formerly
+  `patches/ModernGekko/0001-sunpad-apple-runtime.patch`): 60 FPS activation,
   software vertex-loader selection, warning/error forwarding, and bounded
   frame/graphics diagnostic snapshots.
-- `patches/ModernGekko-dolphin/0001-sunpad-ios-runtime.patch`: interpreter-only
+- Maintained RecompCore fork (formerly
+  `patches/ModernGekko-dolphin/0001-sunpad-ios-runtime.patch`): interpreter-only
   iOS fallback, timebase repair, Metal/iOS, audio changes, and the embedder
-  log/Metal command-buffer error hooks.
+  log/Metal command-buffer error hooks. Pins are in
+  [DEPENDENCIES](DEPENDENCIES.md#maintained-source-graph).
 - `docs/TESTING.md`: retained hardware telemetry and missing hands-on symptom
   classification.
 - [Dolphin's Super Mario Sunshine notes](https://wiki.dolphin-emu.org/index.php?title=Super_Mario_Sunshine): upstream game and 60 FPS limitations.

@@ -1,6 +1,11 @@
 # Research
 
-Last updated: 2026-08-05
+Last updated: 2026-10-07
+
+The October 2026 review of the decompilation-based PC port is in
+[SMS-PC-PORT-REVIEW.md](SMS-PC-PORT-REVIEW.md), and the work it led to is in
+[IMPROVEMENT-PLAN.md](IMPROVEMENT-PLAN.md). The August 2026 sections below are
+kept as the original research record.
 
 ## Questions this document answers
 
@@ -60,6 +65,27 @@ Matching decompilation project for Super Mario Sunshine.
 - Progress service reports substantial but incomplete code matching (fuzzy match around low-70% range at pin time).
 - Produces matching object files for analysis, **not** a host-native playable recompilation product.
 
+### sms-english (October 2026)
+
+CC0 fork of doldecomp/sms that adds a `GMSE01` revision 0 configuration.
+
+- Its required executable SHA-1, `a6782903ef79d4196c8489ecb1b57decb5b3728f`,
+  matches SunPad's extracted `main.dol`.
+- `config/GMSE01/symbols.txt` lists 38,343 symbols with addresses and sizes,
+  which gives SunPad exact function boundaries for profiling and native
+  replacements.
+- The snapshot recorded by sms-pc-port reports 99.57% fuzzy similarity, 72.94%
+  byte-perfect functions and 33.18% source-linked objects.
+
+### sms-pc-port (October 2026)
+
+A native PC port built from sms-english. It compiles the decompiled game as host
+code and replaces the GameCube SDK with an OpenGL renderer, a software audio
+mixer and host services. It runs on Linux, Windows and x86 macOS; Apple silicon
+uses Rosetta 2 because the game's 32-bit pointer fields need memory below 4 GiB.
+It has no license, so SunPad uses it only as a research reference. See the
+[review](SMS-PC-PORT-REVIEW.md).
+
 ### ReShine
 
 Public search results:
@@ -100,6 +126,14 @@ Conclusion for SunPad planning:
 
 `doldecomp/sms` is incomplete and currently oriented around matching, especially JPN. It is invaluable for symbols and understanding, but it is not yet a complete native game implementation for SunPad’s product targets. Static recompilation can produce a full CPU module from the retail DOL immediately, then rely on the compatibility runtime for hardware services.
 
+October 2026 update: a GMSE01 decompilation and a playable PC port now exist,
+which proves the decomp route can be fast. It still cannot reach SunPad's
+targets: arm64 Apple platforms reserve the low 4 GiB the port depends on, iOS
+needs a Metal renderer, and about a quarter of functions are not yet
+byte-matched. SunPad keeps static recompilation and borrows the decomp's
+symbols and the port's findings. The conditions for revisiting this are in the
+[improvement plan](IMPROVEMENT-PLAN.md#track-2-a-decompilation-based-apple-port).
+
 ## Legal / provenance research notes
 
 - No copyrighted disc image, extracted assets, or generated game-derived modules will be committed.
@@ -109,6 +143,7 @@ Conclusion for SunPad planning:
 ## Open research items
 
 - Exact public availability of any Sunshine-specific address maps, code-patch ranges, or runtime patches used by private recomps.
+  - Resolved for address maps: the CC0 sms-english GMSE01 symbol map matches SunPad's `main.dol`.
 - Whether GMSE01 needs REL modules beyond `main.dol`.
 - Whether ModernGekko’s default HLE/GX path is sufficient for Sunshine’s particle/water/FLUDD-heavy scenes.
 - Controller analog-trigger and rumble behavior under ModernGekko on macOS.
