@@ -8,7 +8,7 @@
       "parent": ".",
       "submodulePath": "ref/ModernGekko",
       "url": "https://github.com/chrissotraidis/ModernGekko.git",
-      "revision": "8f49c550ae4637b8b05bc1c2d3cbd2301bd969e9",
+      "revision": "aa0f3f7e863c77d0f6d8ca840a6eba997d66b31c",
       "upstreamUrl": "https://github.com/ExpansionPak/ModernGekko.git",
       "upstreamRevision": "0514d9f03f8602809f66fc92fdca87d30e752997"
     },
@@ -19,7 +19,7 @@
       "parent": "ref/ModernGekko",
       "submodulePath": "vendor/dolphin",
       "url": "https://github.com/chrissotraidis/RecompCore.git",
-      "revision": "da96175d5389b11f6c5f1eb8d680d437a71aab15",
+      "revision": "39b9b9814620100526f2ca36c442942450e68452",
       "upstreamUrl": "https://github.com/ExpansionPak/RecompCore.git",
       "upstreamRevision": "13e492094902644b0d113c586300d358640f9e19"
     },

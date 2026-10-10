@@ -1,0 +1,14 @@
+Analysis of sampling fixture (pid 1) every 1 millisecond
+Call graph:
+    100 Thread_1: CPU-GPU thread
+    + 100 thread_start  (in libsystem_pthread.dylib) + 8  [0x1]
+    +   100 StaticRecompCore::Run()  (in moderngekko-run) + 10  [0x2]
+    +     60 chassis_dispatch  (in gGMSE01_recomp.dylib) + 12  [0x3]
+    +     ! 40 loop_80348814  (in gGMSE01_recomp.dylib) + 4  [0x4]
+    +     ! 15 func_80361600  (in gGMSE01_recomp.dylib) + 8  [0x5]
+    +     ! 5 AbstractStagingTexture::ReadTexels(int)  (in moderngekko-run) + 4  [0x6]
+    +     !   5 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x7]
+    +     40 StaticRecompCore::Run()  (in moderngekko-run) + 20  [0x8]
+    10 Thread_2: other
+
+Total number in stack (recursive counted multiple times, when >=5):

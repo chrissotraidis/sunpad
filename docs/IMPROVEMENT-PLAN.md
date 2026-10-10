@@ -222,6 +222,22 @@ Lockstep is slow. `STATICRECOMP_LOCKSTEP_START` and `STATICRECOMP_LOCKSTEP_LIMIT
 limit the checked window. `STATICRECOMP_DISPATCH_SAMPLES=1` collects dispatch
 samples.
 
+**Benchmarks and profiles.**
+
+```sh
+./scripts/fetch-gmse01-symbols.sh                 # verified function map (task 2.1)
+./scripts/bench-route.sh noki <label>             # one CSV row in artifacts/bench/
+sample <pid> 30 1 -file noki.sample.txt           # macOS sampler, while a route runs
+python3 scripts/symbolize-profile.py noki.sample.txt \
+  --map ref/ModernGekko-Template/build/symbols/GMSE01.map   # ranked self time
+```
+
+The runtime hooks behind these are off unless set:
+`MODERNGEKKO_DEV_WARP=<stage>,<scenario>` boots straight into an area (Noki Bay is
+`9,0`), `MODERNGEKKO_PERF_LOG=<seconds>` prints speed and EFB readback counters, and
+`MODERNGEKKO_EFB_CENSUS=1` adds a per-copy census. They also work in the iOS app,
+so a device run can be launched without anyone playing.
+
 **iOS builds and install.**
 
 ```sh
@@ -282,11 +298,11 @@ human for a device session or a hands-on verdict.
 | 1.2 | Atomic GCI and header writes | ready | 1.1 | S |
 | 1.3 | Last-good backup and load repair | ready | 1.2 | S |
 | 1.4 | Pin and device save session | ready | 1.3 | D, H |
-| 2.1 | Symbol map fetch and verify | ready | none | S (fixture); D for the real hash check |
-| 2.2 | Profile symbolizer | ready | 2.1 | S |
-| 2.3 | Frame breakdown counters | ready | none | D |
-| 2.4 | Unlimited-speed desktop benchmark | ready | none | D |
-| 2.5 | Developer warp and the three routes | ready | 2.1 | D |
+| 2.1 | Symbol map fetch and verify | done | none | S (fixture); D for the real hash check |
+| 2.2 | Profile symbolizer | done | 2.1 | S |
+| 2.3 | Frame breakdown counters | in progress | none | D |
+| 2.4 | Unlimited-speed desktop benchmark | in progress | none | D |
+| 2.5 | Developer warp and the three routes | in progress | 2.1 | D |
 | 2.6 | Baseline measurement and ranking | ready | 2.2-2.5 | D, H |
 | 3.1 | Chunk-validation flag for direct calls | ready | 2.6 entry gate | D |
 | 3.2 | Hook and mod bitmap | ready | 3.1 | D |
