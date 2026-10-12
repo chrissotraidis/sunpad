@@ -1,0 +1,15 @@
+{
+  "game": "Super Mario Sunshine",
+  "system": "GameCube",
+  "type": "recomp",
+  "project": "SunPad",
+  "status": "in-progress",
+  "toolchain": "DolRecomp",
+  "original": {
+    "region": "USA",
+    "revision": "0",
+    "serial": "GMSE01"
+  },
+  "approach": "Ahead-of-time game-code recompilation with ModernGekko and the Dolphin-derived RecompCore runtime.",
+  "notes": "Experimental Apple-platform project. Device coverage, full-game validation and performance work remain ongoing."
+}

@@ -41,10 +41,10 @@ Apple and tvOS versions.
 
 ## Get SunPad
 
-**iOS/iPadOS 27:** the public v0.2.0 base app was built with SDK 27 without
-UIKit scene startup, which that OS/SDK combination requires. Current source
-adds scene startup; the published download still needs a separately verified
-update. See [startup evidence and remaining checks](docs/IOS27_STARTUP.md).
+**iOS/iPadOS 27:** v0.2.1 includes the scene-startup correction missing from
+v0.2.0. The published package declares the new startup configuration; physical
+iOS/iPadOS 27 and the affected reporter's result still need confirmation. See
+[startup evidence and remaining checks](docs/IOS27_STARTUP.md).
 
 The app on the [releases page](https://github.com/chrissotraidis/sunpad/releases/latest) contains no
 game code. On an Apple silicon Mac with Xcode, download
@@ -193,6 +193,11 @@ cannot reopen, find its crash report under **Settings → Privacy & Security →
 Analytics & Improvements → Analytics Data**. [Open a bug report](https://github.com/chrissotraidis/sunpad/issues/new?template=bug_report.yml).
 
 ## Build and contribute
+
+[`.recomp.json`](.recomp.json) describes SunPad for project directories using
+the [recomp.board format](https://recomp.fyi/spec). It contains public project
+facts only, is maintained manually, and is not a build input. The optional
+remote schema reference is omitted to avoid an editor lookup.
 
 Development uses an Apple silicon Mac, Xcode 26.x, CMake, Ninja, ripgrep, Git,
 and Python 3. Start in a clean checkout:

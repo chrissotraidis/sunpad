@@ -226,3 +226,18 @@ Notes: The GCI write moved into Memcard::WriteGCIFile with a test-only
 Next: 1.3 needs a desktop save and reload with the game; then task 1.4's
   device session (terminate during the flush window, relaunch, confirm the
   save loads), after which known issue 22 can be marked fixed.
+
+### 2026-10-13 issue follow-up: metadata and release-status reconciliation
+Result: done (documentation and directory metadata; device gates unchanged)
+Pins: SunPad e57ebb5 (base); dependency pins unchanged
+Checkpoints: check-repository.sh pass; .recomp.json validates against a locally
+  downloaded recomp.board v1 schema; git diff --check pass
+Evidence: issue #70; published v0.2.1 package readback; issue #54, #23 and #12
+  follow-up comments
+Notes: Added public descriptive metadata without a remote schema reference or
+  build integration. Corrected stale startup/release wording: v0.2.1 was
+  separately approved and published on 4 October; further releases still need
+  clearance. The package checksum, ZIP integrity and scene manifest were
+  checked; no physical iOS 27 or reporter acceptance is implied.
+Next: refresh draft #57 against main and complete available host checks;
+  prepare task 2.6's device measurement without claiming a speedup.

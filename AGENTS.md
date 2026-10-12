@@ -1,8 +1,13 @@
 # Working on SunPad
 
-## Releases paused
+## Further releases paused
 
-No public releases until this repo is marked Clear in the maintainer's private release audit. Do not publish, re-publish, or restore any release, IPA, APK, or macOS build, and do not add download links, until then.
+The maintainer separately approved v0.2.1, published on 4 October 2026.
+That approval does not clear the wider private release audit or authorize a
+future release. Preserve the approved release and keep its support documentation
+accurate. Do not publish, re-publish, or restore another release, IPA, APK, or
+macOS build, or add new download links, until this repository is marked Clear
+in the private audit or the maintainer explicitly approves that exact release.
 
 Before any future public release, every artifact must pass `python3 ~/.codex/release-gate/release_gate.py <artifact>` on the maintainer's machine. A failure is a stop, not a note.
 

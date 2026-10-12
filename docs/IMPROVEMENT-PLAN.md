@@ -1,7 +1,8 @@
 # SunPad improvement plan
 
 - **Date:** 2026-10-07
-- **Status:** planned work; nothing in this document is implemented yet
+- **Status:** source work in passes 1 and 10 has landed; device acceptance and
+  performance measurements remain open. See the status table and run log.
 - **Baseline:** SunPad `c77dd61`; pins in [dependencies.lock.json](../config/dependencies.lock.json)
   (ModernGekko `8f49c55`, RecompCore `da96175`, DolRecomp `fa0cf61` on the Apple lane)
 - **Research inputs:** [sms-pc-port review](SMS-PC-PORT-REVIEW.md),
@@ -67,10 +68,10 @@ work that can still start: none in passes 1 and 10; pass 2's device baseline
 When asked to compare SunPad with another Sunshine project or to look for
 features to learn from, run the [research loop](RESEARCH-LOOP.md) instead.
 
-**Releases are paused.** [AGENTS.md](../AGENTS.md) forbids publishing or
-restoring any release, IPA or download link until the maintainer's release
-audit clears this repository. "Candidate build" in this plan means an internal
-build for testing only.
+**Further releases are paused.** The maintainer separately approved the
+published v0.2.1 release. That does not clear the wider audit or authorize
+another release. Follow [AGENTS.md](../AGENTS.md); "candidate build" in this
+plan means an internal build for testing only.
 
 ## Goals
 

@@ -1,5 +1,21 @@
 # iOS 27 startup compatibility
 
+## Published correction and remaining checks
+
+v0.2.1 / build 15 was published on 4 October 2026 with maintainer approval.
+On 13 October, a fresh download matched its published SHA-256 checksum and
+passed ZIP integrity checking. Its Info.plist declares `SunPadSceneDelegate`
+through `UIApplicationSceneManifest`, and the archive has no separate
+`gGMSE01_recomp.dylib` game module. This is package evidence, not confirmation
+of startup, gameplay, audio or save behavior on a physical iOS/iPadOS 27 device.
+
+The issue #54 reporter has identified an iPad A16, but has not yet supplied
+the iPadOS version, a crash report or a result with v0.2.1. A follow-up asks
+for the OS, current app version and normal installation method. Keep the
+issue open until the reporter confirms the result.
+
+## Original v0.2.0 investigation
+
 The public SunPad v0.2.0 / build 14 IPA was built with SDK 27.0, minimum iOS
 16.0. Its Info.plist has no scene manifest, and its native app delegate creates
 an unassociated UIWindow with the legacy application lifecycle. Apple requires
@@ -7,8 +23,8 @@ an unassociated UIWindow with the legacy application lifecycle. Apple requires
 for SDK 27 apps on iOS/iPadOS 27. The lower deployment target does not exempt it.
 
 [Issue #54](https://github.com/chrissotraidis/sunpad/issues/54) reports immediate
-iPad launch failure, but supplies no model, OS version or crash report. The
-scene compatibility gap is independently established by the published package
+iPad launch failure. At the time of the original investigation it supplied
+no model, OS version or crash report. The scene compatibility gap is independently established by the published package
 and source; the reporter's specific cause remains unconfirmed.
 
 Current source declares one application scene and attaches the existing root
@@ -16,8 +32,9 @@ controller to its UIWindowScene. Scene events forward to the existing app
 pause/resume and two-second save-flush path. Settings, save locations, game
 module loading and the tvOS lane are unchanged.
 
-The public v0.2.0 download is unchanged. SDK 27 syntax and repository/source
-checks pass. A ROM-free probe compiled the exact app delegate from candidate
+The original v0.2.0 package was not replaced; v0.2.1 supersedes it.
+SDK 27 syntax and repository/source checks passed. A ROM-free probe compiled
+the exact app delegate from candidate
 `1811b68` with a stub game controller, settings and diagnostic sink, using the
 real UIKit scene and background-task APIs. On a dedicated iOS 26.5 Simulator,
 the window attached to a scene and rendered in landscape. Two background and
