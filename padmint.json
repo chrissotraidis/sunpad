@@ -107,7 +107,10 @@
           "-version"
         ],
         "player": true,
-        "note": "Install full Xcode and its iOS platform (Command Line Tools alone are not enough). Complete first-launch setup, then select Xcode in Xcode > Settings > Locations > Command Line Tools."
+        "note": "Install full Xcode and its iOS platform (Command Line Tools alone are not enough). Complete first-launch setup, then select Xcode in Xcode > Settings > Locations > Command Line Tools.",
+        "hosts": [
+          "macos-arm64"
+        ]
       },
       {
         "name": "xcrun",
@@ -118,7 +121,10 @@
           "--show-sdk-path"
         ],
         "player": true,
-        "note": "Install Xcode's iOS platform and select full Xcode in Xcode > Settings > Locations > Command Line Tools, then run PadMint again."
+        "note": "Install Xcode's iOS platform and select full Xcode in Xcode > Settings > Locations > Command Line Tools, then run PadMint again.",
+        "hosts": [
+          "macos-arm64"
+        ]
       }
     ]
   },
