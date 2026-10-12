@@ -1,6 +1,7 @@
 #import "SunPadGameOverlay.h"
 
 #import "SunPadDiagnostics.h"
+#import "SunPadControllerRumble.h"
 #import "SunPadInputMixer.h"
 #import "SunPadSettings.h"
 
@@ -359,6 +360,7 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
     UISlider *_selectedSizeSlider;
     UISwitch *_hideControlsSwitch;
     UISwitch *_modernCStickSwitch;
+    UISwitch *_invertCStickVerticalSwitch;
     UISwitch *_editLayoutSwitch;
     UIButton *_resetLayoutButton;
     UIView *_editorBar;
@@ -469,6 +471,18 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
                        identifier:nil handler:^(__kindof UIAction *action) {
             (void)action;
             [weakSelf.delegate gameOverlayRequestsGameDataFolderImport:weakSelf];
+        }],
+        [UIAction actionWithTitle:@"Import Dolphin Save (.gci)…"
+                            image:[UIImage systemImageNamed:@"square.and.arrow.down"]
+                       identifier:nil handler:^(__kindof UIAction *action) {
+            (void)action;
+            [weakSelf.delegate gameOverlayRequestsSaveImport:weakSelf];
+        }],
+        [UIAction actionWithTitle:@"Export Saves…"
+                            image:[UIImage systemImageNamed:@"square.and.arrow.up"]
+                       identifier:nil handler:^(__kindof UIAction *action) {
+            (void)action;
+            [weakSelf exportSaves];
         }],
         [UIAction actionWithTitle:@"Remove Stored Game Data"
                             image:[UIImage systemImageNamed:@"trash"]
@@ -602,6 +616,20 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
         [weakSelf reportProblem];
     }];
 
+    UIAction *rumbleAction =
+        [UIAction actionWithTitle:@"Controller Rumble"
+                            image:[UIImage systemImageNamed:@"waveform"]
+                       identifier:nil handler:^(__kindof UIAction *action) {
+        (void)action;
+        SunPadSettings *currentSettings = [SunPadSettings sharedSettings];
+        currentSettings.controllerRumble = !currentSettings.controllerRumble;
+        [currentSettings synchronize];
+        [SunPadControllerRumble sharedRumble].allowed = currentSettings.controllerRumble;
+        [weakSelf refreshMenuButton];
+    }];
+    rumbleAction.state = [SunPadSettings sharedSettings].controllerRumble ?
+        UIMenuElementStateOn : UIMenuElementStateOff;
+
     UIMenu *controlsMenu = [UIMenu menuWithTitle:@"Controls"
                                            image:[UIImage systemImageNamed:@"gamecontroller"]
                                       identifier:nil
@@ -619,6 +647,7 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
             (void)action;
             [weakSelf toggleSettingsPanel];
         }],
+        rumbleAction,
     ]];
 
     return [UIMenu menuWithTitle:@"SunPad" children:@[
@@ -629,6 +658,30 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
         dataMenu,
         reportProblemAction,
     ]];
+}
+
+- (void)exportSaves {
+    UIViewController *presenter = self.window.rootViewController;
+    NSError *error = nil;
+    NSArray<NSURL *> *saves = [self.delegate gameOverlayExportSaves:self error:&error];
+    if (saves == nil) {
+        UIAlertController *alert =
+            [UIAlertController alertControllerWithTitle:@"No Saves Exported"
+                                                message:error.localizedDescription
+                                         preferredStyle:UIAlertControllerStyleAlert];
+        [alert addAction:[UIAlertAction actionWithTitle:@"OK"
+                                                  style:UIAlertActionStyleDefault
+                                                handler:nil]];
+        [presenter presentViewController:alert animated:YES completion:nil];
+        return;
+    }
+    UIActivityViewController *share =
+        [[UIActivityViewController alloc] initWithActivityItems:saves
+                                         applicationActivities:nil];
+    UIPopoverPresentationController *popover = share.popoverPresentationController;
+    popover.sourceView = _menuButton;
+    popover.sourceRect = _menuButton.bounds;
+    [presenter presentViewController:share animated:YES completion:nil];
 }
 
 - (void)reportProblem {
@@ -1340,6 +1393,12 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
     [_modernCStickSwitch addTarget:self action:@selector(modernCStickChanged:)
                    forControlEvents:UIControlEventValueChanged];
 
+    _invertCStickVerticalSwitch = [UISwitch new];
+    _invertCStickVerticalSwitch.on = [SunPadSettings sharedSettings].invertCStickVertical;
+    _invertCStickVerticalSwitch.accessibilityLabel = @"Invert C-stick up and down";
+    [_invertCStickVerticalSwitch addTarget:self action:@selector(invertCStickVerticalChanged:)
+                          forControlEvents:UIControlEventValueChanged];
+
     _editLayoutSwitch = [UISwitch new];
     _editLayoutSwitch.on = NO;
     _editLayoutSwitch.accessibilityLabel = @"Move touch controls";
@@ -1361,6 +1420,7 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
         [self settingsRowWithTitle:@"All sizes" control:_sizeSlider],
         [self settingsRowWithTitle:@"Hide on controller" control:_hideControlsSwitch],
         [self settingsRowWithTitle:@"Modern C-stick L/R" control:_modernCStickSwitch],
+        [self settingsRowWithTitle:@"Invert C-stick Up/Down" control:_invertCStickVerticalSwitch],
         [self settingsRowWithTitle:@"Move controls" control:_editLayoutSwitch],
         _resetLayoutButton,
     ]];
@@ -1462,6 +1522,7 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
         _settingsPanel.hidden = NO;
         _renderScaleControl.selectedSegmentIndex = [SunPadSettings sharedSettings].renderScale - 1;
         _modernCStickSwitch.on = [SunPadSettings sharedSettings].modernCStickHorizontal;
+        _invertCStickVerticalSwitch.on = [SunPadSettings sharedSettings].invertCStickVertical;
         [self bringSubviewToFront:_settingsPanel];
         [self bringSubviewToFront:_menuButton];
     } else {
@@ -1501,6 +1562,11 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
 
 - (void)modernCStickChanged:(UISwitch *)switcher {
     [SunPadSettings sharedSettings].modernCStickHorizontal = switcher.on;
+    [[SunPadSettings sharedSettings] synchronize];
+}
+
+- (void)invertCStickVerticalChanged:(UISwitch *)switcher {
+    [SunPadSettings sharedSettings].invertCStickVertical = switcher.on;
     [[SunPadSettings sharedSettings] synchronize];
 }
 
@@ -1760,6 +1826,7 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
     _sizeSlider.value = settings.controlSizeScale;
     _hideControlsSwitch.on = settings.hideTouchControlsWhenControllerConnected;
     _modernCStickSwitch.on = settings.modernCStickHorizontal;
+    _invertCStickVerticalSwitch.on = settings.invertCStickVertical;
     _editLayoutSwitch.on = NO;
     [[NSUserDefaults standardUserDefaults]
         removeObjectForKey:@"SunPadExperimentalTouchControls"];

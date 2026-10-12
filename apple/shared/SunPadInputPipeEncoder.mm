@@ -4,7 +4,8 @@
 
 std::string SunPadEncodePipeCommands(const SunPadInputState &input,
                                      uint16_t previousButtons,
-                                     bool modernCStickHorizontal) {
+                                     bool modernCStickHorizontal,
+                                     bool invertCStickVertical) {
     std::string commands;
     commands.reserve(320);
     auto appendCommand = [&commands](const char *format, auto... values) {
@@ -19,8 +20,9 @@ std::string SunPadEncodePipeCommands(const SunPadInputState &input,
     float mx = 0.5f + (input.stickX / 127.0f) * 0.5f;
     float my = 0.5f - (input.stickY / 127.0f) * 0.5f;
     float cStickX = modernCStickHorizontal ? -input.cStickX : input.cStickX;
+    float cStickY = invertCStickVertical ? -input.cStickY : input.cStickY;
     float cx = 0.5f + (cStickX / 127.0f) * 0.5f;
-    float cy = 0.5f - (input.cStickY / 127.0f) * 0.5f;
+    float cy = 0.5f - (cStickY / 127.0f) * 0.5f;
     appendCommand("SET MAIN %.3f %.3f\n", mx, my);
     appendCommand("SET C %.3f %.3f\n", cx, cy);
     appendCommand("SET L %.3f\n", input.triggerL / 255.0f);

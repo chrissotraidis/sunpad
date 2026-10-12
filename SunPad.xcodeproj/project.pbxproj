@@ -38,6 +38,8 @@
 		AA0000000000000000000123 /* SunPadInputPipeEncoder.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000233 /* SunPadInputPipeEncoder.mm */; };
 		AA0000000000000000000124 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000235 /* PrivacyInfo.xcprivacy */; };
 		AA0000000000000000000125 /* SunPadControllerMapping.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000236 /* SunPadControllerMapping.mm */; };
+		AA0000000000000000000126 /* SunPadSaveTransfer.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000238 /* SunPadSaveTransfer.mm */; };
+		AA0000000000000000000127 /* SunPadControllerRumble.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000023A /* SunPadControllerRumble.mm */; };
 		BB0000000000000000000101 /* SunPadTVAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = BB0000000000000000000201 /* SunPadTVAppDelegate.mm */; };
 		BB0000000000000000000102 /* SunPadCoreHost.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000218 /* SunPadCoreHost.mm */; };
 		BB0000000000000000000103 /* SunPadSettings.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000204 /* SunPadSettings.mm */; };
@@ -108,6 +110,10 @@
 		AA0000000000000000000233 /* SunPadInputPipeEncoder.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SunPadInputPipeEncoder.mm; sourceTree = "<group>"; };
 		AA0000000000000000000234 /* SunPadInputPipeEncoder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SunPadInputPipeEncoder.h; sourceTree = "<group>"; };
 		AA0000000000000000000235 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		AA0000000000000000000238 /* SunPadSaveTransfer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SunPadSaveTransfer.mm; sourceTree = "<group>"; };
+		AA0000000000000000000239 /* SunPadSaveTransfer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SunPadSaveTransfer.h; sourceTree = "<group>"; };
+		AA000000000000000000023A /* SunPadControllerRumble.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SunPadControllerRumble.mm; sourceTree = "<group>"; };
+		AA000000000000000000023B /* SunPadControllerRumble.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SunPadControllerRumble.h; sourceTree = "<group>"; };
 		AA0000000000000000000236 /* SunPadControllerMapping.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SunPadControllerMapping.mm; sourceTree = "<group>"; };
 		AA0000000000000000000237 /* SunPadControllerMapping.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SunPadControllerMapping.h; sourceTree = "<group>"; };
 		BB0000000000000000000201 /* SunPadTVAppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SunPadTVAppDelegate.mm; sourceTree = "<group>"; };
@@ -242,8 +248,12 @@
 				AA0000000000000000000232 /* SunPadDiagnostics.h */,
 				AA0000000000000000000236 /* SunPadControllerMapping.mm */,
 				AA0000000000000000000237 /* SunPadControllerMapping.h */,
+				AA000000000000000000023A /* SunPadControllerRumble.mm */,
+				AA000000000000000000023B /* SunPadControllerRumble.h */,
 				AA0000000000000000000233 /* SunPadInputPipeEncoder.mm */,
 				AA0000000000000000000234 /* SunPadInputPipeEncoder.h */,
+				AA0000000000000000000238 /* SunPadSaveTransfer.mm */,
+				AA0000000000000000000239 /* SunPadSaveTransfer.h */,
 				AA0000000000000000000204 /* SunPadSettings.mm */,
 				AA0000000000000000000212 /* SunPadSettings.h */,
 				AA000000000000000000022E /* SunPadInputMixer.mm */,
@@ -392,6 +402,8 @@
 				AA0000000000000000000122 /* SunPadDiagnostics.mm in Sources */,
 				AA0000000000000000000123 /* SunPadInputPipeEncoder.mm in Sources */,
 				AA0000000000000000000125 /* SunPadControllerMapping.mm in Sources */,
+				AA0000000000000000000126 /* SunPadSaveTransfer.mm in Sources */,
+				AA0000000000000000000127 /* SunPadControllerRumble.mm in Sources */,
 				AA0000000000000000000120 /* SunPadInputMixer.mm in Sources */,
 				AA000000000000000000011F /* SunPadDiscExtractor.mm in Sources */,
 				AA0000000000000000000112 /* SunPadCoreHost.mm in Sources */,

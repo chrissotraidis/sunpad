@@ -10,6 +10,30 @@ This document turns the August 2026 slowdown investigation into a repeatable
 plan. It supplements [TECH-DEBT.md](TECH-DEBT.md), which contains the broader
 performance history and the separate experimental-60-FPS analysis.
 
+## October 2026 update
+
+The [improvement plan](IMPROVEMENT-PLAN.md) supersedes the queue at the end of
+this document as the order of work. It keeps this document's evidence rules
+and adds four findings:
+
+- **Exact symbols exist.** The CC0 sms-english GMSE01 symbol map matches
+  SunPad's `main.dol` by SHA-1 and gives 38,343 addresses and sizes. That
+  resolves the "exact GMSE01 symbol/function bounds" requirement for rank 6
+  and lets profiles name generated functions.
+- **The pinned DolRecomp has moved on.** `fa0cf61` already inlines the
+  FP-enabled check that rank 1 proposed. It also emits inlinable paired-single
+  call sites, which SunPad's runtime does not yet back with a fast path, and
+  an opt-in direct cross-chunk call path that is off because it bypasses chunk
+  validation. The August profiles predate these changes.
+- **Sunshine reads the GPU back every frame.** Its sun-flare depth peeks,
+  occlusion colour peek, goop pixel metrics and EFB copies to RAM each block
+  the single CPU-GPU thread in Dolphin's Metal backend. CPU samples do not show
+  that blocked time.
+- **Save writes are not atomic.** See the plan's pass 1.
+
+The [sms-pc-port review](SMS-PC-PORT-REVIEW.md) records where each finding
+came from.
+
 ## Current conclusion
 
 The evidence does not identify one universal throttling bug, and it does not

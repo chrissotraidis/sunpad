@@ -19,12 +19,14 @@ done
 python3 -c 'import ast,pathlib; [ast.parse(p.read_text(), filename=str(p)) for p in pathlib.Path("scripts").glob("*.py")]'
 python3 -c 'import json,pathlib; [json.loads(p.read_text()) for p in pathlib.Path("apple").glob("**/Assets.xcassets/**/Contents.json")]'
 plutil -lint apple/ios/Info.plist apple/tvos/Info.plist apple/tvos/PrivacyInfo.xcprivacy apple/macos/Info.plist
-[[ "$(plutil -extract LSApplicationCategoryType raw apple/ios/Info.plist)" == "public.app-category.games" ]]
-[[ "$(plutil -extract LSSupportsGameMode raw apple/ios/Info.plist)" == "true" ]]
-[[ "$(plutil -extract GCSupportsGameMode raw apple/ios/Info.plist)" == "true" ]]
+[[ "$(plutil -extract LSApplicationCategoryType raw apple/ios/Info.plist)" == "public.app-category.games" ]] || { echo "check-repository.sh: check failed (line 22)" >&2; exit 1; }
+[[ "$(plutil -extract LSSupportsGameMode raw apple/ios/Info.plist)" == "true" ]] || { echo "check-repository.sh: check failed (line 23)" >&2; exit 1; }
+[[ "$(plutil -extract GCSupportsGameMode raw apple/ios/Info.plist)" == "true" ]] || { echo "check-repository.sh: check failed (line 24)" >&2; exit 1; }
 ./scripts/check-markdown-links.py
 
 ./tests/test-input-pipe-encoder.sh
+./tests/test-save-transfer.sh
+./tests/test-controller-rumble.sh
 ./tests/test-controller-mapping.sh
 ./tests/test-controller-slots.sh
 ./tests/test-experimental-60fps-config.sh
@@ -35,6 +37,7 @@ python3 tests/test_tvos_contract.py
 ./tests/test-widescreen-heatwave-fix.sh
 ./tests/test-diagnostics.sh
 ./tests/test-game-data-setup.sh
+./tests/test-profile-tools.sh
 
 test -x scripts/package-ios.sh
 test -x scripts/audit-ios-package.sh

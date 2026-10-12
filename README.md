@@ -8,6 +8,8 @@
   <img alt="Ahead-of-time game code" src="https://img.shields.io/badge/game%20code-ahead--of--time-FF9F0A">
   <img alt="Experimental preview" src="https://img.shields.io/badge/preview-experimental-FFD60A">
   <img alt="Game image not included" src="https://img.shields.io/badge/game%20image-not%20included-FF453A">
+  <a href="https://github.com/chrissotraidis/padmint"><img alt="Build SunPad with PadMint" src="https://img.shields.io/badge/PadMint-build%20your%20own-3EB489"></a>
+  <a href="https://discord.gg/xwHfUD2bxW"><img alt="Join the SunPad Discord" src="https://img.shields.io/badge/Discord-Join%20the%20community-5865F2?logo=discord&amp;logoColor=white"></a>
 </p>
 
 **Super Mario Sunshine on iPhone, iPad, Apple silicon Mac, and experimental Apple TV through ahead-of-time recompilation.**
@@ -29,6 +31,13 @@ Runtime and compiler dependencies use pinned submodules. The
 Apple and tvOS versions.
 
 ![SunPad running Super Mario Sunshine in Delfino Plaza on iPad](docs/readme/sunpad-delfino-plaza.jpg)
+
+> [!NOTE]
+> **AI disclosure:** SunPad uses substantial AI assistance for code, tests,
+> documentation, debugging and maintenance. Some support replies and maintenance
+> tasks are automated. There is no audited percentage of AI-generated code.
+> Build, test and device records describe what was checked. This disclosure
+> concerns SunPad's workflow, not the authorship of its upstream projects.
 
 ## Get SunPad
 
@@ -63,6 +72,11 @@ audio, controller, and save acceptance remain open.
 not verified minimum-device compatibility. See [known issues](docs/KNOWN_ISSUES.md)
 and [dated testing evidence](docs/TESTING.md) for the remaining limits.
 
+Next up are save durability and speed on older iPhones. The
+[improvement plan](docs/IMPROVEMENT-PLAN.md) describes that work. It draws on
+research into [sms-pc-port](https://github.com/chasem-dev/sms-pc-port), a
+decompilation-based PC port of the game ([research review](docs/SMS-PC-PORT-REVIEW.md)).
+
 ## Frequently asked questions
 
 <details>
@@ -77,6 +91,22 @@ PowerPC JIT. Mac uses JitArm64 for uncovered code before returning to the AOT
 module. SunPad is a game-specific integration, not a general GameCube loader or a
 from-scratch rewrite. See the [architecture](docs/ARCHITECTURE.md) and
 [upstream review](docs/UPSTREAM-REVIEW.md), including the existing ARM64 fallback fix.
+
+</details>
+
+<details>
+<summary><strong>How is SunPad different from the Super Mario Sunshine PC port?</strong></summary>
+
+[sms-pc-port](https://github.com/chasem-dev/sms-pc-port) compiles the game's
+decompilation as native PC code for Windows, Linux and x86 Macs (Apple silicon
+through Rosetta 2). SunPad translates the original game code ahead of time and
+runs it on a Dolphin-derived runtime, which is what lets it run on iPhone, iPad
+and Apple silicon.
+
+The projects share no code. SunPad uses the PC port's published findings as
+research for its [improvement plan](docs/IMPROVEMENT-PLAN.md); the
+[research review](docs/SMS-PC-PORT-REVIEW.md) explains what carries over and
+what does not.
 
 </details>
 
@@ -126,6 +156,8 @@ Use **••• → Unstable Experiments → Use Supported 30 FPS Mode** to disa
 for the next launch. Broader device performance, audio, lifecycle, and full-game
 validation remain work in progress. New levels, cheats, and extensive mods are
 not promised features.
+The [improvement plan](docs/IMPROVEMENT-PLAN.md#pass-8-real-60-fps) describes how
+a correct 60 FPS mode could be built later for Macs and newer iPads.
 
 </details>
 
@@ -175,7 +207,8 @@ game data. It preserves modified old dependency trees. For source checks without
 game inputs, use `--sources-only`, then run `./scripts/check-repository.sh`.
 
 [Build instructions](docs/BUILDING.md) · [Contribution policy](CONTRIBUTING.md) ·
-[Dependency pins](docs/DEPENDENCIES.md) · [Engineering review](docs/UPSTREAM-REVIEW.md)
+[Dependency pins](docs/DEPENDENCIES.md) · [Engineering review](docs/UPSTREAM-REVIEW.md) ·
+[Improvement plan](docs/IMPROVEMENT-PLAN.md)
 
 ## Screenshots
 
@@ -192,6 +225,16 @@ game inputs, use `--sources-only`, then run `./scripts/check-repository.sh`.
 
 Owner-supplied development screenshots. Individual frames do not establish
 sustained performance or full-game compatibility.
+
+## Community and support
+
+[Join the Discord](https://discord.gg/xwHfUD2bxW) for help and news. It is one
+community for SunPad and its sibling projects, such as KartPad, BlueWake and
+MeleePad: ask about setup, building with PadMint, and installing, share how it
+runs on your device, and hear about new releases first.
+
+Found a bug? [Open an issue](https://github.com/chrissotraidis/sunpad/issues)
+with your device, its OS version, and the steps that led to it.
 
 ## License
 

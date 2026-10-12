@@ -396,8 +396,9 @@ static void SunPadRuntimeLogCallback(
     if (_pipeFd < 0)
         return;
     static uint16_t lastButtons = 0;
-    BOOL modernCStick = [SunPadSettings sharedSettings].modernCStickHorizontal;
-    std::string commands = SunPadEncodePipeCommands(input, lastButtons, modernCStick);
+    SunPadSettings *settings = [SunPadSettings sharedSettings];
+    std::string commands = SunPadEncodePipeCommands(
+        input, lastButtons, settings.modernCStickHorizontal, settings.invertCStickVertical);
     if (!commands.empty()) {
         ssize_t written = ::write(_pipeFd, commands.data(), commands.size());
         if (written == static_cast<ssize_t>(commands.size())) {

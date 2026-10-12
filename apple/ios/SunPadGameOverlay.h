@@ -15,6 +15,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)gameOverlayRequestsGameDataFolderImport:(SunPadGameOverlay *)overlay;
 /* The user confirmed removal of the retained image and extracted game tree. */
 - (void)gameOverlayRequestsGameDataRemoval:(SunPadGameOverlay *)overlay;
+/* The user asked to import a Dolphin .gci save. */
+- (void)gameOverlayRequestsSaveImport:(SunPadGameOverlay *)overlay;
+/* Copies the current saves for sharing, or returns nil with a readable error. */
+- (nullable NSArray<NSURL *> *)gameOverlayExportSaves:(SunPadGameOverlay *)overlay
+                                                error:(NSError **)error;
 /* The user asked to configure the narrow physical-controller face-button map. */
 - (void)gameOverlayRequestsControllerMapping:(SunPadGameOverlay *)overlay;
 /* Current privacy-safe app/runtime state for a user-generated problem report. */

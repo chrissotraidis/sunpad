@@ -1,0 +1,4 @@
+fixtureInit = .init:0x80003100; // type:function size:0x30 scope:global align:4
+idleWait__6FakeOSFv = .text:0x80348700; // type:function size:0x200 scope:global align:4
+drawThing__5FakeGXFv = .text:0x80361700; // type:function size:0x40 scope:global align:4
+fixtureTable = .data:0x803E0000; // type:object size:0x40 scope:global align:4

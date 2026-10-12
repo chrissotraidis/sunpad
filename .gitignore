@@ -70,6 +70,7 @@ xcuserdata/
 *.log
 logs/
 artifacts/runtime/
+artifacts/bench/
 artifacts/screenshots/
 artifacts/device-save-backups/
 !artifacts/.gitkeep

@@ -1,6 +1,12 @@
 # Status
 
-Last updated: 2026-09-04
+Last updated: 2026-10-07
+
+Planned next engineering work, ordered as nine scoped passes, is in the
+[improvement plan](IMPROVEMENT-PLAN.md). It starts with atomic save writes and
+device measurement, then speeds up the translated game code and runtime. It
+draws on the [sms-pc-port research review](SMS-PC-PORT-REVIEW.md). Nothing in
+the plan is implemented yet; the stage evidence below is unchanged.
 
 Current phase: **SunPad now boots Super Mario Sunshine on a physical iPad as
 well as the iPhone and iPad simulators** as an ahead-of-time statically
@@ -231,6 +237,8 @@ behavior has shipped or passed:
 6. Keep Wii U GameCube Adapter, HD textures, Vision Pro, and Eclipse/general
    mods in feasibility backlog. Keep Apple TV separate as an experimental
    tester path until its physical acceptance matrix passes.
+   HD texture packs now have a scoped plan
+   ([pass 7](IMPROVEMENT-PLAN.md#pass-7-hd-texture-packs)) after the speed work.
 
 ## Next core/runtime tasks
 

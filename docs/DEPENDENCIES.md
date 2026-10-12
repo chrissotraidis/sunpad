@@ -13,8 +13,8 @@ or audio implementation is imported by this migration.
 
 | Lane | Component | Gitlink / checkout | Selected commit |
 | --- | --- | --- | --- |
-| apple | [ModernGekko](https://github.com/chrissotraidis/ModernGekko) | `ref/ModernGekko` | `8f49c550ae4637b8b05bc1c2d3cbd2301bd969e9` |
-| apple | [RecompCore](https://github.com/chrissotraidis/RecompCore) | `ref/ModernGekko/vendor/dolphin` | `da96175d5389b11f6c5f1eb8d680d437a71aab15` |
+| apple | [ModernGekko](https://github.com/chrissotraidis/ModernGekko) | `ref/ModernGekko` | `fa822d492e2d2225586ce05cbdfa4e0c5ba8723b` |
+| apple | [RecompCore](https://github.com/chrissotraidis/RecompCore) | `ref/ModernGekko/vendor/dolphin` | `eaa21f09505e1127cdf61da9f108daf52ec89c7d` |
 | apple | [DolRecomp](https://github.com/chrissotraidis/DolRecomp) | `ref/ModernGekko/vendor/dolphin/DolRecomp` | `fa0cf619e8d7eb8cba7eaf55267a12caaebb46aa` |
 | tvos | [ModernGekko](https://github.com/chrissotraidis/ModernGekko) | `ref/ModernGekko-tvOS` | `3982ff05bef91d9e87acd7ebdb3f3b058c53e7f8` |
 | tvos | [RecompCore](https://github.com/chrissotraidis/RecompCore) | `ref/ModernGekko-tvOS/vendor/dolphin` | `6e8c569c4c579328907c5c12c0e63e07fd643df1` |
@@ -64,6 +64,19 @@ build inputs, generated-module identity, toolchain/flags and artifact hashes.
 Older public IPAs retain their own source and device-evidence limitations.
 
 ## Historical baseline and research inventory
+
+### Research references (not build inputs)
+
+| Reference | Revision reviewed | License | Use |
+|---|---|---|---|
+| [sms-pc-port](https://github.com/chasem-dev/sms-pc-port) | `89e9fd01602bfa9735cdb1d5713d39edff91d9e7` | none declared | Research only; no code used ([review](SMS-PC-PORT-REVIEW.md)) |
+| [sms-english](https://github.com/chasem-dev/sms-english) `config/GMSE01/symbols.txt` | `d5f4eb3eb54ac49638b5513efb1fc368068805da` (file SHA-256 `c75a8f35c1d51e7978cc66aeaa86c1d4e2d16c5603576183e0cd49e66a8d98ff`) | CC0-1.0 | Planned hash-checked input for profiling and native replacements ([plan](IMPROVEMENT-PLAN.md#pass-2-measurement)) |
+
+If the symbol map becomes a build input, pin its commit and hash in
+`config/dependencies.lock.json` and verify it against the extracted
+`main.dol` before use.
+
+### Original records
 
 The following records predate the fork migration. They describe the original
 upstream bases and research setup, not current pins or current host versions.

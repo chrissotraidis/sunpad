@@ -16,3 +16,17 @@ patch-replay workflow or discard modified dependency checkouts.
 
 Run the source suite and applicable clean builds. Record exact artifact and device
 evidence separately. Preserve user data, signing state and concurrent work.
+
+## Improvement plan
+
+Ongoing engineering work is organized in
+[docs/IMPROVEMENT-PLAN.md](docs/IMPROVEMENT-PLAN.md). When asked to continue that
+plan, to improve performance or save safety, or to pick up SunPad work without a
+more specific request, start at its "Start here" section and follow its goal
+loop. Record every session in [docs/IMPROVEMENT-LOG.md](docs/IMPROVEMENT-LOG.md).
+[sms-pc-port](https://github.com/chasem-dev/sms-pc-port) is a research
+reference only; do not copy its code.
+
+To compare SunPad with another Sunshine project or look for features to learn
+from, follow [docs/RESEARCH-LOOP.md](docs/RESEARCH-LOOP.md). Its source rules
+say what may be read and what may be reused.

@@ -2,11 +2,13 @@
 
 #import "SunPadCoreHost.h"
 #import "SunPadControllerMapping.h"
+#import "SunPadControllerRumble.h"
 #import "SunPadControllerSlots.h"
 #import "SunPadDiagnostics.h"
 #import "SunPadDiscExtractor.h"
 #import "SunPadGameOverlay.h"
 #import "SunPadInputMixer.h"
+#import "SunPadSaveTransfer.h"
 #import "SunPadSettings.h"
 
 #import <CommonCrypto/CommonDigest.h>
@@ -261,6 +263,8 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
     BOOL _hasPerformanceUsageBaseline;
     NSString *_lastPerformanceSummary;
     NSDate *_lastScreenshotMarker;
+    UIDocumentPickerViewController *_saveImportPicker;
+    UIAlertController *_pendingSaveMessage;
 }
 
 - (BOOL)shouldAutorotate {
@@ -524,6 +528,7 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
 }
 
 - (void)observeControllers {
+    [SunPadControllerRumble sharedRumble].allowed = [SunPadSettings sharedSettings].controllerRumble;
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(controllerDidConnect:)
                                                  name:GCControllerDidConnectNotification
@@ -679,6 +684,7 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
     }
 
     GCController *playerOne = [self controllerForPlayerSlot:0];
+    [[SunPadControllerRumble sharedRumble] useController:playerOne];
     if (playerOne != nil)
         [self publishInputFromController:playerOne gamepad:playerOne.extendedGamepad];
 }
@@ -695,7 +701,13 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
     SunPadSettings *settings = [SunPadSettings sharedSettings];
     [_coreHost setRenderScale:settings.renderScale];
     [_coreHost setAspectRatioMode:settings.aspectRatioMode];
+    [SunPadControllerRumble sharedRumble].allowed = settings.controllerRumble;
     [self updateFPSLabel];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    [self presentPendingSaveMessage];
 }
 
 - (void)viewDidLayoutSubviews {
@@ -806,6 +818,10 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
         if (saveError != nil)
             SunPadLog(@"diagnostic save seed failed: %@", saveError);
     }
+
+    // The runtime has not opened the memory card yet, so a save the player
+    // chose earlier can replace the current one safely here.
+    [self applyStagedSaveImport];
 
     NSString *currentContainerRoot = [gameDataDirectory stringByAppendingPathComponent:@"GMSE01"];
     BOOL currentRootExists = [fileManager fileExistsAtPath:currentContainerRoot];
@@ -1084,6 +1100,33 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
     [self presentControllerMapping];
 }
 
+- (void)gameOverlayRequestsSaveImport:(SunPadGameOverlay *)overlay {
+    (void)overlay;
+    NSMutableArray<UTType *> *types = [NSMutableArray array];
+    UTType *gciType = [UTType typeWithFilenameExtension:@"gci"];
+    if (gciType != nil)
+        [types addObject:gciType];
+    [types addObject:UTTypeData];
+    UIDocumentPickerViewController *picker =
+        [[UIDocumentPickerViewController alloc] initForOpeningContentTypes:types asCopy:YES];
+    picker.delegate = self;
+    picker.allowsMultipleSelection = NO;
+    picker.shouldShowFileExtensions = YES;
+    _saveImportPicker = picker;
+    [self presentViewController:picker animated:YES completion:nil];
+}
+
+- (nullable NSArray<NSURL *> *)gameOverlayExportSaves:(SunPadGameOverlay *)overlay
+                                                error:(NSError **)error {
+    (void)overlay;
+    NSString *destination = [NSTemporaryDirectory()
+        stringByAppendingPathComponent:@"SunPad Saves"];
+    NSArray<NSURL *> *saves =
+        SunPadCopySavesForExport([self saveCardDirectory], destination, error);
+    SunPadLog(@"save export files=%lu", (unsigned long)saves.count);
+    return saves;
+}
+
 - (NSString *)gameOverlayDiagnosticContext:(SunPadGameOverlay *)overlay {
     (void)overlay;
     NSBundle *bundle = NSBundle.mainBundle;
@@ -1304,11 +1347,117 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
 
 - (void)documentPicker:(UIDocumentPickerViewController *)controller
     didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
-    (void)controller;
     NSURL *url = urls.firstObject;
+    if (controller == _saveImportPicker) {
+        _saveImportPicker = nil;
+        if (url != nil)
+            [self stageSaveImportFromURL:url];
+        return;
+    }
     if (url == nil)
         return;
     [self importGameDataFromURL:url];
+}
+
+- (void)documentPickerWasCancelled:(UIDocumentPickerViewController *)controller {
+    if (controller == _saveImportPicker)
+        _saveImportPicker = nil;
+}
+
+#pragma mark - Save import and export
+
+- (NSString *)saveCardDirectory {
+    return [[self sunPadSupportRoot] stringByAppendingPathComponent:@"GC/USA/Card A"];
+}
+
+- (NSString *)saveImportStagingPath {
+    return [[self sunPadSupportRoot] stringByAppendingPathComponent:@"SaveImport/pending.gci"];
+}
+
+// Backups live in Documents so players can find and restore them in Files.
+- (NSString *)saveBackupsRoot {
+    NSString *documents = NSSearchPathForDirectoriesInDomains(
+        NSDocumentDirectory, NSUserDomainMask, YES).firstObject;
+    return [documents stringByAppendingPathComponent:@"Save Backups"];
+}
+
+- (NSString *)filesLocationName {
+    return UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad
+        ? @"On My iPad → SunPad → Save Backups"
+        : @"On My iPhone → SunPad → Save Backups";
+}
+
+// Imports are applied while the view loads, before it is on screen, so the
+// result waits for viewDidAppear when needed.
+- (void)presentSaveMessageWithTitle:(NSString *)title message:(NSString *)message {
+    UIAlertController *alert =
+        [UIAlertController alertControllerWithTitle:title
+                                            message:message
+                                     preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:@"OK"
+                                              style:UIAlertActionStyleDefault
+                                            handler:nil]];
+    _pendingSaveMessage = alert;
+    if (self.view.window != nil)
+        [self presentPendingSaveMessage];
+}
+
+- (void)presentPendingSaveMessage {
+    UIAlertController *alert = _pendingSaveMessage;
+    if (alert == nil)
+        return;
+    _pendingSaveMessage = nil;
+    UIViewController *top = self;
+    while (top.presentedViewController != nil && !top.presentedViewController.isBeingDismissed)
+        top = top.presentedViewController;
+    [top presentViewController:alert animated:YES completion:nil];
+}
+
+- (void)stageSaveImportFromURL:(NSURL *)url {
+    BOOL scoped = [url startAccessingSecurityScopedResource];
+    NSError *error = nil;
+    NSData *data = [NSData dataWithContentsOfURL:url options:0 error:&error];
+    if (scoped)
+        [url stopAccessingSecurityScopedResource];
+    BOOL staged = data != nil && SunPadStageSaveImport(data, [self saveImportStagingPath], &error);
+    SunPadLog(@"save import staged=%d running=%d", staged, _coreHost != nil);
+    if (!staged) {
+        [self presentSaveMessageWithTitle:@"Save Not Imported"
+                                  message:error.localizedDescription
+                                              ?: @"SunPad could not read this file."];
+        return;
+    }
+    NSString *message = _coreHost != nil
+        ? [NSString stringWithFormat:@"Close SunPad and open it again to use this save. "
+                                      "Your current saves are copied to %@ first.",
+                                      [self filesLocationName]]
+        : [NSString stringWithFormat:@"SunPad will use this save when the game starts. "
+                                      "Your current saves are copied to %@ first.",
+                                      [self filesLocationName]];
+    [self presentSaveMessageWithTitle:@"Save Ready to Import" message:message];
+}
+
+- (void)applyStagedSaveImport {
+    NSString *backup = nil;
+    NSError *error = nil;
+    SunPadSaveImportResult result = SunPadApplyStagedSaveImport(
+        [self saveImportStagingPath], [self saveCardDirectory], [self saveBackupsRoot],
+        [NSDate date], &backup, &error);
+    if (result == SunPadSaveImportNothingPending)
+        return;
+    SunPadLog(@"save import result=%ld backup=%@", (long)result,
+              backup.lastPathComponent ?: @"none");
+    if (result == SunPadSaveImportApplied) {
+        [self presentSaveMessageWithTitle:@"Save Imported"
+                                  message:[NSString stringWithFormat:
+            @"Your previous saves are in %@.", [self filesLocationName]]];
+        return;
+    }
+    NSString *message = error.localizedDescription ?: @"SunPad could not import the save.";
+    if (backup != nil)
+        message = [message stringByAppendingFormat:@" Your saves from before the import are in %@.",
+                                                   [self filesLocationName]];
+    [self presentSaveMessageWithTitle:@"Save Import Failed" message:message];
 }
 
 - (void)importGameDataFromURL:(NSURL *)url {

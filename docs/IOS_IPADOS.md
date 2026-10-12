@@ -1,6 +1,9 @@
 # iOS and iPadOS
 
-Last updated: 2026-09-01
+Last updated: 2026-10-07
+
+Planned performance and save-durability work for iPhone and iPad is in the
+[improvement plan](IMPROVEMENT-PLAN.md).
 
 ## Current status
 
@@ -85,6 +88,23 @@ fresh acceptance run:
    Stored Game Data** stops the runtime and deletes the retained image and
    extracted tree; saves are stored separately and are not removed.
 
+**Save import and export** (on `main`, not yet in a release). Saves live in
+`Library/Application Support/SunPad/GC/USA/Card A`, which Files cannot see.
+
+- **Game Data & Saves → Export Saves…** copies each valid GMSE01 `.gci` to a
+  temporary folder and opens the share sheet (Save to Files, AirDrop, and so
+  on). A save the game is writing at that moment is skipped.
+- **Game Data & Saves → Import Dolphin Save (.gci)…** accepts a GMSE01 save
+  exported from Dolphin's Memory Card Manager or from SunPad. It checks the
+  game code, maker code and size the way Dolphin's GCI folder does, then stages
+  the file. The import is applied the next time the game starts, before the
+  runtime opens the memory card: SunPad copies the whole card folder to
+  **Files → On My iPhone/iPad → SunPad → Save Backups → <date> before import**,
+  removes any save with the same internal name, and renames the imported file
+  into place. While the game is running, the player is asked to close and
+  reopen SunPad. To restore a backup, import a `.gci` from that folder.
+- The selected file is never modified, and SunPad never deletes a backup.
+
 Verified: the on-device extraction produces the same 174-file tree as the
 desktop extraction, and the game boots from the imported image and responds to
 input. The recompiled module still comes from the Mac toolchain (iOS has no C
@@ -100,6 +120,11 @@ headlessly for verification.
   runtime on return. The iPad Simulator passed a background/foreground cycle on
   one process with continued 30 FPS/full-speed telemetry. Physical save
   readback and a real audio-interruption replay remain acceptance gates.
+  The flush itself rewrites each save in place, so a termination mid-write can
+  hide the save ([known issue 22](KNOWN_ISSUES.md)); atomic writes are
+  [pass 1](IMPROVEMENT-PLAN.md#pass-1-save-durability) of the plan. They are on
+  `main` (atomic replace, one `.bak` generation, load-time repair) and await
+  the task 1.4 device session.
 - The app frontend uses Apple's GameController framework. Current controllers
   are enumerated and reconciled on notifications, periodically while active,
   and after foreground resume. Valid instances retain their player slots,
@@ -107,7 +132,16 @@ headlessly for verification.
   and removal clears held player-1 buttons, sticks, and triggers. Touch controls
   auto-hide when a controller is connected. The persisted
   **Modern C-stick L/R** setting reverses only the horizontal C-stick axis for
-  both touch and physical controllers, leaving vertical zoom unchanged.
+  both touch and physical controllers, leaving vertical zoom unchanged. The
+  separate **Invert C-stick Up/Down** setting, off by default, reverses only
+  the vertical axis. Both apply immediately.
+  **Controls → Controller Rumble** (on `main`, not yet in a release; off by
+  default) plays the game's rumble on player one's controller through Core
+  Haptics. RecompCore's `Pad::Rumble` calls the app's `SunPadSetRumble` for
+  pad 0; controllers without haptics, or rumble turned off, fall back to
+  Dolphin's own output, which does nothing for SunPad's input pipe. iOS stops
+  haptics in the background, and SunPad restarts them on the next controller
+  check.
 - SunPad writes low-frequency boot, display, controller, lifecycle,
   memory-warning, input-pipe, runtime-warning/error, screenshot-marker, and
   runtime-exit breadcrumbs to both the unified device log and
