@@ -241,3 +241,37 @@ Notes: Added public descriptive metadata without a remote schema reference or
   checked; no physical iOS 27 or reporter acceptance is implied.
 Next: refresh draft #57 against main and complete available host checks;
   prepare task 2.6's device measurement without claiming a speedup.
+
+### 2026-10-13 task 2.6: iPhone baseline preflight
+Result: blocked (device data preservation and human session)
+Pins: SunPad a0db9c0 main; installed iPhone app 0.2.0 / build 14
+Checkpoints: no new C3 or C5 acceptance
+Evidence: private device-query and app-data-copy logs; issue #12 follow-up
+Notes: The connected iPhone 14's app version and preferences could be read,
+  but complete Documents and Library copies timed out. The partial backup and
+  recovered save hash are retained privately; they do not establish a complete
+  backup. No app was replaced, reset or uninstalled. The installed version
+  predates the current profiling work. The remaining route work in 2.3-2.5,
+  a current instrumented app, and a human device session are still needed.
+Next: with the iPhone connected and unlocked, complete both app-data copies
+  and verify save hashes before any in-place install with the same signing
+  identity. Then run the recorded Noki protocol with a person checking
+  gameplay/audio and thermal conditions, and finish the plaza/effects routes
+  before claiming the full 2.6 ranking. Passes 3-6 remain gated on measurements.
+
+### 2026-10-13 draft #57: refresh the personal iPhone module recipe
+Result: in progress (Linux and physical-device acceptance pending)
+Pins: SunPad 5a3432d build inputs, then merged a0db9c0 documentation;
+  dependency pins unchanged from main
+Checkpoints: check-repository.sh pass; clean iOS and tvOS CI pass at 5a3432d;
+  PadMint manifest and per-host requirement checks pass
+Evidence: SunPad #57; PadMint #152 (merged, all ten CI checks pass)
+Notes: Refreshed the draft against current main and limited Xcode/xcrun
+  requirements to Mac hosts. A fresh Mac check exposed missing tool setup and
+  base-app forwarding in the shared player-check helper; PadMint #152 fixes
+  both, with five focused fixtures and 333 passing tests on Apple's Python.
+  The private Mac game-build result and exact revision are recorded in #57.
+  Docker's daemon was unresponsive during bounded checks, preventing refreshed
+  Linux ARM64/x86-64 proof. Historical Linux evidence remains labelled as such.
+Next: complete the host-build and safe device gates listed in #57 before
+  leaving draft. No new release or performance improvement is claimed.

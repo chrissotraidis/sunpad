@@ -330,7 +330,7 @@ human for a device session or a hands-on verdict.
 | 2.3 | Frame breakdown counters | in progress | none | D |
 | 2.4 | Unlimited-speed desktop benchmark | in progress | none | D |
 | 2.5 | Developer warp and the three routes | in progress | 2.1 | D |
-| 2.6 | Baseline measurement and ranking | ready | 2.2-2.5 | D, H |
+| 2.6 | Baseline measurement and ranking | blocked (complete device backup and human session pending) | 2.2-2.5 | D, H |
 | 3.1 | Chunk-validation flag for direct calls | ready | 2.6 entry gate | D |
 | 3.2 | Hook and mod bitmap | ready | 3.1 | D |
 | 3.3 | Enable safe direct calls | ready | 3.2 | D, H |
