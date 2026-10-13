@@ -128,7 +128,7 @@
       }
     ]
   },
-  "notes": "The app loads the translated game from a separate module (gGMSE01_recomp.dylib); package-ios.sh places it with the app. ios-build-core-device.sh builds the module in build/ios-module-device inside the checkout.",
+  "notes": "PadMint builds gGMSE01_recomp.dylib with scripts/build-ios-module.sh in build/ios-module-padmint, checks its imports, and adds it to the published app for personal use.",
   "publication": {
     "public_binaries": false,
     "reason": "The release publishes the app without game code; PadMint adds the module translated from the player's own disc, which stays personal."

@@ -350,3 +350,17 @@ Notes: Local macOS builds looked for Sys at the app root while SunPad packages
 Next: complete clean iOS/tvOS CI for this PR; with a person, perform the actual
   desktop save/reload check before marking 1.3 done, then the backed-up device
   session for 1.4. No new release or performance claim.
+
+### 2026-10-13 draft #57: independent recipe review
+Result: build boundaries rechecked; stale recipe note corrected
+Pins: SunPad 50306de before the notes-only correction; build inputs unchanged
+Checkpoints: current PadMint manifest validation and three-host command
+  expansion pass, including paths with spaces; invalid jobs fail before tools
+Evidence: #57; source review of the module script and metadata consumers
+Notes: The recipe's descriptive note still named the superseded device build
+  and packaging scripts. It now describes the module build and PadMint insertion
+  that the recipe actually runs. The metadata remains descriptive JSON with
+  no build or workflow consumer. This does not audit the external directory's
+  service or establish device acceptance.
+Next: retain the draft until the deferred candidate verdict and physical
+  Linux-module check. The installed iPhone candidate remains unchanged.
