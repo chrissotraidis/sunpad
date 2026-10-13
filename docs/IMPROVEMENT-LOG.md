@@ -275,3 +275,53 @@ Notes: Refreshed the draft against current main and limited Xcode/xcrun
   Linux ARM64/x86-64 proof. Historical Linux evidence remains labelled as such.
 Next: complete the host-build and safe device gates listed in #57 before
   leaving draft. No new release or performance improvement is claimed.
+
+
+### 2026-10-13 draft #57: refreshed Mac and Linux host proof
+Result: host builds and package checks pass; physical Linux-module check pending
+Pins: SunPad 81a66cb; PadMint main 7758cf4; published v0.2.1 base app
+Checkpoints: source suite and clean iOS/tvOS CI pass at 81a66cb; fresh Mac
+  player-check exits 0 using Apple Python 3.9.6, a fresh source checkout and
+  an empty PadMint folder; updated Linux ARM64 and x86-64 builds exit 0
+Evidence: #57; private build records, artifact readbacks and host inventories
+Notes: The Mac personal IPA has SHA-256
+  8eacbf71a403ad2843a85ba85101abab83ca82f4e8910d37fcbdeefca3ffedd0.
+  Both Linux hosts produce the identical personal IPA with SHA-256
+  0d74389bb27aea7ab654f85d6d28aad30ee4dfe920c6d3e10e6b20c2422a205c.
+  Independent ZIP readbacks preserve all 2,797 base-app entries and add exactly
+  one arm64 iOS module, minimum OS 16.0; import checks find zero app imports
+  and three device C/C++ imports. All 225 generated files match across hosts.
+  Linux uses Ubuntu 24.04 containers and LLVM 21.1.8; x86-64 runs under emulation
+  on Apple silicon, so timings are not native-host performance results. ARM64
+  was interrupted after native preparation to raise module jobs from two to
+  six, then rerun with unchanged source/flags; the SDK refresh recompiled its
+  module. Preserve the initial exit-130 record, and do not call that rerun an
+  uninterrupted empty-cache build. x86-64 completed one uninterrupted build
+  with separate native caches. All generated artifacts remain personal-only.
+Next: after the maintainer's pending check of the installed Mac-built candidate,
+  refresh the verified backup and test a Linux-built module on a physical
+  iPhone/iPad before taking #57 out of draft. No new release is authorized.
+
+### 2026-10-13 device preservation and deferred human checks
+Result: complete backup and in-place candidate install verified; C3/C5 pending
+Pins: published v0.2.1 / build 15 app with the Mac-built #57 module;
+  current-source app at 81a66cb built and signed separately, not installed
+Checkpoints: independently verified every regular file in Documents/Library;
+  strict signature verification; post-install save/preferences hashes match;
+  post-launch save hash matches; additional offline backup readback passes
+Evidence: private USB inventory, per-file hashes, install and startup records
+Notes: CoreDevice copies kept timing out. USB AFC/House Arrest recovered and
+  verified 423 regular files (2,866,715,917 bytes). A recursive copy exited
+  successfully after stopping at the runtime pipe; independent traversal
+  caught the omission. Only that confirmed nonpersistent FIFO was excluded.
+  The candidate was installed without uninstall/reset, using the existing
+  signing identity and application entitlements. Its opening scene rendered.
+  QuickTime's preview caused an audio interruption; after closing the preview
+  and relaunching, short startup logs showed normal speed and no interruption.
+  This is not hands-on sound/gameplay or a controlled Noki measurement. The
+  maintainer deferred the save/controls/audio check. The installed candidate
+  remains unchanged; the newer app for save/controller/profile work is staged.
+Next: maintainer checks that the installed candidate loads the existing save
+  and that movement, camera and sound work normally. Then refresh the backup
+  before the current-source install and the 1.4/10.1-10.3 human checks. Complete
+  the Noki/plaza/effects routes before the 2.6 ranking; passes 3-6 remain gated.
