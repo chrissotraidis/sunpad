@@ -65,7 +65,7 @@ The following feature checks require that newer app and a person:
    file from the backup; import a Dolphin GMSE01 `.gci`, reopen SunPad,
    confirm it loads in game and that Files → SunPad → Save Backups holds the
    previous save; restore by importing that backup.
-4. **1.3 and 1.4:** save in game, background SunPad and terminate it from
+4. **1.4:** save in game, background SunPad and terminate it from
    Xcode or `devicectl` within a second, relaunch, and confirm the save
    loads. Check the runtime log for `GCI restored from backup`.
 
@@ -348,7 +348,7 @@ human for a device session or a hands-on verdict.
 | --- | --- | --- | --- | --- |
 | 1.1 | Save fault-injection test | done | none | S |
 | 1.2 | Atomic GCI and header writes | done | 1.1 | S |
-| 1.3 | Last-good backup and load repair | in progress (bundle startup fixed; desktop save and reload pending) | 1.2 | S |
+| 1.3 | Last-good backup and load repair | done (tests and normal desktop save/reload pass) | 1.2 | S |
 | 1.4 | Pin and device save session | ready | 1.3 | D, H |
 | 2.1 | Symbol map fetch and verify | done | none | S (fixture); D for the real hash check |
 | 2.2 | Profile symbolizer | done | 2.1 | S |

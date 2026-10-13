@@ -414,3 +414,23 @@ Notes: The refreshed app contains the import failure guard. The device runtime
   existing personal module is unchanged. No device launch or gameplay claim.
 Next: after the deferred basic candidate check, refresh the device backup before
   any in-place install of this staged app and the save/controller checks.
+
+### 2026-10-13 task 1.3: normal desktop save and cold reload
+Result: done; device termination test remains task 1.4
+Pins: SunPad Mac package inputs 4b953bd; ModernGekko e29496f,
+  RecompCore 7240549; same save implementation and six passing durability tests
+Checkpoints: copied file A loaded into Delfino Plaza; in-game Save reported
+  completion; normal process shutdown, fresh launch and file A reload passed
+Evidence: private save-complete/reloaded-plaza screenshots, runtime logs,
+  process identities and before/after SHA-256 manifests; independent readback
+Notes: The supported controller pipe resolved the earlier synthetic-keyboard
+  blocker. The new save stayed byte-identical through shutdown and reload;
+  movement and pause responded after loading. A last-good backup was present;
+  two writes occurred, so it contains the preceding write rather than the
+  pre-session save. No repair event occurred in this normal session; recovery
+  behavior remains covered by the existing tests. Only a private copied user
+  directory changed, and both test processes were stopped. The installed
+  iPhone candidate and original save were untouched. This is neither a device
+  termination test nor a controlled performance or audio verdict.
+Next: collect the deferred iPhone candidate verdict, refresh its backup, then
+  run task 1.4 and the staged app's save/controller checks with the maintainer.
