@@ -1,10 +1,75 @@
 #import <Foundation/Foundation.h>
+#import <objc/runtime.h>
 
 #include <cassert>
 #include <cstring>
 #include <iostream>
 
 #include "SunPadSaveTransfer.h"
+
+// Reject the final commit, after the backup is complete. Cover both the old
+// remove-then-move implementation and the atomic write used for replacement.
+static NSString *rejectedCommitPath;
+static NSString *rejectedEnumerationPath;
+static NSString *rejectedRemovalPath;
+static BOOL rejectBackupCopy;
+
+@interface NSFileManager (SunPadSaveTransferFaults)
+- (BOOL)sunpadMoveItemAtPath:(NSString *)source toPath:(NSString *)destination error:(NSError **)error;
+- (BOOL)sunpadCopyItemAtPath:(NSString *)source toPath:(NSString *)destination error:(NSError **)error;
+- (NSArray<NSString *> *)sunpadContentsOfDirectoryAtPath:(NSString *)path error:(NSError **)error;
+- (BOOL)sunpadRemoveItemAtPath:(NSString *)path error:(NSError **)error;
+@end
+
+@implementation NSFileManager (SunPadSaveTransferFaults)
+- (BOOL)sunpadMoveItemAtPath:(NSString *)source toPath:(NSString *)destination error:(NSError **)error {
+    if ([destination isEqualToString:rejectedCommitPath]) {
+        if (error != nullptr)
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:nil];
+        return NO;
+    }
+    return [self sunpadMoveItemAtPath:source toPath:destination error:error];
+}
+- (BOOL)sunpadCopyItemAtPath:(NSString *)source toPath:(NSString *)destination error:(NSError **)error {
+    if (rejectBackupCopy) {
+        if (error != nullptr)
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteOutOfSpaceError userInfo:nil];
+        return NO;
+    }
+    return [self sunpadCopyItemAtPath:source toPath:destination error:error];
+}
+- (NSArray<NSString *> *)sunpadContentsOfDirectoryAtPath:(NSString *)path error:(NSError **)error {
+    if ([path isEqualToString:rejectedEnumerationPath]) {
+        if (error != nullptr)
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadNoPermissionError userInfo:nil];
+        return nil;
+    }
+    return [self sunpadContentsOfDirectoryAtPath:path error:error];
+}
+- (BOOL)sunpadRemoveItemAtPath:(NSString *)path error:(NSError **)error {
+    if ([path isEqualToString:rejectedRemovalPath]) {
+        if (error != nullptr)
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteNoPermissionError userInfo:nil];
+        return NO;
+    }
+    return [self sunpadRemoveItemAtPath:path error:error];
+}
+@end
+
+@interface NSData (SunPadSaveTransferFaults)
+- (BOOL)sunpadWriteToFile:(NSString *)path options:(NSDataWritingOptions)options error:(NSError **)error;
+@end
+
+@implementation NSData (SunPadSaveTransferFaults)
+- (BOOL)sunpadWriteToFile:(NSString *)path options:(NSDataWritingOptions)options error:(NSError **)error {
+    if ([path isEqualToString:rejectedCommitPath]) {
+        if (error != nullptr)
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:nil];
+        return NO;
+    }
+    return [self sunpadWriteToFile:path options:options error:error];
+}
+@end
 
 // Synthetic saves only. Real player saves never belong in the repository.
 static NSData *MakeSave(const char *game, const char *maker, const char *name,
@@ -26,6 +91,21 @@ static NSData *Read(NSString *path) {
 
 int main(void) {
     @autoreleasepool {
+        method_exchangeImplementations(
+            class_getInstanceMethod([NSFileManager class], @selector(moveItemAtPath:toPath:error:)),
+            class_getInstanceMethod([NSFileManager class], @selector(sunpadMoveItemAtPath:toPath:error:)));
+        method_exchangeImplementations(
+            class_getInstanceMethod([NSFileManager class], @selector(copyItemAtPath:toPath:error:)),
+            class_getInstanceMethod([NSFileManager class], @selector(sunpadCopyItemAtPath:toPath:error:)));
+        method_exchangeImplementations(
+            class_getInstanceMethod([NSFileManager class], @selector(contentsOfDirectoryAtPath:error:)),
+            class_getInstanceMethod([NSFileManager class], @selector(sunpadContentsOfDirectoryAtPath:error:)));
+        method_exchangeImplementations(
+            class_getInstanceMethod([NSFileManager class], @selector(removeItemAtPath:error:)),
+            class_getInstanceMethod([NSFileManager class], @selector(sunpadRemoveItemAtPath:error:)));
+        method_exchangeImplementations(
+            class_getInstanceMethod([NSData class], @selector(writeToFile:options:error:)),
+            class_getInstanceMethod([NSData class], @selector(sunpadWriteToFile:options:error:)));
         NSFileManager *fm = [NSFileManager defaultManager];
         NSString *root = [NSTemporaryDirectory()
             stringByAppendingPathComponent:[[NSUUID UUID] UUIDString]];
@@ -106,13 +186,90 @@ int main(void) {
         assert([Read([card stringByAppendingPathComponent:@"01-GMSE-super_mario_sunshine.gci"])
             isEqualToData:oldSave]);
 
+        // A failed backup or final commit must preserve the working card save
+        // and keep the import staged for a later retry.
+        NSString *active = [card stringByAppendingPathComponent:@"01-GMSE-super_mario_sunshine.gci"];
+        assert(SunPadStageSaveImport(imported, staging, nil));
+        rejectedEnumerationPath = card;
+        assert(SunPadApplyStagedSaveImport(staging, card, backups, [NSDate date], &backup, &error) ==
+               SunPadSaveImportFailed);
+        rejectedEnumerationPath = nil;
+        assert(backup == nil);
+        assert([Read(active) isEqualToData:oldSave]);
+        assert([Read(staging) isEqualToData:imported]);
+        rejectBackupCopy = YES;
+        assert(SunPadApplyStagedSaveImport(staging, card, backups, [NSDate date], &backup, &error) ==
+               SunPadSaveImportFailed);
+        rejectBackupCopy = NO;
+        assert([Read(active) isEqualToData:oldSave]);
+        assert([Read(staging) isEqualToData:imported]);
+        rejectedCommitPath = active;
+        assert(SunPadApplyStagedSaveImport(staging, card, backups, [NSDate date], &backup, &error) ==
+               SunPadSaveImportFailed);
+        rejectedCommitPath = nil;
+        assert([Read(active) isEqualToData:oldSave]);
+        assert([Read(staging) isEqualToData:imported]);
+        assert([Read([backup stringByAppendingPathComponent:active.lastPathComponent])
+            isEqualToData:oldSave]);
+        assert(SunPadApplyStagedSaveImport(staging, card, backups, [NSDate date], &backup, &error) ==
+               SunPadSaveImportApplied);
+        assert([Read(active) isEqualToData:imported]);
+        assert(![fm fileExistsAtPath:staging]);
+
+        // A committed import can still need duplicate cleanup. Report failure
+        // so the caller keeps gameplay stopped until the pending import clears.
+        NSString *duplicate = [card stringByAppendingPathComponent:@"renamed.gci"];
+        assert([imported writeToFile:duplicate atomically:YES]);
+        assert(SunPadStageSaveImport(oldSave, staging, nil));
+        rejectedRemovalPath = duplicate;
+        assert(SunPadApplyStagedSaveImport(staging, card, backups, [NSDate date], &backup, &error) ==
+               SunPadSaveImportFailed);
+        rejectedRemovalPath = nil;
+        assert([Read(active) isEqualToData:oldSave]);
+        assert([Read(duplicate) isEqualToData:imported]);
+        assert([Read(staging) isEqualToData:oldSave]);
+        assert([Read([backup stringByAppendingPathComponent:active.lastPathComponent])
+            isEqualToData:imported]);
+        assert(SunPadApplyStagedSaveImport(staging, card, backups, [NSDate date], &backup, &error) ==
+               SunPadSaveImportApplied);
+        assert([Read(active) isEqualToData:oldSave]);
+        assert(![fm fileExistsAtPath:duplicate]);
+        assert(![fm fileExistsAtPath:staging]);
+
+        // Failing to consume the staged import also blocks gameplay: otherwise
+        // a later launch could reapply it over progress made after this import.
+        assert(SunPadStageSaveImport(imported, staging, nil));
+        rejectedRemovalPath = staging;
+        assert(SunPadApplyStagedSaveImport(staging, card, backups, [NSDate date], &backup, &error) ==
+               SunPadSaveImportFailed);
+        rejectedRemovalPath = nil;
+        assert([Read(active) isEqualToData:imported]);
+        assert([Read(staging) isEqualToData:imported]);
+        assert([Read([backup stringByAppendingPathComponent:active.lastPathComponent])
+            isEqualToData:oldSave]);
+        assert(SunPadApplyStagedSaveImport(staging, card, backups, [NSDate date], &backup, &error) ==
+               SunPadSaveImportApplied);
+        assert([Read(active) isEqualToData:imported]);
+        assert(![fm fileExistsAtPath:staging]);
+
         // A damaged staged file is discarded without touching the card.
         [truncated writeToFile:staging atomically:YES];
         assert(SunPadApplyStagedSaveImport(staging, card, backups, [NSDate date], &backup, &error) ==
                SunPadSaveImportFailed);
         assert(![fm fileExistsAtPath:staging]);
         assert([Read([card stringByAppendingPathComponent:@"01-GMSE-super_mario_sunshine.gci"])
-            isEqualToData:oldSave]);
+            isEqualToData:imported]);
+
+        // A differently cased filename may be the same destination on the
+        // filesystem. Cleanup must not delete the successfully replaced save.
+        NSString *mixedCase = [card stringByAppendingPathComponent:@"01-GMSE-SUPER_MARIO_SUNSHINE.GCI"];
+        assert([fm moveItemAtPath:active toPath:mixedCase error:&error]);
+        assert(SunPadStageSaveImport(oldSave, staging, nil));
+        assert(SunPadApplyStagedSaveImport(staging, card, backups, [NSDate date], &backup, &error) ==
+               SunPadSaveImportApplied);
+        assert([Read(mixedCase) isEqualToData:oldSave]);
+        assert([[fm contentsOfDirectoryAtPath:card error:nil] containsObject:mixedCase.lastPathComponent]);
+        assert(![fm fileExistsAtPath:staging]);
 
         // Export copies valid saves only.
         [@"partial" writeToFile:[card stringByAppendingPathComponent:@"broken.gci"]

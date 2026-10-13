@@ -49,8 +49,9 @@ candidate built from the published v0.2.1 app is installed, with saves and
 preferences unchanged. First collect the maintainer's deferred verdict that
 its existing save, movement, camera and sound work normally.
 
-A current-source app containing the newer save/controller/profile work is
-built and signed but remains staged. After the basic candidate check, refresh
+A refreshed app containing the save-import failure fix and the newer
+save/controller/profile work is built and signed but remains staged
+(source 0373950). After the basic candidate check, refresh
 the backup if the player has used the app, then install that current-source
 app in place using the [device session protocol](#device-session-protocol).
 The following feature checks require that newer app and a person:
@@ -352,8 +353,8 @@ human for a device session or a hands-on verdict.
 | 2.1 | Symbol map fetch and verify | done | none | S (fixture); D for the real hash check |
 | 2.2 | Profile symbolizer | done | 2.1 | S |
 | 2.3 | Frame breakdown counters | in progress | none | D |
-| 2.4 | Unlimited-speed desktop benchmark | in progress | none | D |
-| 2.5 | Developer warp and the three routes | in progress | 2.1 | D |
+| 2.4 | Unlimited-speed desktop benchmark | in progress (incomplete runs rejected; timing fields pending) | none | D |
+| 2.5 | Developer warp and the three routes | in progress (pipe connection timeout covered; traversal routes pending) | 2.1 | D |
 | 2.6 | Baseline measurement and ranking | blocked (verified backup complete; current-source device session and routes pending) | 2.2-2.5 | D, H |
 | 3.1 | Chunk-validation flag for direct calls | ready | 2.6 entry gate | D |
 | 3.2 | Hook and mod bitmap | ready | 3.1 | D |
@@ -370,7 +371,7 @@ human for a device session or a hands-on verdict.
 | 8.1 | 60 FPS timing audit | ready | 4.1, headroom gate | S |
 | 8.2 | 60 FPS mod | ready | 8.1 | D, H |
 | 9.1 | Widescreen polish | ready | 8.2 or human approval | D, H |
-| 10.1 | Save import and export | in progress (code landed; C5 pending) | none | S, H |
+| 10.1 | Save import and export | in progress (failed replacement preserves the active save; C5 pending) | none | S, H |
 | 10.2 | Controller rumble on iPhone and iPad | in progress (code landed; C5 pending) | none | S, H |
 | 10.3 | Invert camera up and down | in progress (code landed; C5 pending) | none | S, H |
 

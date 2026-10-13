@@ -25,6 +25,8 @@ Focused source regression gates:
 ./tests/test-diagnostics.sh
 ./tests/test-iphone-touch-layout-defaults.sh
 ./tests/test-game-data-setup.sh
+python3 tests/test_gcpipe.py
+python3 tests/test_bench_route.py
 ```
 
 Before publishing or merging release-hardening work, run the combined

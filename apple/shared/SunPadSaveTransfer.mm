@@ -141,44 +141,60 @@ SunPadSaveImportResult SunPadApplyStagedSaveImport(NSString *stagingPath,
                                       error:error])
         return SunPadSaveImportFailed;
 
+    NSArray<NSString *> *entries = [fileManager contentsOfDirectoryAtPath:cardDirectory error:error];
+    if (entries == nil)
+        return SunPadSaveImportFailed;
+
     // Back up everything first. Nothing in the card changes unless this works.
     NSString *backup = NewBackupFolder(backupsRoot, now, error);
     if (backup == nil)
         return SunPadSaveImportFailed;
-    for (NSString *entry in [fileManager contentsOfDirectoryAtPath:cardDirectory error:nil] ?: @[]) {
+    NSData *identity = Identity(data);
+    NSString *destination = [cardDirectory stringByAppendingPathComponent:fileName];
+    NSMutableArray<NSString *> *replacedFiles = [NSMutableArray array];
+    for (NSString *entry in entries) {
         NSString *source = [cardDirectory stringByAppendingPathComponent:entry];
-        BOOL isDirectory = NO;
-        if (![fileManager fileExistsAtPath:source isDirectory:&isDirectory] || isDirectory)
+        NSDictionary *attributes = [fileManager attributesOfItemAtPath:source error:error];
+        if (attributes == nil)
+            return SunPadSaveImportFailed;
+        if ([attributes[NSFileType] isEqualToString:NSFileTypeDirectory])
             continue;
         if (![fileManager copyItemAtPath:source
                                   toPath:[backup stringByAppendingPathComponent:entry]
                                    error:error])
             return SunPadSaveImportFailed;
+        if (![entry.pathExtension.lowercaseString isEqualToString:@"gci"])
+            continue;
+        NSFileHandle *handle = [NSFileHandle fileHandleForReadingFromURL:[NSURL fileURLWithPath:source]
+                                                                error:error];
+        if (handle == nil)
+            return SunPadSaveImportFailed;
+        NSData *header = [handle readDataUpToLength:kEntrySize error:error];
+        [handle closeFile];
+        if (header == nil)
+            return SunPadSaveImportFailed;
+        BOOL sameSave = [Identity(header) isEqualToData:identity];
+        BOOL sameName = [entry caseInsensitiveCompare:fileName] == NSOrderedSame;
+        if (sameSave || sameName)
+            [replacedFiles addObject:source];
+        // On a case-insensitive volume, a differently cased name can refer to
+        // the replacement itself. Reuse that exact path so cleanup keeps it.
+        if (sameName && (![entries containsObject:fileName] || [entry isEqualToString:fileName]))
+            destination = source;
     }
     if (backupPath != nullptr)
         *backupPath = backup;
 
-    NSString *temporary = [cardDirectory stringByAppendingPathComponent:@"SunPad import.tmp"];
-    [fileManager removeItemAtPath:temporary error:nil];
-    if (![data writeToFile:temporary options:0 error:error])
+    // Commit the replacement before removing any playable save. Atomic writing
+    // keeps the existing destination intact if the write or rename fails.
+    if (![data writeToFile:destination options:NSDataWritingAtomic error:error])
         return SunPadSaveImportFailed;
-
-    NSData *identity = Identity(data);
-    NSString *destination = [cardDirectory stringByAppendingPathComponent:fileName];
-    for (NSString *path in GCIFiles(cardDirectory)) {
-        NSFileHandle *handle = [NSFileHandle fileHandleForReadingAtPath:path];
-        NSData *header = [handle readDataOfLength:kEntrySize];
-        [handle closeFile];
-        BOOL sameSave = [Identity(header) isEqualToData:identity];
-        if ((sameSave || [path.lastPathComponent caseInsensitiveCompare:fileName] == NSOrderedSame) &&
-            ![fileManager removeItemAtPath:path error:error]) {
-            [fileManager removeItemAtPath:temporary error:nil];
+    for (NSString *path in replacedFiles) {
+        if (![path isEqualToString:destination] && ![fileManager removeItemAtPath:path error:error])
             return SunPadSaveImportFailed;
-        }
     }
-    if (![fileManager moveItemAtPath:temporary toPath:destination error:error])
+    if (![fileManager removeItemAtPath:stagingPath error:error])
         return SunPadSaveImportFailed;
-    [fileManager removeItemAtPath:stagingPath error:nil];
     return SunPadSaveImportApplied;
 }
 

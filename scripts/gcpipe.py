@@ -13,14 +13,15 @@ $MODERNGEKKO_PIPES_DIR (default ~/.local/share/moderngekko/Pipes). Commands:
 
 Buttons: A B X Y Z START L R D_UP D_DOWN D_LEFT D_RIGHT
 
-This script opens the FIFO for writing (blocking until the runtime opens it for
-reading), then executes the requested sequence with wall-clock timing so the
+This script waits up to --open-timeout for the runtime to open the FIFO for
+reading, then executes the requested sequence with wall-clock timing so the
 game sees a believable button timeline.
 """
 
 from __future__ import annotations
 
 import argparse
+import errno
 import json
 import os
 import sys
@@ -38,12 +39,22 @@ class PadWriter:
         deadline = time.monotonic() + timeout_s
         while time.monotonic() < deadline:
             try:
-                self.fd = os.open(pipe_path, os.O_WRONLY)
+                fd = os.open(pipe_path, os.O_WRONLY | os.O_NONBLOCK)
+            except OSError as error:
+                if error.errno not in (errno.ENOENT, errno.ENXIO):
+                    raise
+            else:
+                # Bound only the connection wait; keep command writes blocking.
+                try:
+                    os.set_blocking(fd, True)
+                except OSError:
+                    os.close(fd)
+                    raise
+                self.fd = fd
                 return
-            except FileNotFoundError:
-                time.sleep(0.25)
-            except BlockingIOError:
-                time.sleep(0.25)
+            remaining = deadline - time.monotonic()
+            if remaining > 0:
+                time.sleep(min(0.25, remaining))
         raise RuntimeError(f"pipe never opened for reading: {pipe_path}")
 
     def send(self, command: str) -> None:

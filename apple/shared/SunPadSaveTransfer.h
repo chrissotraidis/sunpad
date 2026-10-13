@@ -30,9 +30,10 @@ NSString *_Nullable SunPadValidateGMSE01Save(NSData *data, NSError **error);
 BOOL SunPadStageSaveImport(NSData *data, NSString *stagingPath, NSError **error);
 
 /* Applies a staged import. Copies every file in cardDirectory into a new
- * dated folder under backupsRoot, removes saves with the same identity as the
- * import, and renames the import into place. Call only while the runtime is
- * not using the card. backupPath receives the backup folder when one was made. */
+ * dated folder under backupsRoot, atomically writes the replacement, then
+ * removes other saves with the same identity. A failed replacement leaves the
+ * current card saves intact. Call only while the runtime is not using the card.
+ * backupPath receives the backup folder when one was made. */
 SunPadSaveImportResult SunPadApplyStagedSaveImport(NSString *stagingPath,
                                                    NSString *cardDirectory,
                                                    NSString *backupsRoot,

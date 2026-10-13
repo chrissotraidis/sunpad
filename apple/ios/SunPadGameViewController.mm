@@ -243,6 +243,7 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
 - (NSString *)resolvedImportTestPath:(NSString *)requestedPath;
 - (void)showGameDataSetupState;
 - (NSString *)sunPadSupportRoot;
+- (BOOL)applyStagedSaveImport;
 @end
 
 @implementation SunPadGameViewController {
@@ -821,7 +822,12 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
 
     // The runtime has not opened the memory card yet, so a save the player
     // chose earlier can replace the current one safely here.
-    [self applyStagedSaveImport];
+    if (![self applyStagedSaveImport]) {
+        _bootStatusLabel.text = @"Save import could not finish. Close SunPad and open it again to retry.";
+        _bootStatusLabel.accessibilityLabel = _bootStatusLabel.text;
+        [_bootActivityIndicator stopAnimating];
+        return;
+    }
 
     NSString *currentContainerRoot = [gameDataDirectory stringByAppendingPathComponent:@"GMSE01"];
     BOOL currentRootExists = [fileManager fileExistsAtPath:currentContainerRoot];
@@ -1437,27 +1443,30 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
     [self presentSaveMessageWithTitle:@"Save Ready to Import" message:message];
 }
 
-- (void)applyStagedSaveImport {
+- (BOOL)applyStagedSaveImport {
     NSString *backup = nil;
     NSError *error = nil;
     SunPadSaveImportResult result = SunPadApplyStagedSaveImport(
         [self saveImportStagingPath], [self saveCardDirectory], [self saveBackupsRoot],
         [NSDate date], &backup, &error);
     if (result == SunPadSaveImportNothingPending)
-        return;
+        return YES;
     SunPadLog(@"save import result=%ld backup=%@", (long)result,
               backup.lastPathComponent ?: @"none");
     if (result == SunPadSaveImportApplied) {
         [self presentSaveMessageWithTitle:@"Save Imported"
                                   message:[NSString stringWithFormat:
             @"Your previous saves are in %@.", [self filesLocationName]]];
-        return;
+        return YES;
     }
     NSString *message = error.localizedDescription ?: @"SunPad could not import the save.";
     if (backup != nil)
         message = [message stringByAppendingFormat:@" Your saves from before the import are in %@.",
                                                    [self filesLocationName]];
     [self presentSaveMessageWithTitle:@"Save Import Failed" message:message];
+    // Keep the runtime from writing newer progress while this import may be
+    // retried at the next launch, including after a cleanup failure.
+    return NO;
 }
 
 - (void)importGameDataFromURL:(NSURL *)url {

@@ -34,7 +34,12 @@ echo "load-start=$(sysctl -n vm.loadavg 2>/dev/null || true)" > "$LOG"
 MODERNGEKKO_PERF_LOG=5 MODERNGEKKO_DEV_WARP=$WARP \
   "$RUN" --game "$GAME" --module "$MODULE" --user-dir "$USER_DIR" --no-mods --graphics Metal >>"$LOG" 2>&1 &
 PID=$!
+SLEEP_PID=
 stop() {
+  if [[ -n "$SLEEP_PID" ]]; then
+    kill "$SLEEP_PID" 2>/dev/null || true
+    wait "$SLEEP_PID" 2>/dev/null || true
+  fi
   kill -INT "$PID" 2>/dev/null || true
   for _ in $(seq 10); do kill -0 "$PID" 2>/dev/null || break; sleep 1; done
   kill -KILL "$PID" 2>/dev/null || true
@@ -42,15 +47,35 @@ stop() {
   rm -rf "$USER_DIR"
 }
 trap stop EXIT
+check_runner() {
+  if ! kill -0 "$PID" 2>/dev/null; then
+    local status=0
+    wait "$PID" || status=$?
+    echo "bench-route: runner exited (status $status); see $LOG" >&2
+    return 1
+  fi
+}
+sleep_running() {
+  sleep "$1" &
+  SLEEP_PID=$!
+  while kill -0 "$SLEEP_PID" 2>/dev/null; do
+    check_runner || return 1
+    sleep 0.1
+  done
+  wait "$SLEEP_PID"
+  SLEEP_PID=
+  check_runner
+}
 for _ in $(seq 600); do
   grep -q '\[warp\] entered' "$LOG" && break
-  kill -0 "$PID" 2>/dev/null || { echo "bench-route: runner exited; see $LOG" >&2; exit 1; }
+  check_runner
   sleep 1
 done
 grep -q '\[warp\] entered' "$LOG" || { echo "bench-route: area never reached; see $LOG" >&2; exit 1; }
-sleep "$SETTLE"
+echo '[bench] settle-start' >> "$LOG"
+sleep_running "$SETTLE"
 echo '[bench] measure-start' >> "$LOG"
-sleep "$MEASURE"
+sleep_running "$MEASURE"
 echo '[bench] measure-end' >> "$LOG"
 echo "load-end=$(sysctl -n vm.loadavg 2>/dev/null || true)" >> "$LOG"
 

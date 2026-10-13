@@ -364,3 +364,53 @@ Notes: The recipe's descriptive note still named the superseded device build
   service or establish device acceptance.
 Next: retain the draft until the deferred candidate verdict and physical
   Linux-module check. The installed iPhone candidate remains unchanged.
+
+### 2026-10-13 tasks 2.4-2.5: reject stalled and incomplete host probes
+Result: two reproduced tooling defects fixed; measurement tasks remain open
+Pins: SunPad main 1f2bc05 plus these script changes; runtime pins unchanged
+Checkpoints: eight synthetic pipe/process regressions pass on Apple's Python
+  3.9; bootstrap --sources-only and the complete source suite pass
+Evidence: controller FIFO tests and benchmark runner fixtures in tests/
+Notes: An existing FIFO without a reader previously blocked beyond the input
+  tool's timeout. Connection now uses a nonblocking open and a bounded retry;
+  connected command writes retain their existing behavior. A runner exiting
+  during settling or after its first measurement previously could produce a
+  successful benchmark row. The benchmark now rejects either early exit and
+  records the exit status. Both failure cases were reproduced before fixing
+  them. All fixtures use synthetic inputs; no game or device data is involved.
+Next: complete the frame breakdown and timing fields, then the three repeated
+  traversal routes. These tooling checks are not gameplay or speedup evidence;
+  the maintainer's deferred iPhone candidate check remains the device gate.
+
+### 2026-10-13 task 10.1: preserve saves when import cannot finish
+Result: failed replacement preserves the active save; hands-on checks pending
+Pins: SunPad main 1f2bc05 plus the app/helper changes; runtime pins unchanged
+Checkpoints: synthetic filesystem-failure regressions and source suite pass;
+  clean Apple CI remains required before merge
+Evidence: SunPadSaveTransferTests; independent review of startup and retry paths
+Notes: Import previously deleted matching saves before the final file move.
+  An injected move failure reproduced the missing active save, although its
+  dated backup survived. Import now completes the backup and atomically writes
+  the replacement before deleting alternate copies. Enumeration, backup and
+  commit failures preserve the original; mixed-case destination names are kept
+  safely. Cleanup failures keep the import pending, and startup now waits for
+  successful completion before opening the runtime. Otherwise, playing after
+  such a failure could let the next retry replace newer progress. Pending-file
+  removal errors are also reported. Tests use synthetic saves only.
+Next: keep the installed iPhone candidate for the maintainer's deferred basic
+  check. Before the later import/export session, refresh its backup and build
+  the test app from current main; the previously staged app predates this fix.
+  Confirm import, in-game save, export and reload on device before completing
+  10.1. No new release or physical power-loss acceptance is claimed.
+
+### 2026-10-13 task 10.1: refreshed internal device app
+Result: app built and signed; staged only, installed candidate unchanged
+Pins: SunPad 0373950 app source; unchanged runtime pins and personal module
+Checkpoints: incremental device core build and fresh Release app build pass;
+  strict deep signature and existing entitlement match pass
+Evidence: private build logs, app/module hashes and staged-artifact record
+Notes: The refreshed app contains the import failure guard. The device runtime
+  reused the retained cache; this is not an empty-cache runtime build. The
+  existing personal module is unchanged. No device launch or gameplay claim.
+Next: after the deferred basic candidate check, refresh the device backup before
+  any in-place install of this staged app and the save/controller checks.
