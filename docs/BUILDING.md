@@ -4,7 +4,7 @@
 
 # Building
 
-Last updated: 2026-08-09
+Last updated: 2026-10-13
 
 ## Prerequisites
 
@@ -57,6 +57,40 @@ open build-macos/SunPad.app
 
 This local bundle includes the locally generated module but no disc image or
 save. It is gitignored and must not be distributed.
+
+## Experimental PadMint module builds on Linux
+
+The personal iPhone/iPad recipe accepts Linux ARM64 and x86-64 hosts as well
+as Apple silicon Macs. Linux builds the game module and inserts it into the
+published app using PadMint's open-source iPhone SDK. Building the Apple app
+or runtime from source still requires a Mac with Xcode.
+
+Use current [PadMint](https://github.com/chrissotraidis/padmint) and a clean
+SunPad checkout. Linux needs a native C/C++ compiler and the dependencies for
+ModernGekko's desktop tools. The Ubuntu 24.04 validation environment used
+`build-essential`, `ca-certificates`, `cmake`, `curl`, `git`, `ninja-build`,
+`pkg-config`, `python3`, `ripgrep`, `perl`, `zip`, `unzip`, `xz-utils`,
+`libasound2-dev`, `libbluetooth-dev`, `libcurl4-openssl-dev`, `libegl-dev`,
+`libevdev-dev`, `libgl-dev`, `liblzma-dev`, `libpulse-dev`, `libsystemd-dev`,
+`libudev-dev`, `libusb-1.0-0-dev`, `libx11-dev`, `libxi-dev`, `libxrandr-dev`,
+`libxml2`, `libzstd-dev` and `zlib1g-dev`. PadMint installs its pinned module
+compiler and SDK inputs separately.
+
+With PadMint's CLI available, run these from the SunPad checkout:
+
+```sh
+python3 -m padmint tools sunpad --repo . --target ios
+python3 -m padmint build sunpad --repo . --revision "$(git rev-parse HEAD)" \
+  --disc /path/to/GMSE01.iso --target ios \
+  --app /path/to/SunPad-v0.2.1-ios-unsigned.ipa --jobs 6
+```
+
+Use the published base app and verify it against its release checksums first.
+PadMint checks the module's imports and the completed IPA. Follow the
+[installation guide](INSTALL_IPA.md) to sign and install the personal result,
+including its nested module. Keep the generated module and IPA private.
+Host build checks do not establish gameplay, audio or device compatibility.
+Do not reuse one checkout's native build caches across host architectures.
 
 ## iOS / iPadOS Simulator development build
 
@@ -128,11 +162,16 @@ codesign --force --sign <development-identity> --timestamp=none \
   --identifier gGMSE01_recomp build/ios-module-device/gGMSE01_recomp.dylib
 xcrun devicectl device copy to --device <device-udid> \
   --domain-type appDataContainer --domain-identifier com.sunpad.SunPad \
-  --source /tmp/sunpad-module-ios-device/gGMSE01_recomp.dylib \
+  --source build/ios-module-device/gGMSE01_recomp.dylib \
   --destination tmp/gGMSE01_recomp.dylib
 ```
 
-For repeat deployments, use `scripts/deploy-ios-device.sh`. It performs the
+Before updating a device, complete the verified backup in the
+[device session protocol](IMPROVEMENT-PLAN.md#device-session-protocol). For a
+recorded save-preservation session, install, read data back and launch as
+separate steps.
+
+For repeat development deployments, `scripts/deploy-ios-device.sh` performs the
 in-place app update, provisions the signed module at that exact path, and then
 launches SunPad. Installing the app alone clears its temporary module and will
 leave the build unable to start.
