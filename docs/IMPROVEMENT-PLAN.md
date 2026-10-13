@@ -347,7 +347,7 @@ human for a device session or a hands-on verdict.
 | --- | --- | --- | --- | --- |
 | 1.1 | Save fault-injection test | done | none | S |
 | 1.2 | Atomic GCI and header writes | done | 1.1 | S |
-| 1.3 | Last-good backup and load repair | in progress (desktop save and reload pending) | 1.2 | S |
+| 1.3 | Last-good backup and load repair | in progress (bundle startup fixed; desktop save and reload pending) | 1.2 | S |
 | 1.4 | Pin and device save session | ready | 1.3 | D, H |
 | 2.1 | Symbol map fetch and verify | done | none | S (fixture); D for the real hash check |
 | 2.2 | Profile symbolizer | done | 2.1 | S |

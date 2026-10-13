@@ -13,8 +13,8 @@ or audio implementation is imported by this migration.
 
 | Lane | Component | Gitlink / checkout | Selected commit |
 | --- | --- | --- | --- |
-| apple | [ModernGekko](https://github.com/chrissotraidis/ModernGekko) | `ref/ModernGekko` | `fa822d492e2d2225586ce05cbdfa4e0c5ba8723b` |
-| apple | [RecompCore](https://github.com/chrissotraidis/RecompCore) | `ref/ModernGekko/vendor/dolphin` | `eaa21f09505e1127cdf61da9f108daf52ec89c7d` |
+| apple | [ModernGekko](https://github.com/chrissotraidis/ModernGekko) | `ref/ModernGekko` | `e29496fb1171f3e9803dad66f5052b1bab061597` |
+| apple | [RecompCore](https://github.com/chrissotraidis/RecompCore) | `ref/ModernGekko/vendor/dolphin` | `724054945a90eec23b7b94b8d14139525d962a24` |
 | apple | [DolRecomp](https://github.com/chrissotraidis/DolRecomp) | `ref/ModernGekko/vendor/dolphin/DolRecomp` | `fa0cf619e8d7eb8cba7eaf55267a12caaebb46aa` |
 | tvos | [ModernGekko](https://github.com/chrissotraidis/ModernGekko) | `ref/ModernGekko-tvOS` | `3982ff05bef91d9e87acd7ebdb3f3b058c53e7f8` |
 | tvos | [RecompCore](https://github.com/chrissotraidis/RecompCore) | `ref/ModernGekko-tvOS/vendor/dolphin` | `6e8c569c4c579328907c5c12c0e63e07fd643df1` |
