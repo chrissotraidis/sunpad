@@ -231,3 +231,12 @@ game, characters, artwork, and trademarks belong to their respective rights hold
 SunPad's integration is [GPL-3.0-or-later](LICENSE). Upstream components retain
 their own licenses and attribution. See [third-party notices](THIRD_PARTY_NOTICES.md)
 and [legal and provenance details](docs/LEGAL_AND_PROVENANCE.md).
+
+## Legal
+
+SunPad is an unofficial, fan-made project. It is not affiliated with, endorsed
+by, or sponsored by Nintendo. Super Mario Sunshine and related names and marks
+are trademarks of Nintendo (and their respective owners). This repository
+contains no game data, disc images, or extracted assets. To use it, you need
+your own legally obtained copy of the game, and you build it yourself on your
+own machine. Please don't share game files or builds made from them.
