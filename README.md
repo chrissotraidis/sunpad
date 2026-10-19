@@ -30,8 +30,6 @@ Runtime and compiler dependencies use pinned submodules. The
 [source graph](docs/DEPENDENCIES.md#maintained-source-graph) records the separate
 Apple and tvOS versions.
 
-![SunPad running Super Mario Sunshine in Delfino Plaza on iPad](docs/readme/sunpad-delfino-plaza.jpg)
-
 > [!NOTE]
 > **AI disclosure:** SunPad uses substantial AI assistance for code, tests,
 > documentation, debugging and maintenance. Some support replies and maintenance
@@ -215,22 +213,6 @@ game inputs, use `--sources-only`, then run `./scripts/check-repository.sh`.
 [Build instructions](docs/BUILDING.md) · [Contribution policy](CONTRIBUTING.md) ·
 [Dependency pins](docs/DEPENDENCIES.md) · [Engineering review](docs/UPSTREAM-REVIEW.md) ·
 [Improvement plan](docs/IMPROVEMENT-PLAN.md)
-
-## Screenshots
-
-<table>
-  <tr>
-    <td width="50%"><img src="docs/readme/sunpad-plaza-conversation.jpg" alt="Delfino Plaza conversation with SunPad touch controls"></td>
-    <td width="50%"><img src="docs/readme/sunpad-isle-delfino-map.jpg" alt="Isle Delfino map with SunPad touch controls"></td>
-  </tr>
-  <tr>
-    <td align="center">Delfino Plaza</td>
-    <td align="center">Isle Delfino map</td>
-  </tr>
-</table>
-
-Owner-supplied development screenshots. Individual frames do not establish
-sustained performance or full-game compatibility.
 
 ## Community and support
 
