@@ -63,7 +63,6 @@ class WindowsBuilderTests(unittest.TestCase):
                 python, _ = exit_code(build.audit_generated, gen)
                 self.assertEqual((shell, python), (expected, expected))
 
-    def test_job_limits_match_the_shell_rules(self):
     def test_translated_sources_get_unix_line_endings(self):
         gen = self.root / "generated"
         (gen / "chunks").mkdir(parents=True)
