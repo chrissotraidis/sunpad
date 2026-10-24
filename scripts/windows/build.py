@@ -263,6 +263,16 @@ def generated_dir():
     return active.parent / "dolrecomp-output/generated"
 
 
+def unix_line_endings(gen):
+    """dolrecomp writes its C and text output with CRLF on Windows. Rewrite it with LF so
+    every computer compiles byte-identical sources (the same 225 files as Macs and Linux)."""
+    for path in sorted(gen.rglob("*")):
+        if path.is_file() and path.suffix in (".c", ".h", ".txt"):
+            data = path.read_bytes()
+            if b"\r\n" in data:
+                path.write_bytes(data.replace(b"\r\n", b"\n"))
+
+
 def prepare(disc):
     jobs()
     disc = Path(disc)
@@ -295,6 +305,7 @@ def prepare(disc):
     # build that local module quickly, without optimization.
     run([DESKTOP_BUILD / "moderngekko-port.exe", "build", GAME, "--backend", "c",
          "--toolchain", "msvc", "--opt-level", "0", "--output", MODULES], env=env)
+    unix_line_endings(generated_dir())
     audit_generated(generated_dir())
     print(f"Prepared GMSE01 at {GAME}", flush=True)
 
@@ -306,6 +317,7 @@ def module(toolchain, build_dir):
     gen = generated_dir()
     if not ((gen / "generated.c").is_file() and (gen / "generated.h").is_file()):
         die("prepared module sources missing; run scripts/windows/build.py prepare first")
+    unix_line_endings(gen)
     audit_generated(gen)
     if not (gen / "main.dol").is_file():
         shutil.copyfile(GAME / "sys/main.dol", gen / "main.dol")

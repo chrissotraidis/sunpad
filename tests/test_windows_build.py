@@ -64,6 +64,18 @@ class WindowsBuilderTests(unittest.TestCase):
                 self.assertEqual((shell, python), (expected, expected))
 
     def test_job_limits_match_the_shell_rules(self):
+    def test_translated_sources_get_unix_line_endings(self):
+        gen = self.root / "generated"
+        (gen / "chunks").mkdir(parents=True)
+        (gen / "chunks/a.c").write_bytes(b"int a;\r\nint b;\r\n")
+        (gen / "generated_smc.txt").write_bytes(b"x\r\n")
+        (gen / "main.dol").write_bytes(b"\r\n\x00")
+        build.unix_line_endings(gen)
+        self.assertEqual((gen / "chunks/a.c").read_bytes(), b"int a;\nint b;\n")
+        self.assertEqual((gen / "generated_smc.txt").read_bytes(), b"x\n")
+        self.assertEqual((gen / "main.dol").read_bytes(), b"\r\n\x00")
+
+    def test_job_limits_match_the_shell_rules(self):
         for value, expected in (("2", 0), ("12", 0), ("0", 2), ("-1", 2), ("02", 2), ("1.5", 2),
                                 ("2 3", 2), ("abc", 2), (" 2", 2), ("2\n", 2)):
             with self.subTest(value=value), mock.patch.dict(build.os.environ, {"SUNPAD_JOBS": value}):
