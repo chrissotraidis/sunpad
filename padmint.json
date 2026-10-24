@@ -64,8 +64,68 @@
     },
     "macos": {
       "hosts": {
-        "macos-arm64": "planned"
-      }
+        "macos-arm64": "experimental"
+      },
+      "tools": [
+        "git",
+        "cmake",
+        "ninja"
+      ],
+      "output": "zip",
+      "check": "none",
+      "steps": [
+        {
+          "stage": "dependencies",
+          "command": [
+            "{repo}/scripts/bootstrap-dependencies.sh"
+          ]
+        },
+        {
+          "stage": "prepare",
+          "command": [
+            "{repo}/scripts/prepare-game.sh",
+            "{disc}"
+          ]
+        },
+        {
+          "stage": "compile",
+          "command": [
+            "{repo}/scripts/package-macos-app.sh"
+          ]
+        },
+        {
+          "stage": "version",
+          "command": [
+            "{python}",
+            "-c",
+            "import json,plistlib,sys\nv=json.load(open(sys.argv[1]))\np=sys.argv[2]+'/Contents/Info.plist'\nwith open(p,'rb') as f: info=plistlib.load(f)\ninfo['CFBundleShortVersionString']=v['version']\ninfo['CFBundleVersion']=str(v['build'])\nwith open(p,'wb') as f: plistlib.dump(info,f)\n",
+            "{repo}/version.json",
+            "{repo}/build-macos/SunPad.app"
+          ]
+        },
+        {
+          "stage": "sign",
+          "command": [
+            "/usr/bin/codesign",
+            "--force",
+            "--deep",
+            "--sign",
+            "-",
+            "{repo}/build-macos/SunPad.app"
+          ]
+        },
+        {
+          "stage": "package",
+          "command": [
+            "/usr/bin/ditto",
+            "-c",
+            "-k",
+            "--keepParent",
+            "{repo}/build-macos/SunPad.app",
+            "{output}"
+          ]
+        }
+      ]
     }
   },
   "requirements": {

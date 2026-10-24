@@ -30,8 +30,6 @@ Runtime and compiler dependencies use pinned submodules. The
 [source graph](docs/DEPENDENCIES.md#maintained-source-graph) records the separate
 Apple and tvOS versions.
 
-![SunPad running Super Mario Sunshine in Delfino Plaza on iPad](docs/readme/sunpad-delfino-plaza.jpg)
-
 > [!NOTE]
 > **AI disclosure:** SunPad uses substantial AI assistance for code, tests,
 > documentation, debugging and maintenance. Some support replies and maintenance
@@ -53,8 +51,9 @@ game code. On an Apple silicon Mac with Xcode, download
 disc image and click **Make my copy**. PadMint translates the
 game from your disc, adds it to the published app and saves your SunPad IPA in your Downloads
 folder; install it with AltStore Classic, SideStore or Sideloadly. The IPA it makes contains code
-translated from your disc: keep it for yourself. Apple silicon Macs can also
-[build and run locally](docs/MACOS.md).
+translated from your disc: keep it for yourself. With PadMint 0.5.5 or newer you can also choose
+**This Mac**: PadMint builds `SunPad.app` from your disc and saves it as a zip; move it to Applications.
+To build it by hand, see [build and run locally](docs/MACOS.md).
 
 Apple TV requires Mac-side game-data staging and an Extended Gamepad. Its storage
 is purgeable, so [back up your saves](docs/TVOS.md) before replacing the app.
@@ -215,22 +214,6 @@ game inputs, use `--sources-only`, then run `./scripts/check-repository.sh`.
 [Dependency pins](docs/DEPENDENCIES.md) · [Engineering review](docs/UPSTREAM-REVIEW.md) ·
 [Improvement plan](docs/IMPROVEMENT-PLAN.md)
 
-## Screenshots
-
-<table>
-  <tr>
-    <td width="50%"><img src="docs/readme/sunpad-plaza-conversation.jpg" alt="Delfino Plaza conversation with SunPad touch controls"></td>
-    <td width="50%"><img src="docs/readme/sunpad-isle-delfino-map.jpg" alt="Isle Delfino map with SunPad touch controls"></td>
-  </tr>
-  <tr>
-    <td align="center">Delfino Plaza</td>
-    <td align="center">Isle Delfino map</td>
-  </tr>
-</table>
-
-Owner-supplied development screenshots. Individual frames do not establish
-sustained performance or full-game compatibility.
-
 ## Community and support
 
 [Join the Discord](https://discord.gg/xwHfUD2bxW) for help and news. It is one
@@ -248,3 +231,12 @@ game, characters, artwork, and trademarks belong to their respective rights hold
 SunPad's integration is [GPL-3.0-or-later](LICENSE). Upstream components retain
 their own licenses and attribution. See [third-party notices](THIRD_PARTY_NOTICES.md)
 and [legal and provenance details](docs/LEGAL_AND_PROVENANCE.md).
+
+## Legal
+
+SunPad is an unofficial, fan-made project. It is not affiliated with, endorsed
+by, or sponsored by Nintendo. Super Mario Sunshine and related names and marks
+are trademarks of Nintendo (and their respective owners). This repository
+contains no game data, disc images, or extracted assets. To use it, you need
+your own legally obtained copy of the game, and you build it yourself on your
+own machine. Please don't share game files or builds made from them.
