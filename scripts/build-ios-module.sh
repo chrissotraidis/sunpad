@@ -31,7 +31,16 @@ fi
 # Each generated chunk is one very large function. With clang 22 the SLP
 # vectorizer and the register coalescer are superlinear on such functions;
 # these two flags keep each chunk to minutes (as BlueWake's builds do).
-cmake -S "$MG/vendor/dolphin/module-template" -B "$MODULE_BUILD" -G Ninja \
+# PadMint's SDK and toolchain file move with every build, and CMake keeps the
+# first toolchain an existing build folder saw: start the folder fresh when the
+# toolchain changes, and keep its objects otherwise.
+TOOLCHAIN="$(cd "$(dirname "$TOOLCHAIN")" && pwd)/$(basename "$TOOLCHAIN")"
+FRESH=
+if [[ -f "$MODULE_BUILD/CMakeCache.txt" ]] &&
+   ! grep -qxF "CMAKE_TOOLCHAIN_FILE:FILEPATH=$TOOLCHAIN" "$MODULE_BUILD/CMakeCache.txt"; then
+  FRESH=--fresh
+fi
+cmake $FRESH -S "$MG/vendor/dolphin/module-template" -B "$MODULE_BUILD" -G Ninja \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_TOOLCHAIN_FILE="$TOOLCHAIN" \
   "-DCMAKE_C_FLAGS=-fno-slp-vectorize -mllvm -large-interval-freq-threshold=10" \

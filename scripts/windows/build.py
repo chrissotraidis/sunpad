@@ -325,8 +325,15 @@ def module(toolchain, build_dir):
     # Each generated chunk is one very large function. With clang 22 the SLP vectorizer
     # and the register coalescer are superlinear on such functions; these two flags keep
     # each chunk to minutes (as scripts/build-ios-module.sh and BlueWake's builds do).
-    run(["cmake", "-S", dolphin / "module-template", "-B", build_dir, "-G", "Ninja",
-         "-DCMAKE_BUILD_TYPE=Release", f"-DCMAKE_TOOLCHAIN_FILE={posix(toolchain)}",
+    # PadMint's SDK and toolchain file move with every build, and CMake keeps the first
+    # toolchain an existing build folder saw: start the folder fresh when the toolchain
+    # changes, and keep its objects otherwise.
+    toolchain = posix(toolchain)
+    cache = Path(build_dir) / "CMakeCache.txt"
+    fresh = cache.is_file() and \
+        f"CMAKE_TOOLCHAIN_FILE:FILEPATH={toolchain}" not in cache.read_text(errors="replace").splitlines()
+    run(["cmake", *(["--fresh"] if fresh else []), "-S", dolphin / "module-template", "-B", build_dir,
+         "-G", "Ninja", "-DCMAKE_BUILD_TYPE=Release", f"-DCMAKE_TOOLCHAIN_FILE={toolchain}",
          "-DCMAKE_C_FLAGS=-fno-slp-vectorize -mllvm -large-interval-freq-threshold=10",
          "-DGAME_ID=GMSE01", f"-DGENERATED_DIR={posix(gen)}",
          f"-DGXRUNTIME_DIR={posix(dolphin / 'GXRuntime')}",

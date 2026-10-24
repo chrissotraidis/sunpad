@@ -96,6 +96,23 @@ class WindowsBuilderTests(unittest.TestCase):
         deps.assert_not_called()
         studio.assert_not_called()
 
+    def test_module_starts_fresh_only_for_a_new_toolchain(self):
+        gen = self.root / "modules/GMSE01/key/dolrecomp-output/generated"
+        (gen / "chunks").mkdir(parents=True)
+        (gen / "chunks/a.c").write_text(CORRECTED)
+        for name in ("generated.c", "generated.h", "main.dol"):
+            (gen / name).touch()
+        (self.root / "modules/GMSE01/active-module.txt").write_text(str(gen.parents[1] / "gGMSE01_recomp.dll"))
+        toolchain, out = self.root / "toolchain.cmake", self.root / "out"
+        out.mkdir()
+        for cached, fresh in ((None, False), (toolchain, False), (self.root / "old.cmake", True)):
+            if cached:
+                (out / "CMakeCache.txt").write_text(f"CMAKE_TOOLCHAIN_FILE:FILEPATH={build.posix(cached)}\n")
+            with self.subTest(cached=cached), mock.patch.object(build, "MODULES", self.root / "modules"), \
+                    mock.patch.object(build, "run") as run, mock.patch.dict(build.os.environ, {"SUNPAD_JOBS": "2"}):
+                self.assertEqual(exit_code(build.module, toolchain, out)[0], 0)
+                self.assertEqual("--fresh" in run.call_args_list[0][0][0], fresh)
+
     def test_module_needs_prepared_sources(self):
         with mock.patch.object(build, "MODULES", self.root / "modules"), \
                 mock.patch.object(build, "run") as run, \
