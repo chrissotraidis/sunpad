@@ -30,3 +30,57 @@ jobs:
         run: ./scripts/bootstrap-dependencies.sh
       - name: Compile runtime and app without game inputs
         run: ./scripts/check-apple-build.sh ${{ matrix.lane }}
+  # The Windows route up to the disc: no game data in CI, ever.
+  windows-route:
+    runs-on: windows-latest
+    timeout-minutes: 150
+    env:
+      PADMINT_REVISION: a723ae020799200b1ecd00920d0473bf2abf26af
+      SUNPAD_APP_URL: https://github.com/chrissotraidis/sunpad/releases/download/v0.2.2/SunPad-v0.2.2-ios-unsigned.ipa
+      SUNPAD_APP_SHA256: e29eb71157ad4f4a3998233dfacc06908a66f85c068b7b409a6bfd6953e77f76
+      SUNPAD_JOBS: '4'
+    steps:
+      - name: Keep sources byte-identical across build hosts
+        run: git config --global core.autocrlf false
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install Ninja
+        run: python -m pip install ninja==1.13.0
+      - name: Refuse a file that is not the supported disc
+        shell: pwsh
+        run: |
+          $file = Join-Path $env:RUNNER_TEMP 'not a disc.iso'
+          Set-Content -LiteralPath $file -Value 'not a disc'
+          $out = python scripts/windows/build.py prepare $file 2>&1 | Out-String
+          Write-Host $out
+          if ($LASTEXITCODE -ne 1) { throw "expected exit 1, got $LASTEXITCODE" }
+          if ($out -notmatch 'unsupported disc image SHA-256') { throw 'missing disc message' }
+          $out = python scripts/windows/build.py module x y 2>&1 | Out-String
+          if ($LASTEXITCODE -ne 1 -or $out -notmatch 'prepared module sources missing') { throw "module ran without sources: $out" }
+          exit 0
+      - name: PadMint iPhone module pipeline with SunPad's published app
+        shell: pwsh
+        run: |
+          $padmint = Join-Path $env:RUNNER_TEMP 'padmint'
+          git clone --quiet https://github.com/chrissotraidis/padmint.git $padmint
+          git -C $padmint checkout --quiet --detach $env:PADMINT_REVISION
+          if ($LASTEXITCODE -ne 0) { throw 'PadMint checkout failed' }
+          $app = Join-Path $env:RUNNER_TEMP 'SunPad-ios-unsigned.ipa'
+          Invoke-WebRequest $env:SUNPAD_APP_URL -OutFile $app
+          $sha = (Get-FileHash $app -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($sha -ne $env:SUNPAD_APP_SHA256) { throw "published app checksum mismatch: $sha" }
+          python -B (Join-Path $padmint 'scripts/ios-module-probe.py') (Join-Path $env:RUNNER_TEMP 'ios-module-probe') $app
+          if ($LASTEXITCODE -ne 0) { throw 'iPhone module probe failed' }
+      - name: Fetch pinned sources and build the desktop tools with Visual Studio
+        run: python scripts/windows/build.py tools
+      - name: The desktop tools start and the pinned sources stay unmodified
+        shell: pwsh
+        run: |
+          $out = & ref/ModernGekko/build-desktop-tools-public/moderngekko-port.exe 2>&1 | Out-String
+          Write-Host $out
+          if ($out -notmatch 'moderngekko-port build') { throw 'moderngekko-port did not print its usage' }
+          python scripts/windows/build.py dependencies
+          if ($LASTEXITCODE -ne 0) { throw 'second dependency pass failed' }
+          Get-PSDrive -PSProvider FileSystem | Format-Table Name, Used, Free

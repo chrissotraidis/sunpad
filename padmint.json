@@ -20,7 +20,9 @@
       "hosts": {
         "macos-arm64": "experimental",
         "linux-x86_64": "experimental",
-        "linux-arm64": "experimental"
+        "linux-arm64": "experimental",
+        "windows-x86_64": "planned",
+        "windows-arm64": "planned"
       },
       "tools": [
         "git",
@@ -38,21 +40,72 @@
       "steps": [
         {
           "stage": "dependencies",
+          "on": [
+            "macos",
+            "linux"
+          ],
           "command": [
             "{repo}/scripts/bootstrap-dependencies.sh"
           ]
         },
         {
+          "stage": "dependencies",
+          "on": [
+            "windows"
+          ],
+          "command": [
+            "{python}",
+            "{repo}/scripts/windows/build.py",
+            "dependencies"
+          ]
+        },
+        {
           "stage": "prepare",
+          "on": [
+            "macos",
+            "linux"
+          ],
           "command": [
             "{repo}/scripts/prepare-game.sh",
             "{disc}"
           ]
         },
         {
+          "stage": "prepare",
+          "on": [
+            "windows"
+          ],
+          "command": [
+            "{python}",
+            "{repo}/scripts/windows/build.py",
+            "prepare",
+            "{disc}"
+          ]
+        },
+        {
           "stage": "module",
+          "on": [
+            "macos",
+            "linux"
+          ],
           "command": [
             "{repo}/scripts/build-ios-module.sh",
+            "{ios_toolchain}",
+            "{repo}/build/ios-module-padmint"
+          ],
+          "env": {
+            "SUNPAD_JOBS": "{jobs}"
+          }
+        },
+        {
+          "stage": "module",
+          "on": [
+            "windows"
+          ],
+          "command": [
+            "{python}",
+            "{repo}/scripts/windows/build.py",
+            "module",
             "{ios_toolchain}",
             "{repo}/build/ios-module-padmint"
           ],
@@ -153,12 +206,22 @@
         "name": "python3",
         "version_args": [
           "--version"
+        ],
+        "hosts": [
+          "macos-arm64",
+          "linux-x86_64",
+          "linux-arm64"
         ]
       },
       {
         "name": "rg",
         "version_args": [
           "--version"
+        ],
+        "hosts": [
+          "macos-arm64",
+          "linux-x86_64",
+          "linux-arm64"
         ]
       },
       {
@@ -185,10 +248,54 @@
         "hosts": [
           "macos-arm64"
         ]
+      },
+      {
+        "name": "%ProgramFiles(x86)%/Microsoft Visual Studio/Installer/vswhere.exe",
+        "label": "Visual Studio C++ build tools",
+        "version_args": [
+          "-latest",
+          "-products",
+          "*",
+          "-requires",
+          "Microsoft.VisualStudio.Component.VC.Tools.x86.x64",
+          "-property",
+          "catalog_productDisplayVersion"
+        ],
+        "min_version": "17",
+        "player": true,
+        "hosts": [
+          "windows-x86_64"
+        ],
+        "targets": [
+          "ios"
+        ],
+        "note": "SunPad translates your disc with tools built by Visual Studio's C++ compiler. Once: install the free Build Tools for Visual Studio 2022 or newer (visualstudio.microsoft.com/visual-cpp-build-tools), choose the \"Desktop development with C++\" workload and click Install, then run PadMint again."
+      },
+      {
+        "name": "%ProgramFiles(x86)%/Microsoft Visual Studio/Installer/vswhere.exe",
+        "label": "Visual Studio C++ build tools",
+        "version_args": [
+          "-latest",
+          "-products",
+          "*",
+          "-requires",
+          "Microsoft.VisualStudio.Component.VC.Tools.ARM64",
+          "-property",
+          "catalog_productDisplayVersion"
+        ],
+        "min_version": "17",
+        "player": true,
+        "hosts": [
+          "windows-arm64"
+        ],
+        "targets": [
+          "ios"
+        ],
+        "note": "SunPad translates your disc with tools built by Visual Studio's C++ compiler. Once: install the free Build Tools for Visual Studio 2022 or newer (visualstudio.microsoft.com/visual-cpp-build-tools), choose the \"Desktop development with C++\" workload, make sure \"MSVC ARM64 build tools\" is ticked on the right and click Install, then run PadMint again."
       }
     ]
   },
-  "notes": "PadMint builds gGMSE01_recomp.dylib with scripts/build-ios-module.sh in build/ios-module-padmint, checks its imports, and adds it to the published app for personal use.",
+  "notes": "PadMint builds gGMSE01_recomp.dylib in build/ios-module-padmint (scripts/build-ios-module.sh on Macs and Linux, scripts/windows/build.py on Windows), checks its imports, and adds it to the published app for personal use.",
   "publication": {
     "public_binaries": false,
     "reason": "The release publishes the app without game code; PadMint adds the module translated from the player's own disc, which stays personal."

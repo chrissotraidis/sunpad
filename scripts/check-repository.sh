@@ -11,6 +11,7 @@ python3 tests/test_build_jobs.py
 python3 tests/test_package_output.py
 python3 tests/test_gcpipe.py
 python3 tests/test_bench_route.py
+python3 tests/test_windows_build.py
 ./tests/test-extraction-progress.sh
 ./tests/test-ipa-module.sh
 
@@ -18,7 +19,7 @@ for script in scripts/*.sh tests/*.sh apple/macos/SunPad; do
   bash -n "$script"
 done
 
-python3 -c 'import ast,pathlib; [ast.parse(p.read_text(), filename=str(p)) for p in pathlib.Path("scripts").glob("*.py")]'
+python3 -c 'import ast,pathlib; [ast.parse(p.read_text(), filename=str(p)) for p in pathlib.Path("scripts").glob("**/*.py")]'
 python3 -c 'import json,pathlib; [json.loads(p.read_text()) for p in pathlib.Path("apple").glob("**/Assets.xcassets/**/Contents.json")]'
 plutil -lint apple/ios/Info.plist apple/tvos/Info.plist apple/tvos/PrivacyInfo.xcprivacy apple/macos/Info.plist
 [[ "$(plutil -extract LSApplicationCategoryType raw apple/ios/Info.plist)" == "public.app-category.games" ]] || { echo "check-repository.sh: check failed (line 22)" >&2; exit 1; }
