@@ -434,3 +434,37 @@ Notes: The supported controller pipe resolved the earlier synthetic-keyboard
   termination test nor a controlled performance or audio verdict.
 Next: collect the deferred iPhone candidate verdict, refresh its backup, then
   run task 1.4 and the staged app's save/controller checks with the maintainer.
+
+### 2026-10-25 draft #78: Windows source steps and a Windows ARM64 end-to-end build
+Result: Windows ARM64 host build and package checks pass; device check pending
+Pins: SunPad 6069976 build inputs (VM test commit 08d90c7 only marked the
+  Windows hosts runnable); ModernGekko e29496f; RecompCore 7240549; DolRecomp
+  fa0cf61; PadMint main a723ae0 (0.5.13); published v0.2.2 / build 16 base app
+Checkpoints: source suite and tests/test_windows_build.py pass; hosted
+  windows-route (x64), iOS, tvOS and safety CI pass on #78; PadMint build on
+  Windows 11 ARM64 exits 0 with record status completed and gate PASS
+Evidence: #78; private VM build record, backend logs, hash manifests and IPA
+  readbacks outside Git
+Notes: Parallels Windows 11 ARM64 VM (8 vCPU, 16 GB), Visual Studio Build
+  Tools 2022 17.14 (native ARM64 MSVC), native ARM64 Python 3.13, checkout on a
+  local NTFS disk. A first attempt on the Mac share stopped at CMake's compiler
+  check: Python resolves a mapped drive to a \\Mac\Home path, and the link
+  step's cmd.exe cannot use it as its working folder; players' local disks are
+  unaffected, and the guide asks for a local drive. Desktop tools took about 15
+  minutes; the iPhone module (225 compiles plus the ThinLTO link) about 56.
+  The personal IPA has SHA-256
+  b3ed3719ef57129aa807d6f2e15c11af40ee24cf5cfe279116a65513d38ef96a. An
+  independent readback keeps all 2,797 base-app entries byte-identical and adds
+  only Payload/SunPad.app/gGMSE01_recomp.dylib: arm64 iOS, minimum 16.0,
+  libSystem only, three device imports and no app imports. Windows' dolrecomp
+  wrote CRLF text; the builder now writes LF, after which all 225 generated
+  files match a same-revision Mac build byte for byte. The modules still differ
+  because PadMint's lock gives Macs LLVM 22.1.8 and Windows/Linux 21.1.8, with
+  identical flags and SDK contents. Reruns kept the first run's toolchain path
+  in CMake's cache on every host; both module scripts now start the folder
+  fresh only when the toolchain path changes. windows-x86_64 stays planned: CI
+  builds its desktop tools and passes the module probe, but no x64 build from a
+  disc is recorded. All generated files and the IPA remain personal-only.
+Next: install the Windows-built IPA on a physical iPhone/iPad with a verified
+  backup and check startup, save load, controls and sound before leaving draft;
+  record an x64 Windows build before marking windows-x86_64 experimental.

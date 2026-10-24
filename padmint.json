@@ -22,7 +22,7 @@
         "linux-x86_64": "experimental",
         "linux-arm64": "experimental",
         "windows-x86_64": "planned",
-        "windows-arm64": "planned"
+        "windows-arm64": "experimental"
       },
       "tools": [
         "git",

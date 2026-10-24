@@ -4,7 +4,7 @@
 
 # Building
 
-Last updated: 2026-10-13
+Last updated: 2026-10-25
 
 ## Prerequisites
 
@@ -91,6 +91,41 @@ PadMint checks the module's imports and the completed IPA. Follow the
 including its nested module. Keep the generated module and IPA private.
 Host build checks do not establish gameplay, audio or device compatibility.
 Do not reuse one checkout's native build caches across host architectures.
+
+## Experimental PadMint module builds on Windows
+
+Windows PCs build the same personal module. The recipe's Windows steps run
+`scripts/windows/build.py`, which does what `bootstrap-dependencies.sh` and
+`prepare-game.sh` do on other hosts, using Visual Studio's C++ compiler for
+ModernGekko's desktop tools. Its module step is the same `{ios_toolchain}`
+build that Macs and Linux run. The translated sources are byte-identical to
+those from a Mac.
+
+Windows on ARM (`windows-arm64`) has one recorded end-to-end build, so it is
+experimental. Windows x64 builds the desktop tools and passes PadMint's module
+probe in CI, but it has no recorded build from a disc yet. Until it does, it
+stays planned and PadMint does not run it. PadMint identifies the host from
+its Python, so on an ARM PC use a native ARM64 Python 3.9 or newer.
+
+One-time setup: install the free
+[Build Tools for Visual Studio](https://visualstudio.microsoft.com/visual-cpp-build-tools/)
+2022 or newer with the "Desktop development with C++" workload. On an ARM PC,
+keep "MSVC ARM64 build tools" ticked. PadMint downloads Git, CMake, Ninja, its
+module compiler and the SDK parts. Allow about 30 GB, and keep the checkout on
+a local NTFS drive: a network share gives `\\server\...` paths, which the
+linker's `cmd.exe` steps cannot use as their working folder. With PadMint's
+CLI available, run these from the SunPad checkout:
+
+```bat
+py -m padmint tools sunpad --repo . --target ios
+py -m padmint build sunpad --repo . --revision <full commit> ^
+  --disc D:\path\to\GMSE01.iso --target ios ^
+  --app D:\path\to\SunPad-v0.2.2-ios-unsigned.ipa --jobs 6
+```
+
+Dolphin's Windows build writes its programs to `ref/ModernGekko/Binary`; the
+script marks that folder ignored in that checkout so the dependency check still
+passes. The same privacy, signing and device notes as for Linux apply.
 
 ## iOS / iPadOS Simulator development build
 
