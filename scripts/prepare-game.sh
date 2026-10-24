@@ -71,8 +71,17 @@ test -d "$GAME/files"
 test "$(find "$GAME/files" -type f | wc -l | tr -d ' ')" = 174
 
 export MACOSX_DEPLOYMENT_TARGET=14.0
+# moderngekko-port translates the game and then builds a module for this computer.
+# Off a Mac, only the translated sources are used (scripts/build-ios-module.sh makes
+# the iPhone module from them), so build that local module quickly with the local
+# compiler instead of requiring clang.
+if [[ "$(uname -s)" = Darwin ]]; then
+  HOST_MODULE=(--toolchain clang)
+else
+  HOST_MODULE=(--toolchain auto --opt-level 0)
+fi
 "$DESKTOP_BUILD/moderngekko-port" build "$GAME" \
-  --backend c --toolchain clang --output "$MODULES"
+  --backend c "${HOST_MODULE[@]}" --output "$MODULES"
 ACTIVE_MODULE="$(<"$MODULES/GMSE01/active-module.txt")"
 if [[ "$ACTIVE_MODULE" != /* ]]; then
   ACTIVE_MODULE="$TPL/$ACTIVE_MODULE"
