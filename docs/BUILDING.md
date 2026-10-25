@@ -4,7 +4,7 @@
 
 # Building
 
-Last updated: 2026-10-13
+Last updated: 2026-10-25
 
 ## Prerequisites
 
@@ -91,6 +91,64 @@ PadMint checks the module's imports and the completed IPA. Follow the
 including its nested module. Keep the generated module and IPA private.
 Host build checks do not establish gameplay, audio or device compatibility.
 Do not reuse one checkout's native build caches across host architectures.
+
+## Experimental PadMint module builds on Windows
+
+Windows PCs build the same personal module. The recipe's Windows steps run
+`scripts/windows/build.py`, which does what `bootstrap-dependencies.sh` and
+`prepare-game.sh` do on other hosts, using Visual Studio's C++ compiler for
+ModernGekko's desktop tools. Its module step is the same `{ios_toolchain}`
+build that Macs and Linux run. The recorded preparation produces the same
+224 translated text files and copied `main.dol` as the prior Mac/ARM build.
+
+Both Windows host labels are experimental in this draft. Windows on ARM has a
+recorded normal PadMint build using native ARM64 Python. Native Windows x64 CI
+builds the desktop tools and checks PadMint's module pipeline. A private proof
+also built the x64 MSVC tools, translated the original disc, compiled with x64
+LLVM and packaged the result under Windows ARM64 emulation using bundled x64
+Python. It reused managed tools and preserved extraction after a failed attempt;
+it is not an empty-cache player run or a private build on native x64 hardware.
+
+That proof used a private harness to select the x64 target on the ARM VM. CMake's
+runtime probes actually executed; diagnostic mode retained their temporary files
+after a cleanup failure, without supplying test answers or changing VM settings.
+The packaged module matches the existing StaticRecomp ABI and iOS 16 minimum,
+passes import checks and preserves all 2,797 base-app entries. Device startup,
+gameplay, audio and saves still need validation. The result qualifies this source
+draft, not a new published release.
+
+One-time setup: install the free
+[Build Tools for Visual Studio](https://visualstudio.microsoft.com/visual-cpp-build-tools/)
+2022 or newer with the "Desktop development with C++" workload. On an ARM PC,
+keep "MSVC ARM64 build tools" ticked. PadMint downloads Git, CMake, Ninja, its
+module compiler and the SDK parts. Allow about 30 GB, and keep the checkout on
+a local NTFS drive: a network share gives `\\server\...` paths, which the
+linker's `cmd.exe` steps cannot use as their working folder. With PadMint's
+CLI available, run these from the SunPad checkout:
+
+```bat
+py -m padmint tools sunpad --repo . --target ios
+py -m padmint build sunpad --repo . --revision <full commit> ^
+  --disc D:\path\to\GMSE01.iso --target ios ^
+  --app D:\path\to\SunPad-v0.2.2-ios-unsigned.ipa --jobs 6
+```
+
+Dolphin's Windows build writes its programs to `ref/ModernGekko/Binary`; the
+script marks that folder ignored in that checkout so the dependency check still
+passes. The same privacy, signing and device notes as for Linux apply.
+
+Windows preparation calls the pinned DolRecomp translator directly and keeps its
+output in `build/windows-generated`. This avoids building an unused desktop DLL
+whose nested cache paths can exceed Windows' path limit. The compiler flags and
+generated sources are unchanged; developer `DOLRECOMP_*` environment switches are
+ignored. If a future dependency enables default DOL patches, preparation stops for
+review rather than skipping them. The Mac route is unchanged.
+
+A completed receipt checks the input executable, translator, settings, source pins,
+builder and every output file before reuse. Failed generation leaves the previous
+output intact; a successful replacement preserves the previous folder alongside it.
+Older `modules-macos14` caches are also left intact. A separate module command refuses
+stale or incomplete prepared sources and asks you to rerun preparation.
 
 ## iOS / iPadOS Simulator development build
 
@@ -189,3 +247,32 @@ generated module and macOS package configuration set macOS 14.0, but the final
 macOS artifact still needs equivalent inspection and oldest-target runtime
 acceptance. Do not describe either oldest-OS compatibility boundary as
 physically accepted yet.
+
+### Windows paths outside the current code page
+
+The Windows builder prints UTF-8, preserves Unicode values when loading Visual
+Studio's environment, and decodes Git metadata paths as UTF-8. Its dependency
+Python child explicitly enables UTF-8. A project-specific CMake hook embeds a
+UTF-8 manifest in `dolrecomp` without changing pinned compiler sources, flags,
+ModernGekko's source-root layout, or the Mac build scripts. Native host CMake
+commands receive a private hidden UTF-8 console: MSVC otherwise writes `?` into
+Ninja's header dependencies and breaks the next build. The caller's console,
+compiler flags and system settings are unchanged.
+
+The pinned generator passed a public two-instruction DOL fixture with Unicode
+input/output/cwd and TEMP paths under bundled Windows Python with UTF-8 mode
+disabled. Its generated C/header bytes matched the control; manifest readback
+retained `asInvoker`. Adding the hook to a cached standalone generator build
+required only relinking; an unchanged repeat did no work. The actual
+ModernGekko nested generator target also passed from a separate public build.
+A public header fixture also verifies the second build does no work, literal
+command arguments stay intact, and failed children remain failures.
+These local checks used x64 MSVC tools under Windows ARM64 emulation. They do not
+execute the emitted PowerPC code or repeat the earlier private module build.
+The previous private build caches and outputs are preserved.
+
+After `python scripts/windows/build.py tools`, run
+`python tests/check-windows-host.py` for the public fixture. Hosted Windows CI
+builds the complete desktop tool graph before running this check. The default
+prepared-source repository suite and the portable Windows encoding/cache tests
+remain separate required checks.
