@@ -6,6 +6,11 @@ its disc, job-limit and generated-code checks equal to the shell scripts'.
 import contextlib
 import importlib.util
 import io
+import json
+import os
+import shutil
+import sys
+from types import SimpleNamespace
 from pathlib import Path
 import subprocess
 import tempfile
@@ -34,7 +39,7 @@ def exit_code(function, *args):
 
 class WindowsBuilderTests(unittest.TestCase):
     def setUp(self):
-        temp = tempfile.TemporaryDirectory(prefix="sun windows ")
+        temp = tempfile.TemporaryDirectory(prefix="sun windows 雪 ")
         self.addCleanup(temp.cleanup)
         self.root = Path(temp.name)
 
@@ -236,6 +241,71 @@ class TranslationTests(unittest.TestCase):
                 self.translate()
         self.assertEqual(build.generated_hashes(build.TRANSLATION), before)
         self.assertEqual(exit_code(build.generated_dir)[0], 1)
+
+
+class UnicodeTests(unittest.TestCase):
+    def test_cli_logs_unicode_command_with_utf8_disabled(self):
+        fixture = r"""
+import importlib.util, sys
+from unittest.mock import patch
+from types import SimpleNamespace
+spec=importlib.util.spec_from_file_location('builder',sys.argv[1]);m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+with patch.object(m, 'os', SimpleNamespace(name='nt')), patch.object(sys,'argv',['build','dependencies']), patch.object(m,'dependencies',side_effect=lambda unused:m.run([sys.executable,'-c','pass','completed 雪'])):
+    m.main()
+"""
+        result = subprocess.run([sys.executable, '-X', 'utf8=0', '-c', fixture,
+                                 str(SOURCE / 'scripts/windows/build.py')],
+                                env={**os.environ, 'PYTHONIOENCODING': 'cp1252'}, capture_output=True)
+        self.assertEqual(result.returncode, 0, result.stderr.decode('utf-8', 'replace'))
+        self.assertIn('completed 雪', result.stdout.decode('utf-8'))
+
+    def test_git_metadata_path_is_decoded_as_utf8(self):
+        with mock.patch.object(build.subprocess, 'check_output', return_value='metadata 雪') as command:
+            self.assertEqual(build.git_lines(Path('source'), 'rev-parse', '--git-path', 'info/exclude'), 'metadata 雪')
+        self.assertEqual(command.call_args.kwargs['encoding'], 'utf-8')
+
+
+    @unittest.skipUnless(shutil.which('git'), 'Git is required for the metadata-path fixture')
+    def test_real_git_metadata_path_survives_legacy_windows_encoding(self):
+        fixture = r"""
+import importlib.util, pathlib, subprocess, sys
+from unittest.mock import patch
+spec=importlib.util.spec_from_file_location('builder',sys.argv[1]);m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+root=pathlib.Path(sys.argv[2]);source=root/'source 雪';metadata=root/'metadata 雪'
+subprocess.run(['git','init',str(source)],check=True,capture_output=True)
+(source/'.git').rename(metadata)
+(source/'.git').write_text('gitdir: '+metadata.as_posix()+'\n',encoding='utf-8')
+with patch.object(m,'MG',source):
+    m.ignore_windows_outputs()
+assert '/Binary/' in (metadata/'info/exclude').read_text()
+"""
+        with tempfile.TemporaryDirectory(prefix='sun Git 雪 ') as temporary:
+            result = subprocess.run([sys.executable, '-X', 'utf8=0', '-c', fixture,
+                                     str(SOURCE / 'scripts/windows/build.py'), temporary],
+                                    env={**os.environ, 'PYTHONIOENCODING':'cp1252'}, capture_output=True)
+        self.assertEqual(result.returncode, 0, result.stderr.decode('utf-8', 'replace'))
+
+    def test_dependency_child_uses_utf8(self):
+        with mock.patch.object(build, 'run') as run:
+            build.lock('--declarations-only')
+        self.assertEqual(run.call_args.args[0][:3], [sys.executable, '-X', 'utf8'])
+
+    def test_visual_studio_keeps_unicode_environment_and_uses_explicit_encodings(self):
+        with tempfile.TemporaryDirectory(prefix='sun VS 雪 ') as temporary:
+            programs = Path(temporary)
+            installer = programs / 'Microsoft Visual Studio/Installer/vswhere.exe'
+            vcvars = programs / 'VS 雪/VC/Auxiliary/Build/vcvarsarm64.bat'
+            for path in (installer, vcvars):
+                path.parent.mkdir(parents=True, exist_ok=True); path.touch()
+            discovery = json.dumps([{'installationVersion':'17.0', 'installationPath':str(programs/'VS 雪')}])
+            output = SimpleNamespace(returncode=0, stdout='Path=prepared\nINCLUDE=headers\nTEMP=temp 雪\n')
+            with mock.patch.dict(build.os.environ, {'ProgramFiles(x86)':str(programs)}), mock.patch.object(build.platform,'system',return_value='Windows'), mock.patch.object(build.platform,'machine',return_value='ARM64'), mock.patch.object(build.subprocess,'check_output',return_value=discovery) as discover, mock.patch.object(build.subprocess,'run',return_value=output) as command, mock.patch.object(build.shutil,'which',return_value=str(programs/'tool.exe')), contextlib.redirect_stdout(io.StringIO()):
+                result=build.visual_studio_env()
+            self.assertEqual(result['TEMP'], 'temp 雪')
+            self.assertIn(' /u ', command.call_args.args[0])
+            self.assertEqual(command.call_args.kwargs['encoding'], 'utf-16le')
+            self.assertIn('-utf8', discover.call_args.args[0])
+            self.assertEqual(discover.call_args.kwargs['encoding'], 'utf-8')
 
 
 if __name__ == "__main__":

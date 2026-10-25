@@ -247,3 +247,32 @@ generated module and macOS package configuration set macOS 14.0, but the final
 macOS artifact still needs equivalent inspection and oldest-target runtime
 acceptance. Do not describe either oldest-OS compatibility boundary as
 physically accepted yet.
+
+### Windows paths outside the current code page
+
+The Windows builder prints UTF-8, preserves Unicode values when loading Visual
+Studio's environment, and decodes Git metadata paths as UTF-8. Its dependency
+Python child explicitly enables UTF-8. A project-specific CMake hook embeds a
+UTF-8 manifest in `dolrecomp` without changing pinned compiler sources, flags,
+ModernGekko's source-root layout, or the Mac build scripts. Native host CMake
+commands receive a private hidden UTF-8 console: MSVC otherwise writes `?` into
+Ninja's header dependencies and breaks the next build. The caller's console,
+compiler flags and system settings are unchanged.
+
+The pinned generator passed a public two-instruction DOL fixture with Unicode
+input/output/cwd and TEMP paths under bundled Windows Python with UTF-8 mode
+disabled. Its generated C/header bytes matched the control; manifest readback
+retained `asInvoker`. Adding the hook to a cached standalone generator build
+required only relinking; an unchanged repeat did no work. The actual
+ModernGekko nested generator target also passed from a separate public build.
+A public header fixture also verifies the second build does no work, literal
+command arguments stay intact, and failed children remain failures.
+These local checks used x64 MSVC tools under Windows ARM64 emulation. They do not
+execute the emitted PowerPC code or repeat the earlier private module build.
+The previous private build caches and outputs are preserved.
+
+After `python scripts/windows/build.py tools`, run
+`python tests/check-windows-host.py` for the public fixture. Hosted Windows CI
+builds the complete desktop tool graph before running this check. The default
+prepared-source repository suite and the portable Windows encoding/cache tests
+remain separate required checks.

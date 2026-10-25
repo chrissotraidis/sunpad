@@ -72,12 +72,28 @@ def die(message, code=1):
     raise SystemExit(code)
 
 
-def run(command, env=None, cwd=None):
+def run(command, env=None, cwd=None, host=False):
     command = [str(part) for part in command]
     print("+ " + subprocess.list2cmdline(command), flush=True)
-    status = subprocess.call(command, env=env, cwd=cwd)
+    program = Path(command[0]).name
+    options = {}
+    if host and os.name == "nt":
+        # MSVC /showIncludes needs a UTF-8 console even when output is piped.
+        # Give only this host build a hidden console; never change the caller's.
+        bootstrap = (
+            "import ctypes,subprocess,sys\n"
+            "k=ctypes.windll.kernel32\n"
+            "if not k.SetConsoleCP(65001) or not k.SetConsoleOutputCP(65001): raise ctypes.WinError()\n"
+            "sys.exit(subprocess.call(sys.argv[1:]))\n")
+        startup = subprocess.STARTUPINFO()
+        startup.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        startup.wShowWindow = 0
+        options = {"creationflags": subprocess.CREATE_NEW_CONSOLE, "startupinfo": startup,
+                   "stdout": sys.stdout, "stderr": sys.stderr}
+        command = [sys.executable, "-X", "utf8", "-c", bootstrap, *command]
+    status = subprocess.call(command, env=env, cwd=cwd, **options)
     if status != 0:
-        die(f"{Path(command[0]).name} failed (exit {status})")
+        die(f"{program} failed (exit {status})")
 
 
 def jobs():
@@ -100,13 +116,13 @@ def sha256(path):
 
 
 def git_lines(path, *args):
-    return subprocess.check_output(GIT + ["-C", str(path), *args], text=True)
+    return subprocess.check_output(GIT + ["-C", str(path), *args], text=True, encoding="utf-8")
 
 
 # --- dependencies -------------------------------------------------------------------
 
 def lock(*args):
-    run([sys.executable, ROOT / "scripts/dependency-lock.py", *args])
+    run([sys.executable, "-X", "utf8", ROOT / "scripts/dependency-lock.py", *args])
 
 
 def ignore_windows_outputs():
@@ -186,7 +202,7 @@ def visual_studio_env():
     # them); keep the clean ones (as BlueWake's Windows builder does).
     path = [p.strip('"') for p in os.environ.get("PATH", "").split(os.pathsep)]
     base = dict(os.environ, PATH=os.pathsep.join(p for p in path if p and "(" not in p and ")" not in p))
-    output = subprocess.run(f'cmd /d /c ""{vcvars}" >nul 2>&1 && set"', capture_output=True, text=True,
+    output = subprocess.run(f'cmd /u /d /c ""{vcvars}" >nul 2>&1 && set"', capture_output=True, encoding="utf-16le",
                             env=base)
     if output.returncode != 0 or "INCLUDE=" not in output.stdout:
         die(f"{vcvars} failed. Repair Visual Studio in the Visual Studio Installer, then run PadMint again.")
@@ -206,9 +222,11 @@ def visual_studio_env():
 
 def desktop_tools(env):
     run(["cmake", "-S", MG, "-B", DESKTOP_BUILD, "-G", "Ninja", "-DCMAKE_C_COMPILER=cl",
-         "-DCMAKE_CXX_COMPILER=cl", *DESKTOP_OPTIONS], env=env)
+         "-DCMAKE_CXX_COMPILER=cl",
+         f"-DCMAKE_PROJECT_DolRecomp_INCLUDE={ROOT / 'scripts/windows/host-tools.cmake'}",
+         *DESKTOP_OPTIONS], env=env, host=True)
     run(["cmake", "--build", DESKTOP_BUILD, "--target", "moderngekko-port", "moderngekko-run",
-         "-j", jobs()], env=env)
+         "-j", jobs()], env=env, host=True)
     ignore_windows_outputs()
     for name in ("dolrecomp.exe", "moderngekko-port.exe"):
         if not (DESKTOP_BUILD / name).is_file():
@@ -422,6 +440,10 @@ def module(toolchain, build_dir):
 
 
 def main():
+    if os.name == "nt":
+        for stream in (sys.stdout, sys.stderr):
+            if hasattr(stream, "reconfigure"):
+                stream.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest="command")
     deps = commands.add_parser("dependencies")

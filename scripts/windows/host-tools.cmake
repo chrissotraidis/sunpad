@@ -1,0 +1,10 @@
+# Configure the app-owned Windows executable without changing pinned sources.
+if(MSVC AND PROJECT_NAME STREQUAL "DolRecomp")
+    function(sunpad_dolrecomp_utf8)
+        if(NOT TARGET dolrecomp)
+            message(FATAL_ERROR "The pinned DolRecomp executable target is missing")
+        endif()
+        target_sources(dolrecomp PRIVATE "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/windows-utf8.manifest")
+    endfunction()
+    cmake_language(DEFER CALL sunpad_dolrecomp_utf8)
+endif()

@@ -498,3 +498,24 @@ Notes: A real long-path failure came from an unused desktop DLL configuration.
   78301d938ad2c62c3e117b54ffd909740eaf8135c0c8863d7a8d7adf646d8020.
 Next: native x64 private-player validation and physical-device startup, gameplay,
   audio and save checks remain open. No binary publication or release occurred.
+
+### 2026-10-26 draft #78: preserve Unicode Windows build paths
+Result: public native generator and Python boundary checks pass; private outputs preserved
+
+The existing builder corrupted Unicode TEMP values through ANSI `cmd set`,
+decoded Git's UTF-8 metadata paths with the local code page, and could fail while
+printing a Unicode command before launching it. Explicit encodings fix these
+boundaries. A small project-specific CMake hook adds DolRecomp's UTF-8 manifest
+without patching its source or changing dependency pins and Mac scripts. A
+private hidden UTF-8 console for host CMake commands also prevents MSVC from
+storing corrupted Unicode header paths in Ninja; the parent console is unchanged.
+
+The exact pinned x64 generator, run under Windows ARM64 emulation, reproduced
+identical public fixture output in Unicode folders. Manifest readback retained
+`asInvoker`, and an unchanged repeat performed no build. The actual nested
+ModernGekko generator target passed separately. The prepared-source repository
+suite passed, as did the bundled-Python encoding/cache tests with UTF-8 mode
+disabled. No private module was rebuilt or uploaded, and no device test occurred.
+
+Next: review the source follow-up and native hosted checks; keep the existing
+private hardware, gameplay/audio/save and authorized-release gates.
