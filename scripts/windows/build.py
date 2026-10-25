@@ -25,12 +25,13 @@ import re
 import shutil
 import subprocess
 import sys
+import uuid
 
 ROOT = Path(__file__).resolve().parents[2]
 MG = ROOT / "ref/ModernGekko"
 TPL = ROOT / "ref/ModernGekko-Template"
 GAME = TPL / "extracted/Super-Mario-Sunshine"
-MODULES = TPL / "build/modules-macos14"
+TRANSLATION = ROOT / "build/windows-generated"
 MARKER = GAME / ".sunpad-source-sha256"
 DESKTOP_BUILD = MG / "build-desktop-tools-public"
 EXPECTED_SHA256 = "67cec1634e641227a4cd51e6a0b277730cb9a1adaa867530c9e66de45373e51d"
@@ -253,14 +254,98 @@ def audit_generated(gen):
     print(f"generated GMSE01 audit passed: {gen}", flush=True)
 
 
+def translation_inputs():
+    settings = MG / "vendor/dolphin/Data/Sys/GameSettings/GMSE01.ini"
+    # ModernGekko applies enabled OnFrame patches before translation. This pinned
+    # game has none; never silently skip one introduced by a future dependency.
+    section = ""
+    for line in settings.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if line.startswith("[") and line.endswith("]"):
+            section = line[1:-1]
+        elif section == "OnFrame_Enabled" and line.startswith("$"):
+            die("GMSE01 now enables default DOL patches; its Windows translation needs review before building.")
+    return {"disc": EXPECTED_SHA256, "dol": sha256(GAME / "sys/main.dol"),
+            "compiler": sha256(DESKTOP_BUILD / "dolrecomp.exe"), "settings": sha256(settings),
+            "pins": sha256(ROOT / "config/dependencies.lock.json"),
+            "builder": sha256(Path(__file__)), "backend": "c", "cpu": "gekko"}
+
+
+def generated_hashes(folder):
+    if folder.is_symlink():
+        raise ValueError("generated source folder is a symlink")
+    result = {}
+    for path in sorted(folder.rglob("*")):
+        if path.is_symlink():
+            raise ValueError("generated source contains a symlink")
+        if path.is_file():
+            result[path.relative_to(folder).as_posix()] = sha256(path)
+    return result
+
+
+def translation_current(inputs):
+    try:
+        if TRANSLATION.is_symlink():
+            return False
+        receipt = json.loads((TRANSLATION / "inputs.json").read_text(encoding="utf-8"))
+        actual = generated_hashes(TRANSLATION / "generated")
+        return (receipt.get("inputs") == inputs and receipt.get("outputs") == actual
+                and {"generated.c", "generated.h", "generated_smc.txt", "main.dol"} <= actual.keys()
+                and any(name.startswith("chunks/") and name.endswith(".c") for name in actual))
+    except (OSError, ValueError, AttributeError):
+        return False
+
+
 def generated_dir():
-    active_file = MODULES / "GMSE01/active-module.txt"
-    if not active_file.is_file():
-        die("prepared module sources missing; run scripts/windows/build.py prepare first")
-    active = Path(active_file.read_text().strip())
-    if not active.is_absolute():
-        active = TPL / active
-    return active.parent / "dolrecomp-output/generated"
+    try:
+        current = translation_current(translation_inputs())
+    except OSError:
+        current = False
+    if not current:
+        die("prepared module sources missing or changed; run scripts/windows/build.py prepare first")
+    return TRANSLATION / "generated"
+
+
+def translate(env):
+    inputs = translation_inputs()
+    if translation_current(inputs):
+        audit_generated(TRANSLATION / "generated")
+        return
+    if TRANSLATION.is_symlink():
+        die(f"Preserved symlink at {TRANSLATION}; move it aside before preparing.")
+    stage = TRANSLATION.with_name(TRANSLATION.name + ".preparing." + uuid.uuid4().hex)
+    stage.mkdir(parents=True)
+    # Same pinned DolRecomp invocation as ModernGekko's C backend. A personal iOS
+    # build needs these sources, not its deeply nested temporary desktop DLL.
+    # Keep fixed defaults: developer switches can change dispatch, chunk sizes
+    # and unsafe call handling without changing the compiler executable.
+    generation_env = {key: value for key, value in (env if env is not None else os.environ).items()
+                      if not key.upper().startswith("DOLRECOMP_")}
+    run([DESKTOP_BUILD / "dolrecomp.exe", "-j" + jobs(), "--backend=c", "--cpu", "gekko",
+         "--gamecube", GAME / "sys/main.dol", stage], env=generation_env)
+    generated = stage / "generated"
+    if not (generated / "generated_smc.txt").is_file():
+        (generated / "generated_smc.txt").touch()
+    shutil.copyfile(GAME / "sys/main.dol", generated / "main.dol")
+    unix_line_endings(generated)
+    audit_generated(generated)
+    if inputs != translation_inputs():
+        die(f"Translation inputs changed while generating; preserved incomplete output at {stage}. Rerun prepare.")
+    (stage / "inputs.json").write_text(json.dumps(
+        {"inputs": inputs, "outputs": generated_hashes(generated)}, sort_keys=True, indent=2) + "\n",
+        encoding="utf-8")
+    previous = TRANSLATION.with_name(TRANSLATION.name + ".previous." + uuid.uuid4().hex)
+    if previous.exists():
+        die(f"Preserved existing recovery folder at {previous}; rerun prepare.")
+    if TRANSLATION.exists():
+        TRANSLATION.rename(previous)
+        print(f"Preserved previous generated files at {previous}", flush=True)
+    try:
+        stage.rename(TRANSLATION)
+    except OSError:
+        if previous.exists():
+            previous.rename(TRANSLATION)
+        raise
 
 
 def unix_line_endings(gen):
@@ -300,13 +385,7 @@ def prepare(disc):
             if staging.exists():
                 shutil.rmtree(staging)
     check_extraction(GAME)
-    # moderngekko-port translates the game and then builds a module for this computer.
-    # Only the translated sources are used here (module makes the iPhone module), so
-    # build that local module quickly, without optimization.
-    run([DESKTOP_BUILD / "moderngekko-port.exe", "build", GAME, "--backend", "c",
-         "--toolchain", "msvc", "--opt-level", "0", "--output", MODULES], env=env)
-    unix_line_endings(generated_dir())
-    audit_generated(generated_dir())
+    translate(env)
     print(f"Prepared GMSE01 at {GAME}", flush=True)
 
 

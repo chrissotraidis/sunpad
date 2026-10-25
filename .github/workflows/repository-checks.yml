@@ -48,6 +48,8 @@ jobs:
           python-version: '3.13'
       - name: Install Ninja
         run: python -m pip install ninja==1.13.0
+      - name: Translation cache and failure recovery without game inputs
+        run: python tests/test_windows_build.py TranslationTests
       - name: Refuse a file that is not the supported disc
         shell: pwsh
         run: |

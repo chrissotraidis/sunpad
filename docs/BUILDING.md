@@ -127,6 +127,19 @@ Dolphin's Windows build writes its programs to `ref/ModernGekko/Binary`; the
 script marks that folder ignored in that checkout so the dependency check still
 passes. The same privacy, signing and device notes as for Linux apply.
 
+Windows preparation calls the pinned DolRecomp translator directly and keeps its
+output in `build/windows-generated`. This avoids building an unused desktop DLL
+whose nested cache paths can exceed Windows' path limit. The compiler flags and
+generated sources are unchanged; developer `DOLRECOMP_*` environment switches are
+ignored. If a future dependency enables default DOL patches, preparation stops for
+review rather than skipping them. The Mac route is unchanged.
+
+A completed receipt checks the input executable, translator, settings, source pins,
+builder and every output file before reuse. Failed generation leaves the previous
+output intact; a successful replacement preserves the previous folder alongside it.
+Older `modules-macos14` caches are also left intact. A separate module command refuses
+stale or incomplete prepared sources and asks you to rerun preparation.
+
 ## iOS / iPadOS Simulator development build
 
 Run the clean-clone preparation above first. One command then provisions the

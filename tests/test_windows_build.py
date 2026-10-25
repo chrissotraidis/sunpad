@@ -102,25 +102,140 @@ class WindowsBuilderTests(unittest.TestCase):
         (gen / "chunks/a.c").write_text(CORRECTED)
         for name in ("generated.c", "generated.h", "main.dol"):
             (gen / name).touch()
-        (self.root / "modules/GMSE01/active-module.txt").write_text(str(gen.parents[1] / "gGMSE01_recomp.dll"))
         toolchain, out = self.root / "toolchain.cmake", self.root / "out"
         out.mkdir()
         for cached, fresh in ((None, False), (toolchain, False), (self.root / "old.cmake", True)):
             if cached:
                 (out / "CMakeCache.txt").write_text(f"CMAKE_TOOLCHAIN_FILE:FILEPATH={build.posix(cached)}\n")
-            with self.subTest(cached=cached), mock.patch.object(build, "MODULES", self.root / "modules"), \
+            with self.subTest(cached=cached), mock.patch.object(build, "generated_dir", return_value=gen), \
                     mock.patch.object(build, "run") as run, mock.patch.dict(build.os.environ, {"SUNPAD_JOBS": "2"}):
                 self.assertEqual(exit_code(build.module, toolchain, out)[0], 0)
                 self.assertEqual("--fresh" in run.call_args_list[0][0][0], fresh)
 
     def test_module_needs_prepared_sources(self):
-        with mock.patch.object(build, "MODULES", self.root / "modules"), \
+        with mock.patch.object(build, "TRANSLATION", self.root / "modules"), \
                 mock.patch.object(build, "run") as run, \
                 mock.patch.dict(build.os.environ, {"SUNPAD_JOBS": "2"}):
             code, stderr = exit_code(build.module, self.root / "toolchain.cmake", self.root / "out")
         self.assertEqual(code, 1)
         self.assertIn("prepared module sources missing", stderr)
         run.assert_not_called()
+
+
+class TranslationTests(unittest.TestCase):
+    def setUp(self):
+        temp = tempfile.TemporaryDirectory(prefix="sun Windows translation ")
+        self.addCleanup(temp.cleanup)
+        self.root = Path(temp.name)
+        for name, path in {"ROOT": self.root, "MG": self.root / "ref/ModernGekko",
+                           "GAME": self.root / "game", "DESKTOP_BUILD": self.root / "tools",
+                           "TRANSLATION": self.root / "build/windows-generated"}.items():
+            patched = mock.patch.object(build, name, path); patched.start(); self.addCleanup(patched.stop)
+        for path, data in ((build.GAME / "sys/main.dol", b"synthetic DOL\r\n"),
+                           (build.DESKTOP_BUILD / "dolrecomp.exe", b"synthetic compiler"),
+                           (build.ROOT / "config/dependencies.lock.json", b"{}")):
+            path.parent.mkdir(parents=True, exist_ok=True); path.write_bytes(data)
+        self.settings = build.MG / "vendor/dolphin/Data/Sys/GameSettings/GMSE01.ini"
+        self.settings.parent.mkdir(parents=True)
+        self.settings.write_text("[OnFrame]\n$Disabled patch\n0x80000000:dword:1\n")
+
+    def compiler(self, command, env=None):
+        self.assertEqual(command[:2], [build.DESKTOP_BUILD / "dolrecomp.exe", "-j2"])
+        self.assertEqual(command[2:7], ["--backend=c", "--cpu", "gekko", "--gamecube", build.GAME / "sys/main.dol"])
+        generated = command[-1] / "generated"
+        (generated / "chunks").mkdir(parents=True)
+        (generated / "generated.c").write_bytes(b"synthetic generated\r\n")
+        (generated / "generated.h").write_bytes(b"synthetic header\r\n")
+        (generated / "chunks/a.c").write_bytes(CORRECTED.replace("\n", "\r\n").encode())
+
+    def translate(self):
+        with mock.patch.object(build, "run", side_effect=self.compiler) as compiler, \
+                mock.patch.dict(build.os.environ, {"SUNPAD_JOBS": "2"}):
+            build.translate({"PATH": "synthetic environment"})
+        return compiler
+
+    def test_direct_generation_is_complete_and_reuses_only_exact_inputs_and_outputs(self):
+        self.assertEqual(self.translate().call_count, 1)
+        gen = build.generated_dir()
+        self.assertEqual((gen / "main.dol").read_bytes(), b"synthetic DOL\r\n")
+        self.assertNotIn(b"\r", (gen / "generated.c").read_bytes())
+        self.assertTrue((gen / "generated_smc.txt").is_file())
+        self.assertEqual(self.translate().call_count, 0)
+        (gen / "chunks/a.c").write_text(CORRECTED + "changed\n")
+        code, _ = exit_code(build.generated_dir); self.assertEqual(code, 1)
+        self.assertEqual(self.translate().call_count, 1)
+        previous = list(build.TRANSLATION.parent.glob("windows-generated.previous.*"))
+        self.assertEqual(len(previous), 1)
+        self.assertIn("changed", (previous[0] / "generated/chunks/a.c").read_text())
+
+    def test_failed_regeneration_preserves_previous_and_diagnostic_outputs(self):
+        self.translate()
+        before = build.generated_hashes(build.TRANSLATION)
+        (build.DESKTOP_BUILD / "dolrecomp.exe").write_bytes(b"new compiler")
+        def fail(command, env=None):
+            (command[-1] / "partial.txt").write_text("partial diagnostics")
+            raise SystemExit(1)
+        with mock.patch.object(build, "run", side_effect=fail):
+            self.assertEqual(exit_code(build.translate, {})[0], 1)
+        self.assertEqual(build.generated_hashes(build.TRANSLATION), before)
+        stages = list(build.TRANSLATION.parent.glob("windows-generated.preparing.*"))
+        self.assertEqual((stages[0] / "partial.txt").read_text(), "partial diagnostics")
+        self.assertEqual(exit_code(build.generated_dir)[0], 1)
+        self.assertEqual(self.translate().call_count, 1)
+        self.assertEqual(len(list(build.TRANSLATION.parent.glob("windows-generated.previous.*"))), 1)
+
+    def test_changed_inputs_and_added_files_invalidate_cache(self):
+        self.translate()
+        (build.TRANSLATION / "generated/user-notes.txt").write_text("preserve me")
+        self.translate()
+        previous = next(build.TRANSLATION.parent.glob("windows-generated.previous.*"))
+        self.assertEqual((previous / "generated/user-notes.txt").read_text(), "preserve me")
+        for path in (build.GAME / "sys/main.dol", build.ROOT / "config/dependencies.lock.json", self.settings):
+            with self.subTest(path=path):
+                path.write_bytes(path.read_bytes() + b"\n")
+                self.assertEqual(exit_code(build.generated_dir)[0], 1)
+                self.assertEqual(self.translate().call_count, 1)
+
+    def test_enabled_default_patches_stop_before_generation(self):
+        self.settings.write_text("[OnFrame_Enabled]\n $Required fix\n[OnFrame]\n$Required fix\n0x80000000:dword:1\n")
+        with mock.patch.object(build, "run") as compiler:
+            code, error = exit_code(build.translate, {})
+        self.assertEqual(code, 1); self.assertIn("default DOL patches", error)
+        compiler.assert_not_called(); self.assertFalse(build.TRANSLATION.exists())
+
+    def test_developer_environment_cannot_change_fixed_generation_defaults(self):
+        env = {"PATH": "kept tools", "DOLRECOMP_UNSAFE_DIRECT_CALLS": "1",
+               "DOLRECOMP_DISPATCH_LOOKUP": "linear", "dolrecomp_c_chunk_instructions": "1"}
+        with mock.patch.object(build, "run", side_effect=self.compiler) as compiler, \
+                mock.patch.dict(build.os.environ, {"SUNPAD_JOBS": "2"}):
+            build.translate(env)
+        self.assertEqual(compiler.call_args.kwargs["env"], {"PATH": "kept tools"})
+        self.assertEqual(env["DOLRECOMP_UNSAFE_DIRECT_CALLS"], "1")
+
+    def test_inputs_changing_during_generation_are_not_published(self):
+        def changing(command, env=None):
+            self.compiler(command, env)
+            (build.GAME / "sys/main.dol").write_bytes(b"changed during generation")
+        with mock.patch.object(build, "run", side_effect=changing), \
+                mock.patch.dict(build.os.environ, {"SUNPAD_JOBS": "2"}):
+            code, error = exit_code(build.translate, {})
+        self.assertEqual(code, 1); self.assertIn("inputs changed", error)
+        self.assertFalse(build.TRANSLATION.exists())
+
+    def test_failed_publication_restores_previous_output(self):
+        self.translate()
+        before = build.generated_hashes(build.TRANSLATION)
+        (build.DESKTOP_BUILD / "dolrecomp.exe").write_bytes(b"changed compiler")
+        rename = Path.rename
+        def fail_publication(path, destination):
+            if ".preparing." in path.name:
+                raise PermissionError("synthetic publication failure")
+            return rename(path, destination)
+        with mock.patch.object(Path, "rename", fail_publication):
+            with self.assertRaises(PermissionError):
+                self.translate()
+        self.assertEqual(build.generated_hashes(build.TRANSLATION), before)
+        self.assertEqual(exit_code(build.generated_dir)[0], 1)
 
 
 if __name__ == "__main__":
