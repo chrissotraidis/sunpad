@@ -21,7 +21,7 @@
         "macos-arm64": "experimental",
         "linux-x86_64": "experimental",
         "linux-arm64": "experimental",
-        "windows-x86_64": "planned",
+        "windows-x86_64": "experimental",
         "windows-arm64": "experimental"
       },
       "tools": [

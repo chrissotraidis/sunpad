@@ -98,14 +98,24 @@ Windows PCs build the same personal module. The recipe's Windows steps run
 `scripts/windows/build.py`, which does what `bootstrap-dependencies.sh` and
 `prepare-game.sh` do on other hosts, using Visual Studio's C++ compiler for
 ModernGekko's desktop tools. Its module step is the same `{ios_toolchain}`
-build that Macs and Linux run. The translated sources are byte-identical to
-those from a Mac.
+build that Macs and Linux run. The recorded preparation produces the same
+224 translated text files and copied `main.dol` as the prior Mac/ARM build.
 
-Windows on ARM (`windows-arm64`) has one recorded end-to-end build, so it is
-experimental. Windows x64 builds the desktop tools and passes PadMint's module
-probe in CI, but it has no recorded build from a disc yet. Until it does, it
-stays planned and PadMint does not run it. PadMint identifies the host from
-its Python, so on an ARM PC use a native ARM64 Python 3.9 or newer.
+Both Windows host labels are experimental in this draft. Windows on ARM has a
+recorded normal PadMint build using native ARM64 Python. Native Windows x64 CI
+builds the desktop tools and checks PadMint's module pipeline. A private proof
+also built the x64 MSVC tools, translated the original disc, compiled with x64
+LLVM and packaged the result under Windows ARM64 emulation using bundled x64
+Python. It reused managed tools and preserved extraction after a failed attempt;
+it is not an empty-cache player run or a private build on native x64 hardware.
+
+That proof used a private harness to select the x64 target on the ARM VM. CMake's
+runtime probes actually executed; diagnostic mode retained their temporary files
+after a cleanup failure, without supplying test answers or changing VM settings.
+The packaged module matches the existing StaticRecomp ABI and iOS 16 minimum,
+passes import checks and preserves all 2,797 base-app entries. Device startup,
+gameplay, audio and saves still need validation. The result qualifies this source
+draft, not a new published release.
 
 One-time setup: install the free
 [Build Tools for Visual Studio](https://visualstudio.microsoft.com/visual-cpp-build-tools/)
