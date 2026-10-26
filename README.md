@@ -1,6 +1,10 @@
 # SunPad
 
 <p align="center">
+  <img src="apple/ios/Assets.xcassets/AppIcon.appiconset/AppIcon.png" width="128" height="128" alt="SunPad illustrated island and sun icon">
+</p>
+
+<p align="center">
   <img alt="iOS and iPadOS artifact target 16+" src="https://img.shields.io/badge/iOS%20%2F%20iPadOS%20target-16%2B-0A84FF?logo=apple">
   <img alt="Experimental tvOS target 17+" src="https://img.shields.io/badge/tvOS%20experimental-17%2B-0A84FF?logo=apple">
   <img alt="Configured macOS target 14+" src="https://img.shields.io/badge/macOS%20target-14%2B-0A84FF?logo=apple">

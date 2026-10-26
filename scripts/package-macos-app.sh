@@ -72,8 +72,7 @@ cp "$ROOT/apple/macos/default-config.ini" "$OUTPUT/Contents/Resources/default-co
 cp "$ROOT/apple/macos/default-GCPadNew.ini" "$OUTPUT/Contents/Resources/default-GCPadNew.ini"
 chmod +x "$OUTPUT/Contents/MacOS/SunPad"
 
-SOURCE_ICON="$ROOT/apple/ios/Assets.xcassets/AppIcon.appiconset/AppIcon.png"
-cp "$SOURCE_ICON" "$OUTPUT/Contents/Resources/AppIcon.png"
+cp "$ROOT/apple/macos/AppIcon.icns" "$OUTPUT/Contents/Resources/AppIcon.icns"
 
 "$ROOT/scripts/package-notices.sh" "$OUTPUT/Contents/Resources/SourceNotices"
 codesign --force --deep --sign - "$OUTPUT"
