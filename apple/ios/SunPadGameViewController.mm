@@ -253,6 +253,7 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
     dispatch_source_t _controllerTimer;
     UILabel *_fpsLabel;
     UILabel *_bootStatusLabel;
+    UIImageView *_brandImageView;
     UIActivityIndicatorView *_bootActivityIndicator;
     UIButton *_gameDataImportButton;
     SunPadControllerSlots _controllerSlots;
@@ -301,6 +302,14 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
     _overlay.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     _overlay.delegate = self;
     [self.view addSubview:_overlay];
+
+    _brandImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"SunPadBrand"]];
+    _brandImageView.contentMode = UIViewContentModeScaleAspectFit;
+    _brandImageView.layer.cornerRadius = 12.0;
+    _brandImageView.clipsToBounds = YES;
+    _brandImageView.isAccessibilityElement = YES;
+    _brandImageView.accessibilityLabel = @"SunPad";
+    [self.view addSubview:_brandImageView];
 
     _bootActivityIndicator = [[UIActivityIndicatorView alloc]
         initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleLarge];
@@ -461,6 +470,7 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
     }
     if (fps > 0.0) {
         _bootStatusLabel.hidden = YES;
+        _brandImageView.hidden = YES;
         [_bootActivityIndicator stopAnimating];
         if (++_performanceLogSeconds >= 10) {
             _performanceLogSeconds = 0;
@@ -724,6 +734,9 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
                   NSStringFromCGSize(layer.drawableSize));
     }
     CGRect safe = UIEdgeInsetsInsetRect(self.view.bounds, self.view.safeAreaInsets);
+    CGFloat brandSize = MIN(56.0, MAX(32.0, CGRectGetHeight(safe) / 2.0 - 128.0));
+    _brandImageView.frame = CGRectMake(CGRectGetMidX(safe) - brandSize / 2.0,
+                                       CGRectGetMinY(safe) + 16.0, brandSize, brandSize);
     CGFloat statusWidth = MIN(420.0, CGRectGetWidth(safe) - 32.0);
     _bootActivityIndicator.center = CGPointMake(CGRectGetMidX(safe),
                                                 CGRectGetMidY(safe) - 34.0);
@@ -759,6 +772,7 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
         return;
     _gameDataImportButton.hidden = YES;
     _bootStatusLabel.hidden = NO;
+    _brandImageView.hidden = NO;
     _bootStatusLabel.text = @"Preparing runtime…";
     _bootStatusLabel.accessibilityLabel = @"Preparing runtime";
     [_bootActivityIndicator startAnimating];
@@ -964,6 +978,7 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
 - (void)showGameDataSetupState {
     [_bootActivityIndicator stopAnimating];
     _bootStatusLabel.hidden = NO;
+    _brandImageView.hidden = NO;
 
     NSMutableParagraphStyle *paragraph = [NSMutableParagraphStyle new];
     paragraph.alignment = NSTextAlignmentCenter;

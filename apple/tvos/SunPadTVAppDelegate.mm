@@ -215,6 +215,7 @@ SunPadTVPadSnapshot SunPadTVSnapshotFromInputState(
     BOOL _modernCStickHorizontal;
 }
 @property(nonatomic, strong) UILabel *titleLabel;
+@property(nonatomic, strong) UIImageView *brandImageView;
 @property(nonatomic, strong) UILabel *statusLabel;
 @property(nonatomic, strong) UIStackView *actions;
 @property(nonatomic, strong) SunPadCoreHost *coreHost;
@@ -250,6 +251,14 @@ extern "C" bool SunPadTVSetRumble(bool enabled) {
         SunPadSettings.sharedSettings.modernCStickHorizontal;
     SunPadTVMetalView *root = [[SunPadTVMetalView alloc] initWithFrame:CGRectZero];
     self.view = root;
+    UIImageView *brand = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"SunPadBrand"]];
+    brand.contentMode = UIViewContentModeScaleAspectFit;
+    brand.isAccessibilityElement = YES;
+    brand.accessibilityLabel = @"SunPad";
+    NSLayoutConstraint *brandHeight = [brand.heightAnchor constraintEqualToConstant:144];
+    brandHeight.priority = UILayoutPriorityDefaultHigh;
+    brandHeight.active = YES;
+    self.brandImageView = brand;
     UILabel *title = [[UILabel alloc] init];
     title.text = @"SunPad for Apple TV";
     title.font = [UIFont systemFontOfSize:52 weight:UIFontWeightBold];
@@ -268,7 +277,7 @@ extern "C" bool SunPadTVSetRumble(bool enabled) {
     actions.spacing = 28;
     self.actions = actions;
     UIStackView *content = [[UIStackView alloc]
-        initWithArrangedSubviews:@[title, status, actions]];
+        initWithArrangedSubviews:@[brand, title, status, actions]];
     content.translatesAutoresizingMaskIntoConstraints = NO;
     content.axis = UILayoutConstraintAxisVertical;
     content.spacing = 32;
@@ -297,6 +306,7 @@ extern "C" bool SunPadTVSetRumble(bool enabled) {
 }
 
 - (void)showStatus:(NSString *)status buttons:(NSArray<UIButton *> *)buttons {
+    self.brandImageView.hidden = NO;
     self.titleLabel.hidden = NO;
     self.statusLabel.hidden = NO;
     self.actions.hidden = NO;
@@ -313,6 +323,7 @@ extern "C" bool SunPadTVSetRumble(bool enabled) {
 }
 
 - (void)hideSetup {
+    self.brandImageView.hidden = YES;
     self.titleLabel.hidden = YES;
     self.statusLabel.hidden = YES;
     self.actions.hidden = YES;
