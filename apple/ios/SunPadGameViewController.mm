@@ -734,8 +734,9 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
                   NSStringFromCGSize(layer.drawableSize));
     }
     CGRect safe = UIEdgeInsetsInsetRect(self.view.bounds, self.view.safeAreaInsets);
-    _brandImageView.frame = CGRectMake(CGRectGetMinX(safe) + 16.0,
-                                       CGRectGetMinY(safe) + 16.0, 56.0, 56.0);
+    CGFloat brandSize = MIN(56.0, MAX(32.0, CGRectGetHeight(safe) / 2.0 - 128.0));
+    _brandImageView.frame = CGRectMake(CGRectGetMidX(safe) - brandSize / 2.0,
+                                       CGRectGetMinY(safe) + 16.0, brandSize, brandSize);
     CGFloat statusWidth = MIN(420.0, CGRectGetWidth(safe) - 32.0);
     _bootActivityIndicator.center = CGPointMake(CGRectGetMidX(safe),
                                                 CGRectGetMidY(safe) - 34.0);
