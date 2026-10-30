@@ -11,6 +11,11 @@ returns an error through the existing staging cleanup path, before the running
 game is stopped or installed data is replaced. The supported disc, picker,
 controls and save paths are unchanged.
 
+The clean device build also now forces the bundled xxHash library, matching the
+existing Simulator check. A Mac with a system xxHash installation could select
+that host library and then fail when device provisioning expected the bundled
+archive.
+
 ## Validation
 
 The focused extraction test reproduces the old false success with a short final
