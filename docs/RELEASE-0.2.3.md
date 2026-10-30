@@ -14,7 +14,8 @@ controls and save paths are unchanged.
 The clean device build also now forces the bundled xxHash library, matching the
 existing Simulator check. A Mac with a system xxHash installation could select
 that host library and then fail when device provisioning expected the bundled
-archive.
+archive. Reconfiguring an existing checkout clears that library's stale
+pkg-config result before selecting the bundled copy.
 
 ## Validation
 

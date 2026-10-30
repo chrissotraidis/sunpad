@@ -25,6 +25,8 @@ MODULE_BUILD="${SUNPAD_IOS_MODULE_BUILD:-$ROOT/build/ios-module-device}"
 "$ROOT/scripts/bootstrap-dependencies.sh"
 
 CMAKE_COMMON=(
+  # A previous AUTO configure may cache a host pkg-config match even after OFF.
+  '-Uxxhash_*'
   -DCMAKE_TOOLCHAIN_FILE="$TOOLCHAIN"
   -DCMAKE_SYSTEM_PROCESSOR=arm64
   -DCMAKE_OSX_DEPLOYMENT_TARGET=16.0
