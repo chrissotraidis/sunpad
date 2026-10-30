@@ -25,6 +25,8 @@ MODULE_BUILD="${SUNPAD_IOS_MODULE_BUILD:-$ROOT/build/ios-module-device}"
 "$ROOT/scripts/bootstrap-dependencies.sh"
 
 CMAKE_COMMON=(
+  # A previous AUTO configure may cache a host pkg-config match even after OFF.
+  '-Uxxhash_*'
   -DCMAKE_TOOLCHAIN_FILE="$TOOLCHAIN"
   -DCMAKE_SYSTEM_PROCESSOR=arm64
   -DCMAKE_OSX_DEPLOYMENT_TARGET=16.0
@@ -40,6 +42,7 @@ CMAKE_COMMON=(
   -DMODERNGEKKO_ENABLE_DOLPHIN_TESTS=OFF
   -DENABLE_CUBEB=OFF -DENABLE_VULKAN=OFF
   -DUSE_SYSTEM_LZ4=OFF -DUSE_SYSTEM_ZSTD=OFF
+  -DUSE_SYSTEM_XXHASH=OFF
   -DHAVE_PIPE2=0
   "-DCMAKE_C_FLAGS=-ffile-prefix-map=$ROOT=."
   # PADFORGE_PUBLIC_APP: the published app carries no Nintendo keys (IOSC.cpp).
