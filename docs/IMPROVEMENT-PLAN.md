@@ -43,10 +43,18 @@ specific request.
 - Leave the repositories with no unpushed work. If a human step is next, write
   exactly what the human needs to do in the log entry's `Next:` line.
 
-**What is next (2026-10-11).** The source-only work in passes 1 and 10 is on
-`main`. What remains needs a person and the iPad, and one session covers all
-of it. Build and install in place with the [device session
-protocol](#device-session-protocol) (back up and hash saves first), then:
+**What is next (2026-10-13).** The source work in passes 1 and 10 is on
+`main`. A complete verified iPhone backup now exists. The personal PadMint
+candidate built from the published v0.2.1 app is installed, with saves and
+preferences unchanged. First collect the maintainer's deferred verdict that
+its existing save, movement, camera and sound work normally.
+
+A refreshed app containing the save-import failure fix and the newer
+save/controller/profile work is built and signed but remains staged
+(source 0373950). After the basic candidate check, refresh
+the backup if the player has used the app, then install that current-source
+app in place using the [device session protocol](#device-session-protocol).
+The following feature checks require that newer app and a person:
 
 1. **10.3:** in Touch Control Settings turn on Invert C-stick Up/Down; with a
    controller and with touch, confirm only the camera's up/down reverses.
@@ -57,7 +65,7 @@ protocol](#device-session-protocol) (back up and hash saves first), then:
    file from the backup; import a Dolphin GMSE01 `.gci`, reopen SunPad,
    confirm it loads in game and that Files → SunPad → Save Backups holds the
    previous save; restore by importing that backup.
-4. **1.3 and 1.4:** save in game, background SunPad and terminate it from
+4. **1.4:** save in game, background SunPad and terminate it from
    Xcode or `devicectl` within a second, relaunch, and confirm the save
    loads. Check the runtime log for `GCI restored from backup`.
 
@@ -279,21 +287,38 @@ Never use a removing CoreDevice copy for updates ([known issue 12](KNOWN_ISSUES.
 
 ### Device session protocol
 
-1. List the device: `xcrun devicectl list devices`.
-2. Back up the app container before installing:
+1. List the device: `xcrun devicectl list devices`. Record the installed app
+   version and signing identity. Close the game normally before copying saves.
+2. Back up `Documents` and `Library` before installing, using bounded copies:
 
    ```sh
-   xcrun devicectl device copy from --device <id> --domain-type appDataContainer \
+   xcrun devicectl --timeout 120 device copy from --device <id> --domain-type appDataContainer \
      --domain-identifier com.sunpad.SunPad --source Documents --destination <backup>/Documents
-   xcrun devicectl device copy from --device <id> --domain-type appDataContainer \
+   xcrun devicectl --timeout 120 device copy from --device <id> --domain-type appDataContainer \
      --domain-identifier com.sunpad.SunPad --source Library --destination <backup>/Library
    ```
 
-3. Record SHA-256 hashes of every save file in the backup.
-4. Install in place with `deploy-ios-device.sh`.
+   A successful exit alone is not proof of a complete backup. Check the copy
+   log and compare the device's file inventory with the backup, including file
+   counts, sizes and hashes. Verify every regular file, including game data,
+   saves, settings and any existing backup saves. If a recursive copy fails or
+   stalls, a USB AFC/House Arrest client can copy regular files individually.
+   The runtime pipe at `Library/Application Support/SunPad/Pipes/sunpad` may
+   stop recursive copies: confirm that its type is FIFO and record its exclusion;
+   it has no persistent contents. Do not skip unreadable regular files or
+   treat other unexamined file types as safe to omit. Preserve a partial backup
+   as partial, and do not install until all regular files are verified.
+3. Record SHA-256 hashes of every save file and the app's preferences. Keep
+   the backup and its inventory private. If the player uses the app again
+   before installation, refresh the backup first.
+4. Install in place with the same signing identity and application entitlements;
+   verify the candidate's signature first. Never uninstall or reset to bypass a
+   signing or copy failure. Read saves and preferences back immediately after
+   installation and compare hashes before launching.
 5. Run the session. Copy the diagnostics log out of `Documents` the same way.
-6. Read the saves back and compare hashes. Any unexpected difference stops the
-   session.
+6. Read the saves back and compare hashes. Explain intentional changes from
+   in-game saving; any unexpected difference stops the session. Record startup,
+   hands-on gameplay and controlled performance evidence separately.
 
 ### Landing changes
 
@@ -323,14 +348,14 @@ human for a device session or a hands-on verdict.
 | --- | --- | --- | --- | --- |
 | 1.1 | Save fault-injection test | done | none | S |
 | 1.2 | Atomic GCI and header writes | done | 1.1 | S |
-| 1.3 | Last-good backup and load repair | in progress (bundle startup fixed; desktop save and reload pending) | 1.2 | S |
+| 1.3 | Last-good backup and load repair | done (tests and normal desktop save/reload pass) | 1.2 | S |
 | 1.4 | Pin and device save session | ready | 1.3 | D, H |
 | 2.1 | Symbol map fetch and verify | done | none | S (fixture); D for the real hash check |
 | 2.2 | Profile symbolizer | done | 2.1 | S |
 | 2.3 | Frame breakdown counters | in progress | none | D |
 | 2.4 | Unlimited-speed desktop benchmark | in progress (incomplete runs rejected; timing fields pending) | none | D |
 | 2.5 | Developer warp and the three routes | in progress (pipe connection timeout covered; traversal routes pending) | 2.1 | D |
-| 2.6 | Baseline measurement and ranking | ready | 2.2-2.5 | D, H |
+| 2.6 | Baseline measurement and ranking | blocked (verified backup complete; current-source device session and routes pending) | 2.2-2.5 | D, H |
 | 3.1 | Chunk-validation flag for direct calls | ready | 2.6 entry gate | D |
 | 3.2 | Hook and mod bitmap | ready | 3.1 | D |
 | 3.3 | Enable safe direct calls | ready | 3.2 | D, H |

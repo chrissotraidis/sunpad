@@ -242,6 +242,90 @@ Notes: Added public descriptive metadata without a remote schema reference or
 Next: refresh draft #57 against main and complete available host checks;
   prepare task 2.6's device measurement without claiming a speedup.
 
+### 2026-10-13 task 2.6: iPhone baseline preflight
+Result: blocked (device data preservation and human session)
+Pins: SunPad a0db9c0 main; installed iPhone app 0.2.0 / build 14
+Checkpoints: no new C3 or C5 acceptance
+Evidence: private device-query and app-data-copy logs; issue #12 follow-up
+Notes: The connected iPhone 14's app version and preferences could be read,
+  but complete Documents and Library copies timed out. The partial backup and
+  recovered save hash are retained privately; they do not establish a complete
+  backup. No app was replaced, reset or uninstalled. The installed version
+  predates the current profiling work. The remaining route work in 2.3-2.5,
+  a current instrumented app, and a human device session are still needed.
+Next: with the iPhone connected and unlocked, complete both app-data copies
+  and verify save hashes before any in-place install with the same signing
+  identity. Then run the recorded Noki protocol with a person checking
+  gameplay/audio and thermal conditions, and finish the plaza/effects routes
+  before claiming the full 2.6 ranking. Passes 3-6 remain gated on measurements.
+
+### 2026-10-13 draft #57: refresh the personal iPhone module recipe
+Result: in progress (Linux and physical-device acceptance pending)
+Pins: SunPad 5a3432d build inputs, then merged a0db9c0 documentation;
+  dependency pins unchanged from main
+Checkpoints: check-repository.sh pass; clean iOS and tvOS CI pass at 5a3432d;
+  PadMint manifest and per-host requirement checks pass
+Evidence: SunPad #57; PadMint #152 (merged, all ten CI checks pass)
+Notes: Refreshed the draft against current main and limited Xcode/xcrun
+  requirements to Mac hosts. A fresh Mac check exposed missing tool setup and
+  base-app forwarding in the shared player-check helper; PadMint #152 fixes
+  both, with five focused fixtures and 333 passing tests on Apple's Python.
+  The private Mac game-build result and exact revision are recorded in #57.
+  Docker's daemon was unresponsive during bounded checks, preventing refreshed
+  Linux ARM64/x86-64 proof. Historical Linux evidence remains labelled as such.
+Next: complete the host-build and safe device gates listed in #57 before
+  leaving draft. No new release or performance improvement is claimed.
+
+
+### 2026-10-13 draft #57: refreshed Mac and Linux host proof
+Result: host builds and package checks pass; physical Linux-module check pending
+Pins: SunPad 81a66cb; PadMint main 7758cf4; published v0.2.1 base app
+Checkpoints: source suite and clean iOS/tvOS CI pass at 81a66cb; fresh Mac
+  player-check exits 0 using Apple Python 3.9.6, a fresh source checkout and
+  an empty PadMint folder; updated Linux ARM64 and x86-64 builds exit 0
+Evidence: #57; private build records, artifact readbacks and host inventories
+Notes: The Mac personal IPA has SHA-256
+  8eacbf71a403ad2843a85ba85101abab83ca82f4e8910d37fcbdeefca3ffedd0.
+  Both Linux hosts produce the identical personal IPA with SHA-256
+  0d74389bb27aea7ab654f85d6d28aad30ee4dfe920c6d3e10e6b20c2422a205c.
+  Independent ZIP readbacks preserve all 2,797 base-app entries and add exactly
+  one arm64 iOS module, minimum OS 16.0; import checks find zero app imports
+  and three device C/C++ imports. All 225 generated files match across hosts.
+  Linux uses Ubuntu 24.04 containers and LLVM 21.1.8; x86-64 runs under emulation
+  on Apple silicon, so timings are not native-host performance results. ARM64
+  was interrupted after native preparation to raise module jobs from two to
+  six, then rerun with unchanged source/flags; the SDK refresh recompiled its
+  module. Preserve the initial exit-130 record, and do not call that rerun an
+  uninterrupted empty-cache build. x86-64 completed one uninterrupted build
+  with separate native caches. All generated artifacts remain personal-only.
+Next: after the maintainer's pending check of the installed Mac-built candidate,
+  refresh the verified backup and test a Linux-built module on a physical
+  iPhone/iPad before taking #57 out of draft. No new release is authorized.
+
+### 2026-10-13 device preservation and deferred human checks
+Result: complete backup and in-place candidate install verified; C3/C5 pending
+Pins: published v0.2.1 / build 15 app with the Mac-built #57 module;
+  current-source app at 81a66cb built and signed separately, not installed
+Checkpoints: independently verified every regular file in Documents/Library;
+  strict signature verification; post-install save/preferences hashes match;
+  post-launch save hash matches; additional offline backup readback passes
+Evidence: private USB inventory, per-file hashes, install and startup records
+Notes: CoreDevice copies kept timing out. USB AFC/House Arrest recovered and
+  verified 423 regular files (2,866,715,917 bytes). A recursive copy exited
+  successfully after stopping at the runtime pipe; independent traversal
+  caught the omission. Only that confirmed nonpersistent FIFO was excluded.
+  The candidate was installed without uninstall/reset, using the existing
+  signing identity and application entitlements. Its opening scene rendered.
+  QuickTime's preview caused an audio interruption; after closing the preview
+  and relaunching, short startup logs showed normal speed and no interruption.
+  This is not hands-on sound/gameplay or a controlled Noki measurement. The
+  maintainer deferred the save/controls/audio check. The installed candidate
+  remains unchanged; the newer app for save/controller/profile work is staged.
+Next: maintainer checks that the installed candidate loads the existing save
+  and that movement, camera and sound work normally. Then refresh the backup
+  before the current-source install and the 1.4/10.1-10.3 human checks. Complete
+  the Noki/plaza/effects routes before the 2.6 ranking; passes 3-6 remain gated.
+
 ### 2026-10-13 task 1.3 preflight: packaged Mac resource lookup
 Result: startup resource defect fixed; actual save and reload still pending
 Pins: SunPad 4b953bd build inputs; ModernGekko e29496f; RecompCore 7240549;
@@ -266,6 +350,20 @@ Notes: Local macOS builds looked for Sys at the app root while SunPad packages
 Next: complete clean iOS/tvOS CI for this PR; with a person, perform the actual
   desktop save/reload check before marking 1.3 done, then the backed-up device
   session for 1.4. No new release or performance claim.
+
+### 2026-10-13 draft #57: independent recipe review
+Result: build boundaries rechecked; stale recipe note corrected
+Pins: SunPad 50306de before the notes-only correction; build inputs unchanged
+Checkpoints: current PadMint manifest validation and three-host command
+  expansion pass, including paths with spaces; invalid jobs fail before tools
+Evidence: #57; source review of the module script and metadata consumers
+Notes: The recipe's descriptive note still named the superseded device build
+  and packaging scripts. It now describes the module build and PadMint insertion
+  that the recipe actually runs. The metadata remains descriptive JSON with
+  no build or workflow consumer. This does not audit the external directory's
+  service or establish device acceptance.
+Next: retain the draft until the deferred candidate verdict and physical
+  Linux-module check. The installed iPhone candidate remains unchanged.
 
 ### 2026-10-13 tasks 2.4-2.5: reject stalled and incomplete host probes
 Result: two reproduced tooling defects fixed; measurement tasks remain open
@@ -316,3 +414,23 @@ Notes: The refreshed app contains the import failure guard. The device runtime
   existing personal module is unchanged. No device launch or gameplay claim.
 Next: after the deferred basic candidate check, refresh the device backup before
   any in-place install of this staged app and the save/controller checks.
+
+### 2026-10-13 task 1.3: normal desktop save and cold reload
+Result: done; device termination test remains task 1.4
+Pins: SunPad Mac package inputs 4b953bd; ModernGekko e29496f,
+  RecompCore 7240549; same save implementation and six passing durability tests
+Checkpoints: copied file A loaded into Delfino Plaza; in-game Save reported
+  completion; normal process shutdown, fresh launch and file A reload passed
+Evidence: private save-complete/reloaded-plaza screenshots, runtime logs,
+  process identities and before/after SHA-256 manifests; independent readback
+Notes: The supported controller pipe resolved the earlier synthetic-keyboard
+  blocker. The new save stayed byte-identical through shutdown and reload;
+  movement and pause responded after loading. A last-good backup was present;
+  two writes occurred, so it contains the preceding write rather than the
+  pre-session save. No repair event occurred in this normal session; recovery
+  behavior remains covered by the existing tests. Only a private copied user
+  directory changed, and both test processes were stopped. The installed
+  iPhone candidate and original save were untouched. This is neither a device
+  termination test nor a controlled performance or audio verdict.
+Next: collect the deferred iPhone candidate verdict, refresh its backup, then
+  run task 1.4 and the staged app's save/controller checks with the maintainer.
