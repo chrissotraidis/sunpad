@@ -28,6 +28,8 @@
 	<true/>
 	<key>GCSupportsGameMode</key>
 	<true/>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>SunPad connects your Nintendo Switch Online GameCube controller over Bluetooth.</string>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
