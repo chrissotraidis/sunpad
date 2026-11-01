@@ -22,6 +22,7 @@
 #include <pthread.h>
 #include <sys/resource.h>
 #include <algorithm>
+#include <atomic>
 #include <cmath>
 #include <unordered_map>
 #include <vector>
@@ -251,6 +252,8 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
     SunPadCoreHost *_coreHost;
     SunPadGameOverlay *_overlay;
     dispatch_source_t _controllerTimer;
+    dispatch_queue_t _inputQueue;
+    std::atomic<bool> _inputPublishPending;
     UILabel *_fpsLabel;
     UILabel *_bootStatusLabel;
     UIImageView *_brandImageView;
@@ -639,6 +642,7 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
     if (state.triggerL > 30) state.buttons |= SunPadButtonL;
     if (physicalTriggerR > 30) state.buttons |= SunPadButtonR;
     [[SunPadInputMixer sharedMixer] setInputState:state fromTouch:NO];
+    [self publishInputSoon];
 }
 
 - (void)reconcileControllersForReason:(NSString *)reason {
@@ -1017,13 +1021,17 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
 }
 
 - (void)startInputConsumer {
-    // Feed the game thread the merged touch+controller snapshot at 60 Hz.
+    // Feed the game thread the merged touch+controller snapshot at 120 Hz, on
+    // a queue of its own so a busy main thread does not delay it. Controllers
+    // also publish as soon as they report (publishInputSoon).
     if (_controllerTimer)
         return;
-    _controllerTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0,
-                                              dispatch_get_main_queue());
+    _inputQueue = dispatch_queue_create(
+        "sunpad.input",
+        dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INTERACTIVE, 0));
+    _controllerTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, _inputQueue);
     dispatch_source_set_timer(_controllerTimer, dispatch_time(DISPATCH_TIME_NOW, 0),
-                              1.0 / 60.0 * NSEC_PER_SEC, 0);
+                              NSEC_PER_SEC / 120, NSEC_PER_MSEC);
     __weak SunPadGameViewController *weakSelf = self;
     dispatch_source_set_event_handler(_controllerTimer, ^{
         [weakSelf publishMergedInput];
@@ -1031,9 +1039,26 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
     dispatch_resume(_controllerTimer);
 }
 
+// Runs on _inputQueue only, so the pipe writes stay in order.
 - (void)publishMergedInput {
     SunPadInputState merged = [[SunPadInputMixer sharedMixer] consumeMergedState];
     [_coreHost publishInput:merged];
+}
+
+// Any thread. Publishes the mixer's state on _inputQueue now instead of at
+// the next tick; calls while one is queued fold into it.
+- (void)publishInputSoon {
+    dispatch_queue_t queue = _inputQueue;
+    if (queue == nil || _inputPublishPending.exchange(true))
+        return;
+    __weak SunPadGameViewController *weakSelf = self;
+    dispatch_async(queue, ^{
+        SunPadGameViewController *strongSelf = weakSelf;
+        if (strongSelf == nil)
+            return;
+        strongSelf->_inputPublishPending.store(false);
+        [strongSelf publishMergedInput];
+    });
 }
 
 - (void)pauseRuntimeForApplicationLifecycle {
