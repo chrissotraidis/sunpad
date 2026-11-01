@@ -8,6 +8,7 @@
 #import "SunPadDiscExtractor.h"
 #import "SunPadGameOverlay.h"
 #import "SunPadInputMixer.h"
+#import "SunPadNSOGCBridge.h"
 #import "SunPadSaveTransfer.h"
 #import "SunPadSettings.h"
 
@@ -552,6 +553,19 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
                                                  name:GCControllerDidDisconnectNotification
                                                object:nil];
     [self reconcileControllersForReason:@"launch"];
+
+    // An NSO GameCube controller has no iOS driver; SunPad connects it itself.
+    __weak SunPadGameViewController *weakSelf = self;
+    SunPadNSOGCBridge *bridge = [SunPadNSOGCBridge sharedBridge];
+    bridge.connectionChangedHandler = ^{
+        SunPadGameViewController *strongSelf = weakSelf;
+        if (strongSelf != nil)
+            [strongSelf->_overlay refreshControllerVisibility];
+    };
+    bridge.inputUpdatedHandler = ^{
+        [weakSelf publishInputSoon];
+    };
+    [bridge start];
 }
 
 - (void)controllerDidConnect:(NSNotification *)notification {
@@ -617,6 +631,9 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
 
     uintptr_t instance = SunPadControllerInstanceID(controller);
     if (_controllerSlots.SlotFor(instance) != 0)
+        return;
+    // A connected NSO GameCube controller is player one.
+    if ([SunPadNSOGCBridge sharedBridge].controllerConnected)
         return;
 
     // Every callback is a complete snapshot. Leaving buttons uninitialized

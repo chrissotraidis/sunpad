@@ -66,6 +66,11 @@
 		BB0000000000000000000118 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000228 /* Foundation.framework */; };
 		BB0000000000000000000119 /* CoreHaptics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000000000000000000022A /* CoreHaptics.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		BB000000000000000000011A /* gGMSE01_recomp.dylib in Copy Module */ = {isa = PBXBuildFile; fileRef = BB0000000000000000000205 /* gGMSE01_recomp.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		CC0000000000000000000101 /* SunPadNSOGCBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000201 /* SunPadNSOGCBridge.mm */; };
+		CC0000000000000000000102 /* nsogc_protocol.c in Sources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000211 /* nsogc_protocol.c */; };
+		CC0000000000000000000103 /* NSOGCController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000213 /* NSOGCController.m */; };
+		CC0000000000000000000104 /* NSOGCManager.m in Sources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000215 /* NSOGCManager.m */; };
+		CC0000000000000000000105 /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000220 /* CoreBluetooth.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -123,6 +128,18 @@
 		BB0000000000000000000205 /* gGMSE01_recomp.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = gGMSE01_recomp.dylib; path = "Provisioned/$(PLATFORM_NAME)/gGMSE01_recomp.dylib"; sourceTree = "<group>"; };
 		BB0000000000000000000206 /* SunPadTV.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SunPadTV.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB0000000000000000000207 /* tvOS Sys */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Sys; path = ref/ModernGekko-tvOS/vendor/dolphin/Data/Sys; sourceTree = SOURCE_ROOT; };
+		CC0000000000000000000201 /* SunPadNSOGCBridge.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SunPadNSOGCBridge.mm; sourceTree = "<group>"; };
+		CC0000000000000000000202 /* SunPadNSOGCBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SunPadNSOGCBridge.h; sourceTree = "<group>"; };
+		CC0000000000000000000211 /* nsogc_protocol.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = nsogc_protocol.c; sourceTree = "<group>"; };
+		CC0000000000000000000212 /* nsogc_protocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = nsogc_protocol.h; sourceTree = "<group>"; };
+		CC0000000000000000000213 /* NSOGCController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NSOGCController.m; sourceTree = "<group>"; };
+		CC0000000000000000000214 /* NSOGCController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSOGCController.h; sourceTree = "<group>"; };
+		CC0000000000000000000215 /* NSOGCManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NSOGCManager.m; sourceTree = "<group>"; };
+		CC0000000000000000000216 /* NSOGCManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSOGCManager.h; sourceTree = "<group>"; };
+		CC0000000000000000000217 /* NSOGCInternal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSOGCInternal.h; sourceTree = "<group>"; };
+		CC0000000000000000000218 /* NSOGCKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSOGCKit.h; sourceTree = "<group>"; };
+		CC0000000000000000000219 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		CC0000000000000000000220 /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -158,6 +175,7 @@
 				AA0000000000000000000111 /* QuartzCore.framework in Frameworks */,
 				AA0000000000000000000110 /* CoreGraphics.framework in Frameworks */,
 				AA0000000000000000000109 /* GameController.framework in Frameworks */,
+				CC0000000000000000000105 /* CoreBluetooth.framework in Frameworks */,
 				AA0000000000000000000108 /* MetalKit.framework in Frameworks */,
 				AA0000000000000000000107 /* Metal.framework in Frameworks */,
 				AA0000000000000000000106 /* UIKit.framework in Frameworks */,
@@ -233,6 +251,9 @@
 				AA0000000000000000000211 /* SunPadGameViewController.h */,
 				AA0000000000000000000203 /* SunPadGameOverlay.mm */,
 				AA0000000000000000000210 /* SunPadGameOverlay.h */,
+				CC0000000000000000000201 /* SunPadNSOGCBridge.mm */,
+				CC0000000000000000000202 /* SunPadNSOGCBridge.h */,
+				CC0000000000000000000401 /* NSOGC */,
 				AA0000000000000000000205 /* Assets.xcassets */,
 				AA0000000000000000000214 /* Info.plist */,
 				AA0000000000000000000220 /* dev-config.plist */,
@@ -283,6 +304,7 @@
 				AA0000000000000000000207 /* Metal.framework */,
 				AA0000000000000000000208 /* MetalKit.framework */,
 				AA0000000000000000000209 /* GameController.framework */,
+				CC0000000000000000000220 /* CoreBluetooth.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -294,6 +316,22 @@
 				BB0000000000000000000206 /* SunPadTV.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		CC0000000000000000000401 /* NSOGC */ = {
+			isa = PBXGroup;
+			children = (
+				CC0000000000000000000219 /* README.md */,
+				CC0000000000000000000218 /* NSOGCKit.h */,
+				CC0000000000000000000212 /* nsogc_protocol.h */,
+				CC0000000000000000000211 /* nsogc_protocol.c */,
+				CC0000000000000000000214 /* NSOGCController.h */,
+				CC0000000000000000000213 /* NSOGCController.m */,
+				CC0000000000000000000216 /* NSOGCManager.h */,
+				CC0000000000000000000215 /* NSOGCManager.m */,
+				CC0000000000000000000217 /* NSOGCInternal.h */,
+			);
+			path = NSOGC;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -411,6 +449,10 @@
 				AA0000000000000000000102 /* SunPadGameViewController.mm in Sources */,
 				AA0000000000000000000103 /* SunPadGameOverlay.mm in Sources */,
 				AA0000000000000000000104 /* SunPadSettings.mm in Sources */,
+				CC0000000000000000000101 /* SunPadNSOGCBridge.mm in Sources */,
+				CC0000000000000000000102 /* nsogc_protocol.c in Sources */,
+				CC0000000000000000000103 /* NSOGCController.m in Sources */,
+				CC0000000000000000000104 /* NSOGCManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
