@@ -39,6 +39,10 @@ REQUIRED_DOLPHIN_SUBMODULES=(
   Externals/watcher/watcher Externals/xxhash/xxHash
   Externals/zlib-ng/zlib-ng Externals/zstd/zstd
 )
+# Dolphin's Linux build also needs cpp-ipc (PadMint builds the game module on Linux).
+if [[ "$(uname -s)" = Linux ]]; then
+  REQUIRED_DOLPHIN_SUBMODULES+=(Externals/cpp-ipc/cpp-ipc)
+fi
 for MG in "$ROOT/ref/ModernGekko" "$ROOT/ref/ModernGekko-tvOS"; do
  git -C "$MG/vendor/dolphin" submodule update --init "${REQUIRED_DOLPHIN_SUBMODULES[@]}"
 git -C "$MG/vendor/dolphin/Externals/cubeb/cubeb" submodule update --init --recursive
