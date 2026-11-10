@@ -1,6 +1,10 @@
 # SunPad
 
 <p align="center">
+  <img src="apple/ios/Assets.xcassets/AppIcon.appiconset/AppIcon.png" width="128" height="128" alt="SunPad illustrated island and sun icon">
+</p>
+
+<p align="center">
   <img alt="iOS and iPadOS artifact target 16+" src="https://img.shields.io/badge/iOS%20%2F%20iPadOS%20target-16%2B-0A84FF?logo=apple">
   <img alt="Experimental tvOS target 17+" src="https://img.shields.io/badge/tvOS%20experimental-17%2B-0A84FF?logo=apple">
   <img alt="Configured macOS target 14+" src="https://img.shields.io/badge/macOS%20target-14%2B-0A84FF?logo=apple">
@@ -38,6 +42,14 @@ Apple and tvOS versions.
 > concerns SunPad's workflow, not the authorship of its upstream projects.
 
 ## Get SunPad
+
+**No Mac?** Building SunPad for iPhone or iPad needs an Apple Silicon Mac today.
+SunPad reads your own disc image while it builds, so it can't use [GitHub's
+Mac](https://github.com/chrissotraidis/padmint#no-mac-build-on-githubs-mac) the
+way some other ports do: that would mean uploading your game file. A Windows
+build is in progress; [PadMint's Windows
+list](https://github.com/chrissotraidis/padmint/blob/main/docs/WINDOWS.md) shows
+where it stands.
 
 **iOS/iPadOS 27:** v0.2.1 includes the scene-startup correction missing from
 v0.2.0. The published package declares the new startup configuration; physical

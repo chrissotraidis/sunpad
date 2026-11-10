@@ -9,7 +9,7 @@
     <key>CFBundleExecutable</key>
     <string>SunPad</string>
     <key>CFBundleIconFile</key>
-    <string>AppIcon.png</string>
+    <string>AppIcon.icns</string>
     <key>CFBundleIdentifier</key>
     <string>com.sunpad.SunPad.macos</string>
     <key>CFBundleInfoDictionaryVersion</key>

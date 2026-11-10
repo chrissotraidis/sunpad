@@ -18,6 +18,8 @@ MODULE_BUILD="/tmp/sunpad-module-ios-simulator"
 "$ROOT/scripts/bootstrap-dependencies.sh"
 
 CMAKE_COMMON=(
+  # Match device builds, including a checkout previously configured with a host library.
+  '-Uxxhash_*'
   -DCMAKE_TOOLCHAIN_FILE="$TOOLCHAIN"
   -DCMAKE_SYSTEM_PROCESSOR=arm64
   -DCMAKE_OSX_DEPLOYMENT_TARGET=16.0
@@ -33,6 +35,7 @@ CMAKE_COMMON=(
   -DMODERNGEKKO_ENABLE_DOLPHIN_TESTS=OFF
   -DENABLE_CUBEB=OFF -DENABLE_VULKAN=OFF
   -DUSE_SYSTEM_LZ4=OFF -DUSE_SYSTEM_ZSTD=OFF
+  -DUSE_SYSTEM_XXHASH=OFF
   -DHAVE_PIPE2=0
 )
 
