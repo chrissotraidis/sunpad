@@ -43,13 +43,18 @@ Apple and tvOS versions.
 
 ## Get SunPad
 
-**No Mac?** Building SunPad for iPhone or iPad needs an Apple Silicon Mac today.
-SunPad reads your own disc image while it builds, so it can't use [GitHub's
-Mac](https://github.com/chrissotraidis/padmint#no-mac-build-on-githubs-mac) the
-way some other ports do: that would mean uploading your game file. A Windows
-build is in progress; [PadMint's Windows
-list](https://github.com/chrissotraidis/padmint/blob/main/docs/WINDOWS.md) shows
-where it stands.
+**No Mac? (experimental)** Since 0.3.0, PadMint can build SunPad for iPhone or
+iPad on a Windows PC. Install the free [Build Tools for Visual
+Studio](https://visualstudio.microsoft.com/visual-cpp-build-tools/) with
+"Desktop development with C++", then use [PadMint for
+Windows](https://github.com/chrissotraidis/padmint/releases/latest) the same way
+as on a Mac and install the IPA with Sideloadly. The first build takes a few
+hours and needs about 30 GB free. A copy built on Windows 11 ARM64 has been
+installed and played on an iPad; a native x64 PC hasn't been tried yet, so
+please report how it goes. Linux builds are experimental too
+([details](docs/BUILDING.md)). SunPad can't use [GitHub's
+Mac](https://github.com/chrissotraidis/padmint#no-mac-build-on-githubs-mac),
+because that would mean uploading your game file.
 
 **iOS/iPadOS 27:** v0.2.1 includes the scene-startup correction missing from
 v0.2.0. The published package declares the new startup configuration; physical
