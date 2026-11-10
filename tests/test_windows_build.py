@@ -116,6 +116,9 @@ class WindowsBuilderTests(unittest.TestCase):
                     mock.patch.object(build, "run") as run, mock.patch.dict(build.os.environ, {"SUNPAD_JOBS": "2"}):
                 self.assertEqual(exit_code(build.module, toolchain, out)[0], 0)
                 self.assertEqual("--fresh" in run.call_args_list[0][0][0], fresh)
+                # Players' PCs usually have no Python of their own: CMake must use this one.
+                self.assertIn(f"-DPython3_EXECUTABLE={build.posix(Path(sys.executable))}",
+                              run.call_args_list[0][0][0])
 
     def test_module_needs_prepared_sources(self):
         with mock.patch.object(build, "TRANSLATION", self.root / "modules"), \

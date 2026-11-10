@@ -62,6 +62,13 @@ DESKTOP_OPTIONS = [
     "-DUSE_MGBA=OFF", "-DUSE_RETRO_ACHIEVEMENTS=OFF", "-DENABLE_AUTOUPDATE=OFF",
     "-DENABLE_ANALYTICS=OFF", "-DUSE_UPNP=OFF",
 ]
+
+
+def python_option():
+    """Point CMake at the Python running this builder (PadMint's own on a player's PC).
+    Dolphin's module template needs a Python interpreter, and most Windows PCs have
+    none installed, so CMake's own search fails there."""
+    return f"-DPython3_EXECUTABLE={posix(Path(sys.executable))}"
 VS_SETUP = ("In the Visual Studio Installer, install Visual Studio 2022 or newer (the free "
             "Build Tools for Visual Studio are enough) with the \"Desktop development with C++\" "
             "workload, then run PadMint again.")
@@ -224,7 +231,7 @@ def desktop_tools(env):
     run(["cmake", "-S", MG, "-B", DESKTOP_BUILD, "-G", "Ninja", "-DCMAKE_C_COMPILER=cl",
          "-DCMAKE_CXX_COMPILER=cl",
          f"-DCMAKE_PROJECT_DolRecomp_INCLUDE={ROOT / 'scripts/windows/host-tools.cmake'}",
-         *DESKTOP_OPTIONS], env=env, host=True)
+         python_option(), *DESKTOP_OPTIONS], env=env, host=True)
     run(["cmake", "--build", DESKTOP_BUILD, "--target", "moderngekko-port", "moderngekko-run",
          "-j", jobs()], env=env, host=True)
     ignore_windows_outputs()
@@ -434,7 +441,8 @@ def module(toolchain, build_dir):
          "-DCMAKE_C_FLAGS=-fno-slp-vectorize -mllvm -large-interval-freq-threshold=10",
          "-DGAME_ID=GMSE01", f"-DGENERATED_DIR={posix(gen)}",
          f"-DGXRUNTIME_DIR={posix(dolphin / 'GXRuntime')}",
-         f"-DCHASSIS_ABI_DIR={posix(dolphin / 'Source/Core/Core/PowerPC/StaticRecomp')}"])
+         f"-DCHASSIS_ABI_DIR={posix(dolphin / 'Source/Core/Core/PowerPC/StaticRecomp')}",
+         python_option()])
     run(["cmake", "--build", build_dir, "-j", count])
     print(f"Built {Path(build_dir) / 'gGMSE01_recomp.dylib'}", flush=True)
 
