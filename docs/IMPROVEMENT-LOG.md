@@ -519,3 +519,28 @@ disabled. No private module was rebuilt or uploaded, and no device test occurred
 
 Next: review the source follow-up and native hosted checks; keep the existing
 private hardware, gameplay/audio/save and authorized-release gates.
+
+### 2026-11-10 #57 and #78 on SunPad 0.2.3: Mac Xcode route kept, released PadMint builds on Windows ARM64
+Result: Mac player check and a released-PadMint Windows ARM64 build pass; device check pending
+Pins: #57 065f76c and #78 4b7c2d7, both merging main 774de79 (0.2.3 / build 17);
+  PadMint 0.6.3; published v0.2.3 base app
+Checkpoints: iOS, tvOS, safety and windows-route CI pass on both; 19 Windows
+  builder tests pass; PadMint's scripts/player-check.sh passes on the Mac with
+  the #57 checkout and the published app (Apple Python 3.9.6, empty folder, 4,576 s)
+Notes: The recipe moves to schema 2. On a Mac it keeps 0.2.3's Xcode steps
+  (ios-build-core-device.sh, then package-ios.sh), so Mac output is unchanged
+  and Macs download no LLVM. ios_module and the open-source SDK module steps run
+  only on Windows and Linux, as in BlueWake 0.11.0. The xxHash fix in d1e14cb
+  touches only the Xcode core build; the module template uses no xxHash and the
+  Windows desktop tools already build bundled libraries (USE_SYSTEM_LIBS=OFF).
+  On Windows 11 ARM64 (Parallels, 8 vCPU, 16 GB), PadMint 0.6.3's release ZIP
+  with its bundled Python 3.13.15 (host windows-arm64), a fresh PadMint folder,
+  a clean clone and a local NTFS disk built the personal IPA: tools 1,591 s,
+  build 8,556 s at 2 jobs. Record completed, publication gate PASS. Readback
+  keeps 2,796 of 2,797 base entries byte-identical; Info.plist changes only the
+  padmint-sunpad URL type; the one added entry is gGMSE01_recomp.dylib (arm64,
+  iOS 16, libSystem only, imports ldexp, ldexpf and dyld_stub_binder). Personal
+  IPA SHA-256 409ae0e9d098237c859b4fd02868fb1b4e17b4b32240d1ce17fa737e1415720b,
+  kept private outside Git.
+Next: install the Windows-built IPA on an iPad after a verified save backup and
+  check startup, gameplay, sound and a save reload before leaving draft.
