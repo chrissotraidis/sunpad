@@ -10,6 +10,26 @@
 
 namespace fs = std::filesystem;
 
+// DiscIO's void directory exporter logs individual write failures and carries
+// on. A partial final file still exists and preserves the expected file count,
+// so check every output against the verified disc's file table before activation.
+static bool VerifyExtractedFiles(const DiscIO::FileInfo &directory, const fs::path &target) {
+    std::error_code error;
+    if (!fs::is_directory(fs::symlink_status(target, error)) || error)
+        return false;
+    for (const auto &entry : directory) {
+        const fs::path path = target / entry.GetName();
+        if (entry.IsDirectory()) {
+            if (!VerifyExtractedFiles(entry, path))
+                return false;
+        } else if (!fs::is_regular_file(fs::symlink_status(path, error)) || error ||
+                   fs::file_size(path, error) != entry.GetSize() || error) {
+            return false;
+        }
+    }
+    return true;
+}
+
 @implementation SunPadDiscExtractor
 
 + (void)extractImageAtPath:(NSString *)imagePath
@@ -85,8 +105,9 @@ namespace fs = std::filesystem;
                 return false;
             });
 
+        const bool complete = VerifyExtractedFiles(filesystem->GetRoot(), root / "files");
         dispatch_async(dispatch_get_main_queue(), ^{
-            completion(YES, nil);
+            completion(complete, complete ? nil : @"Game-data extraction was incomplete. Check available storage and try importing again. Existing game data and saves are unchanged.");
         });
     });
 }

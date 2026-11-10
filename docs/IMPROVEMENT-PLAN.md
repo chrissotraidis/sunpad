@@ -76,10 +76,8 @@ work that can still start: none in passes 1 and 10; pass 2's device baseline
 When asked to compare SunPad with another Sunshine project or to look for
 features to learn from, run the [research loop](RESEARCH-LOOP.md) instead.
 
-**Further releases are paused.** The maintainer separately approved the
-published v0.2.1 release. That does not clear the wider audit or authorize
-another release. Follow [AGENTS.md](../AGENTS.md); "candidate build" in this
-plan means an internal build for testing only.
+"Candidate build" in this plan means an internal build for testing only. Public
+releases follow the release rules in [AGENTS.md](../AGENTS.md).
 
 ## Goals
 
@@ -781,7 +779,7 @@ waiting for device sessions.
 | --- | --- | --- | --- |
 | 1 | 1-3 | 1.1-1.4, 2.1-2.6 | Saves cannot be cut short; ranked, repeatable numbers |
 | 2 | 4-10 | 3.x and 4.x; 6.x in parallel if its entry gate passes | Faster module and runtime |
-| 3 | 11-13 | 5.x, full scene matrix on iPhone 14, iPhone 15 Pro and iPad | Internal candidate build with evidence (no public release while releases are paused) |
+| 3 | 11-13 | 5.x, full scene matrix on iPhone 14, iPhone 15 Pro and iPad | Internal candidate build with evidence |
 | 4 | 14-22 | 7.1, 8.x, 9.1 | Optional features on hardware with headroom |
 | Any | 1-2 | 10.1-10.3 | Player features, alongside any phase |
 
