@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "id": "sunpad",
   "name": "SunPad",
   "game": "Super Mario Sunshine (GameCube, GMSE01 rev 0)",
@@ -33,24 +33,59 @@
       "check": "ipa",
       "ios_module": {
         "file": "{repo}/build/ios-module-padmint/gGMSE01_recomp.dylib",
-        "into": "gGMSE01_recomp.dylib"
+        "into": "gGMSE01_recomp.dylib",
+        "on": [
+          "linux"
+        ]
       },
       "steps": [
         {
           "stage": "dependencies",
+          "on": [
+            "macos",
+            "linux"
+          ],
           "command": [
             "{repo}/scripts/bootstrap-dependencies.sh"
           ]
         },
         {
           "stage": "prepare",
+          "on": [
+            "macos",
+            "linux"
+          ],
           "command": [
             "{repo}/scripts/prepare-game.sh",
             "{disc}"
           ]
         },
         {
+          "stage": "translate",
+          "on": [
+            "macos"
+          ],
+          "command": [
+            "{repo}/scripts/ios-build-core-device.sh"
+          ]
+        },
+        {
+          "stage": "package",
+          "on": [
+            "macos"
+          ],
+          "command": [
+            "{repo}/scripts/package-ios.sh",
+            "{app}",
+            "{repo}/build/ios-module-device/gGMSE01_recomp.dylib",
+            "{output}"
+          ]
+        },
+        {
           "stage": "module",
+          "on": [
+            "linux"
+          ],
           "command": [
             "{repo}/scripts/build-ios-module.sh",
             "{ios_toolchain}",
@@ -188,7 +223,7 @@
       }
     ]
   },
-  "notes": "PadMint builds gGMSE01_recomp.dylib with scripts/build-ios-module.sh in build/ios-module-padmint, checks its imports, and adds it to the published app for personal use.",
+  "notes": "On a Mac, ios-build-core-device.sh builds gGMSE01_recomp.dylib with Xcode in build/ios-module-device and package-ios.sh places it in the published app. On Linux, scripts/build-ios-module.sh builds it with PadMint's open-source iPhone SDK in build/ios-module-padmint, and PadMint checks its imports and adds it to the published app.",
   "publication": {
     "public_binaries": false,
     "reason": "The release publishes the app without game code; PadMint adds the module translated from the player's own disc, which stays personal."
