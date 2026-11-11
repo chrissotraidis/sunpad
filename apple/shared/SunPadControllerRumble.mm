@@ -168,10 +168,19 @@
 
 @end
 
+// SunPadNSOGCBridge (iOS) replaces this default: it returns true when an NSO
+// GameCube controller over Bluetooth LE is connected and took the rumble.
+extern "C" __attribute__((weak)) bool SunPadNSOGCSetRumble(bool enabled) {
+    (void)enabled;
+    return false;
+}
+
 // Weakly imported by RecompCore's Pad::Rumble and Pad::ResetRumble for pad 0
 // on iOS and iPadOS. Called on the emulation thread.
 extern "C" bool SunPadSetRumble(bool enabled) {
     @autoreleasepool {
+        if (SunPadNSOGCSetRumble(enabled))
+            return true;
         return [[SunPadControllerRumble sharedRumble] setRumbleEnabled:enabled];
     }
 }

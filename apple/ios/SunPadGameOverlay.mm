@@ -3,6 +3,7 @@
 #import "SunPadDiagnostics.h"
 #import "SunPadControllerRumble.h"
 #import "SunPadInputMixer.h"
+#import "SunPadNSOGCBridge.h"
 #import "SunPadSettings.h"
 
 #import <GameController/GameController.h>
@@ -630,6 +631,21 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
     rumbleAction.state = [SunPadSettings sharedSettings].controllerRumble ?
         UIMenuElementStateOn : UIMenuElementStateOff;
 
+    UIAction *hideTouchAction =
+        [UIAction actionWithTitle:@"Hide Touch Controls with a Controller"
+                            image:[UIImage systemImageNamed:@"eye.slash"]
+                       identifier:nil handler:^(__kindof UIAction *action) {
+        (void)action;
+        SunPadSettings *currentSettings = [SunPadSettings sharedSettings];
+        currentSettings.hideTouchControlsWhenControllerConnected =
+            !currentSettings.hideTouchControlsWhenControllerConnected;
+        [currentSettings synchronize];
+        [weakSelf syncHideControlsSwitch];
+        [weakSelf refreshMenuButton];
+    }];
+    hideTouchAction.state = settings.hideTouchControlsWhenControllerConnected ?
+        UIMenuElementStateOn : UIMenuElementStateOff;
+
     UIMenu *controlsMenu = [UIMenu menuWithTitle:@"Controls"
                                            image:[UIImage systemImageNamed:@"gamecontroller"]
                                       identifier:nil
@@ -647,7 +663,14 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
             (void)action;
             [weakSelf toggleSettingsPanel];
         }],
+        hideTouchAction,
         rumbleAction,
+        // Built when the menu opens, so it shows the controller as it is now.
+        [UIDeferredMenuElement elementWithUncachedProvider:^(
+                                   void (^completion)(NSArray<UIMenuElement *> *elements)) {
+            SunPadGameOverlay *strongSelf = weakSelf;
+            completion(strongSelf != nil ? @[[strongSelf nsoControllerMenu]] : @[]);
+        }],
     ]];
 
     return [UIMenu menuWithTitle:@"SunPad" children:@[
@@ -853,6 +876,90 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
 
 - (void)refreshMenuButton {
     _menuButton.menu = [self buildMenu];
+}
+
+- (void)syncHideControlsSwitch {
+    _hideControlsSwitch.on = [SunPadSettings sharedSettings].hideTouchControlsWhenControllerConnected;
+    [self applyControllerVisibility];
+}
+
+// The NSO GameCube controller's section of the Controls menu.
+- (UIMenu *)nsoControllerMenu {
+    __weak SunPadGameOverlay *weakSelf = self;
+    SunPadNSOGCBridge *bridge = [SunPadNSOGCBridge sharedBridge];
+    SunPadNSOGCStatus status = bridge.status;
+
+    NSString *statusTitle = nil;
+    NSString *statusImage = nil;
+    switch (status) {
+        case SunPadNSOGCStatusConnected:
+            statusTitle = @"Connected";
+            statusImage = @"checkmark.circle.fill";
+            break;
+        case SunPadNSOGCStatusSearching:
+            statusTitle = @"Searching: press SYNC on the controller";
+            statusImage = @"dot.radiowaves.left.and.right";
+            break;
+        case SunPadNSOGCStatusUnavailable:
+            statusTitle = @"Bluetooth is off or not allowed";
+            statusImage = @"exclamationmark.triangle";
+            break;
+        case SunPadNSOGCStatusOff:
+            statusTitle = @"Off";
+            statusImage = @"power";
+            break;
+    }
+    UIAction *statusAction = [UIAction actionWithTitle:statusTitle
+                                                 image:[UIImage systemImageNamed:statusImage]
+                                            identifier:nil
+                                               handler:^(__kindof UIAction *action) { (void)action; }];
+    statusAction.attributes = UIMenuElementAttributesDisabled;
+    if (status == SunPadNSOGCStatusConnected)
+        statusAction.subtitle = bridge.controllerName;
+    NSMutableArray<UIMenuElement *> *children = [NSMutableArray arrayWithObject:statusAction];
+
+    if (status == SunPadNSOGCStatusOff) {
+        [children addObject:[UIAction actionWithTitle:@"Connect"
+                                                image:[UIImage systemImageNamed:@"link"]
+                                           identifier:nil handler:^(__kindof UIAction *action) {
+            (void)action;
+            [[SunPadNSOGCBridge sharedBridge] connect];
+            [weakSelf showNSOControllerPairingHint];
+        }]];
+    } else {
+        NSString *title = status == SunPadNSOGCStatusConnected ? @"Disconnect" : @"Stop Searching";
+        [children addObject:[UIAction actionWithTitle:title
+                                                image:[UIImage systemImageNamed:@"xmark.circle"]
+                                           identifier:nil handler:^(__kindof UIAction *action) {
+            (void)action;
+            [[SunPadNSOGCBridge sharedBridge] disconnect];
+        }]];
+    }
+    if (bridge.hasRememberedController) {
+        UIAction *forgetAction = [UIAction actionWithTitle:@"Forget Controller"
+                                                     image:[UIImage systemImageNamed:@"trash"]
+                                                identifier:nil handler:^(__kindof UIAction *action) {
+            (void)action;
+            [[SunPadNSOGCBridge sharedBridge] forgetController];
+        }];
+        forgetAction.attributes = UIMenuElementAttributesDestructive;
+        [children addObject:forgetAction];
+    }
+    return [UIMenu menuWithTitle:@"NSO GameCube Controller"
+                           image:[UIImage systemImageNamed:@"gamecontroller.fill"]
+                      identifier:nil
+                         options:0
+                        children:children];
+}
+
+- (void)showNSOControllerPairingHint {
+    UIAlertController *alert = [UIAlertController
+        alertControllerWithTitle:@"Pair the Controller"
+                         message:@"Press the small SYNC button on the NSO GameCube controller. "
+                                 @"It connects in a few seconds and becomes player one."
+                  preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
+    [self.window.rootViewController presentViewController:alert animated:YES completion:nil];
 }
 
 - (void)confirmGameDataRemoval {
@@ -1855,6 +1962,8 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
             break;
         }
     }
+    if ([SunPadNSOGCBridge sharedBridge].controllerConnected)
+        controllerConnected = YES;
 #endif
     BOOL shouldHide = !_editingLayout && controllerConnected &&
         [SunPadSettings sharedSettings].hideTouchControlsWhenControllerConnected;
