@@ -130,7 +130,12 @@ headlessly for verification.
   and after foreground resume. Valid instances retain their player slots,
   stale instances are removed, a returning sole controller reclaims player 1,
   and removal clears held player-1 buttons, sticks, and triggers. Touch controls
-  auto-hide when a controller is connected. The persisted
+  auto-hide while a controller owns player 1 (**Controls → Auto-hide Touch
+  Controls with Controller**, on by default); a controller assigned to another
+  player does not hide them. Hiding releases any held touch input. While they
+  are hidden, **Show Touch Controls** at the top of the three-dot menu brings
+  them back with the controller still connected and turns auto-hide off until
+  it is turned on again. The persisted
   **Modern C-stick L/R** setting reverses only the horizontal C-stick axis for
   both touch and physical controllers, leaving vertical zoom unchanged. The
   separate **Invert C-stick Up/Down** setting, off by default, reverses only

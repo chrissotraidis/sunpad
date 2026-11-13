@@ -26,6 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)gameOverlayDiagnosticContext:(SunPadGameOverlay *)overlay;
 /* The performance profile actually selected at launch. */
 - (NSString *)gameOverlayPerformanceProfile:(SunPadGameOverlay *)overlay;
+/* Whether a physical controller currently owns player 1, the touch player. */
+- (BOOL)gameOverlayTouchPlayerHasController:(SunPadGameOverlay *)overlay;
 @end
 
 /* UIKit overlay above the game render surface: the three-dot menu, render
@@ -43,7 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
 /* Hide the touch controls (e.g., a physical controller is connected). */
 - (void)setTouchControlsHidden:(BOOL)hidden animated:(BOOL)animated;
 
-/* Re-evaluates the current GameController enumeration after foreground resume. */
+/* Re-evaluates auto-hide after player 1's controller assignment changes. */
 - (void)refreshControllerVisibility;
 
 /* Applies persisted settings to the touch controls. */
