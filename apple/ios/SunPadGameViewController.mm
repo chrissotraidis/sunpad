@@ -10,6 +10,7 @@
 #import "SunPadInputMixer.h"
 #import "SunPadSaveTransfer.h"
 #import "SunPadSettings.h"
+#import "SunPadTouchControlsVisibility.h"
 
 #import <CommonCrypto/CommonDigest.h>
 #import <GameController/GameController.h>
@@ -1077,6 +1078,17 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
 }
 
 #pragma mark - SunPadGameOverlayDelegate
+
+- (BOOL)gameOverlayTouchPlayerHasController:(SunPadGameOverlay *)overlay {
+    (void)overlay;
+#if TARGET_OS_SIMULATOR
+    // The Simulator can report virtual controllers that would hide the touch
+    // controls during testing.
+    return NO;
+#else
+    return SunPadTouchPlayerHasController(_controllerSlots);
+#endif
+}
 
 - (void)gameOverlayRequestsGameDataChange:(SunPadGameOverlay *)overlay {
     (void)overlay;

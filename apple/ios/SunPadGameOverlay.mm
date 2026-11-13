@@ -4,8 +4,8 @@
 #import "SunPadControllerRumble.h"
 #import "SunPadInputMixer.h"
 #import "SunPadSettings.h"
+#import "SunPadTouchControlsVisibility.h"
 
-#import <GameController/GameController.h>
 #import <QuartzCore/QuartzCore.h>
 
 #include <algorithm>
@@ -379,7 +379,6 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
         [self buildTouchControls];
         [self buildSettingsPanel];
         [self applySettings];
-        [self observeControllerConnection];
     }
     return self;
 }
@@ -630,6 +629,17 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
     rumbleAction.state = [SunPadSettings sharedSettings].controllerRumble ?
         UIMenuElementStateOn : UIMenuElementStateOff;
 
+    UIAction *autoHideAction =
+        [UIAction actionWithTitle:@"Auto-hide Touch Controls with Controller"
+                            image:[UIImage systemImageNamed:@"eye.slash"]
+                       identifier:nil handler:^(__kindof UIAction *action) {
+        (void)action;
+        [weakSelf setAutoHideTouchControls:
+            ![SunPadSettings sharedSettings].hideTouchControlsWhenControllerConnected];
+    }];
+    autoHideAction.state = settings.hideTouchControlsWhenControllerConnected ?
+        UIMenuElementStateOn : UIMenuElementStateOff;
+
     UIMenu *controlsMenu = [UIMenu menuWithTitle:@"Controls"
                                            image:[UIImage systemImageNamed:@"gamecontroller"]
                                       identifier:nil
@@ -647,10 +657,21 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
             (void)action;
             [weakSelf toggleSettingsPanel];
         }],
+        autoHideAction,
         rumbleAction,
     ]];
 
-    return [UIMenu menuWithTitle:@"SunPad" children:@[
+    NSMutableArray<UIMenuElement *> *rootItems = [NSMutableArray array];
+    if (_touchControlsHidden) {
+        [rootItems addObject:[UIAction actionWithTitle:@"Show Touch Controls"
+                                                 image:[UIImage systemImageNamed:@"hand.tap"]
+                                            identifier:nil
+                                               handler:^(__kindof UIAction *action) {
+            (void)action;
+            [weakSelf setAutoHideTouchControls:NO];
+        }]];
+    }
+    [rootItems addObjectsFromArray:@[
         displayMenu,
         fpsAction,
         experimentsMenu,
@@ -658,6 +679,7 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
         dataMenu,
         reportProblemAction,
     ]];
+    return [UIMenu menuWithTitle:@"SunPad" children:rootItems];
 }
 
 - (void)exportSaves {
@@ -984,7 +1006,7 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
 }
 
 - (void)stickChanged:(SunPadStickView *)stick x:(float)x y:(float)y {
-    if (_editingLayout)
+    if (_editingLayout || _touchControlsHidden)
         return;
     int8_t xi = (int8_t)std::lround(x * 127.0f);
     int8_t yi = (int8_t)std::lround(y * 127.0f);
@@ -1000,7 +1022,7 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
 }
 
 - (void)buttonDown:(SunPadGameButton *)button {
-    if (_editingLayout)
+    if (_editingLayout || _touchControlsHidden)
         return;
     if (button.inputMask == SunPadButtonR)
         return;
@@ -1030,7 +1052,7 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
 }
 
 - (void)rPressureChanged:(uint8_t)pressure fullPress:(BOOL)fullPress {
-    if (_editingLayout)
+    if (_editingLayout || _touchControlsHidden)
         return;
     _touchState.triggerR = pressure;
     if (fullPress)
@@ -1383,7 +1405,7 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
 
     _hideControlsSwitch = [UISwitch new];
     _hideControlsSwitch.on = [SunPadSettings sharedSettings].hideTouchControlsWhenControllerConnected;
-    _hideControlsSwitch.accessibilityLabel = @"Hide touch controls when controller connected";
+    _hideControlsSwitch.accessibilityLabel = @"Auto-hide Touch Controls with Controller";
     [_hideControlsSwitch addTarget:self action:@selector(hideChanged:)
                   forControlEvents:UIControlEventValueChanged];
 
@@ -1418,7 +1440,7 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
         [self settingsRowWithTitle:@"Render" control:_renderScaleControl],
         [self settingsRowWithTitle:@"Opacity" control:_opacitySlider],
         [self settingsRowWithTitle:@"All sizes" control:_sizeSlider],
-        [self settingsRowWithTitle:@"Hide on controller" control:_hideControlsSwitch],
+        [self settingsRowWithTitle:@"Auto-hide with controller" control:_hideControlsSwitch],
         [self settingsRowWithTitle:@"Modern C-stick L/R" control:_modernCStickSwitch],
         [self settingsRowWithTitle:@"Invert C-stick Up/Down" control:_invertCStickVerticalSwitch],
         [self settingsRowWithTitle:@"Move controls" control:_editLayoutSwitch],
@@ -1555,9 +1577,7 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
 }
 
 - (void)hideChanged:(UISwitch *)switcher {
-    [SunPadSettings sharedSettings].hideTouchControlsWhenControllerConnected = switcher.on;
-    [[SunPadSettings sharedSettings] synchronize];
-    [self applyControllerVisibility];
+    [self setAutoHideTouchControls:switcher.on];
 }
 
 - (void)modernCStickChanged:(UISwitch *)switcher {
@@ -1837,45 +1857,42 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
 }
 
 - (void)setTouchControlsHidden:(BOOL)hidden animated:(BOOL)animated {
+    BOOL changed = _touchControlsHidden != hidden;
     _touchControlsHidden = hidden;
+    // Hidden controls must not leave a button, stick or trigger held.
+    if (hidden)
+        [self clearTouchInput];
     [UIView animateWithDuration:animated ? 0.25 : 0.0 animations:^{
         [self setNeedsLayout];
         [self layoutIfNeeded];
     }];
+    if (changed)
+        [self refreshMenuButton];
+}
+
+// The saved "Auto-hide Touch Controls with Controller" choice. Off shows the
+// controls immediately, on applies the current controller state immediately.
+// "Show Touch Controls" turns it off so the controls stay up with the
+// controller connected until the user turns auto-hide back on.
+- (void)setAutoHideTouchControls:(BOOL)autoHide {
+    SunPadSettings *settings = [SunPadSettings sharedSettings];
+    settings.hideTouchControlsWhenControllerConnected = autoHide;
+    [settings synchronize];
+    _hideControlsSwitch.on = autoHide;
+    [self applyControllerVisibility];
+    [self refreshMenuButton];
 }
 
 - (void)applyControllerVisibility {
-    BOOL controllerConnected = NO;
-#if !TARGET_OS_SIMULATOR
-    // Only real hardware controllers hide the touch controls; the Simulator
-    // can report virtual controllers that would hide them during testing.
-    for (GCController *controller in GCController.controllers) {
-        if (controller.extendedGamepad != nil) {
-            controllerConnected = YES;
-            break;
-        }
-    }
-#endif
-    BOOL shouldHide = !_editingLayout && controllerConnected &&
-        [SunPadSettings sharedSettings].hideTouchControlsWhenControllerConnected;
+    // The game view controller owns controller slots; touch is player 1.
+    BOOL shouldHide = SunPadTouchControlsHidden(
+        _editingLayout,
+        [SunPadSettings sharedSettings].hideTouchControlsWhenControllerConnected,
+        [self.delegate gameOverlayTouchPlayerHasController:self]);
     [self setTouchControlsHidden:shouldHide animated:YES];
-    if (controllerConnected)
-        [self clearTouchInput];
 }
 
 - (void)refreshControllerVisibility {
-    [self applyControllerVisibility];
-}
-
-- (void)observeControllerConnection {
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(applyControllerVisibility)
-                                                 name:GCControllerDidConnectNotification
-                                               object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(applyControllerVisibility)
-                                                 name:GCControllerDidDisconnectNotification
-                                               object:nil];
     [self applyControllerVisibility];
 }
 
