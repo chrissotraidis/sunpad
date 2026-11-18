@@ -275,9 +275,7 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    // Super Mario Sunshine is a landscape game; the overlay is designed for
-    // landscape like the BellPad reference (never portrait).
-    return UIInterfaceOrientationMaskLandscape;
+    return UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad ? UIInterfaceOrientationMaskAll : UIInterfaceOrientationMaskLandscape;
 }
 
 - (void)viewDidLoad {
