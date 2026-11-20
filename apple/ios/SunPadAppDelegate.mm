@@ -62,8 +62,7 @@ static void SunPadApplyExperimentSafetyMigration(void) {
     supportedInterfaceOrientationsForWindow:(UIWindow *)window {
     (void)application;
     (void)window;
-    // Super Mario Sunshine is a landscape-only experience.
-    return UIInterfaceOrientationMaskLandscape;
+    return UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad ? UIInterfaceOrientationMaskAll : UIInterfaceOrientationMaskLandscape;
 }
 
 - (BOOL)application:(UIApplication *)application
