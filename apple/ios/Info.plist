@@ -55,6 +55,10 @@
 	<true/>
 	<key>UIRequiresFullScreenIgnoredStartingWithVersion</key>
 	<string>26</string>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>
