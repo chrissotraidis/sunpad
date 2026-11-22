@@ -1,5 +1,11 @@
 # sms-pc-port research review
 
+> **Superseded in part (2026-11-23).** sms-pc-port added an MIT license on
+> 2026-10-13, builds natively for Apple silicon, and renders through Vulkan and
+> MoltenVK. The license, arm64 and renderer findings below are out of date. The
+> [decompilation engine plan](DECOMP-ENGINE-PLAN.md) records the current
+> assessment.
+
 - **Date:** 2026-10-07
 - **Reviewed:** [chasem-dev/sms-pc-port](https://github.com/chasem-dev/sms-pc-port)
   at `89e9fd01602bfa9735cdb1d5713d39edff91d9e7`, with its decompilation submodule

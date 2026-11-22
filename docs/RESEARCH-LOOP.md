@@ -19,7 +19,8 @@ look for features or fixes to learn from, or to refresh the inventory below.
 
 | Source | License | Read | Reuse in SunPad |
 | --- | --- | --- | --- |
-| [sms-pc-port](https://github.com/chasem-dev/sms-pc-port) | None (all rights reserved) | README, docs, commit messages, issues; source only to locate a game behavior | Nothing. No code, patches, data tables or assets |
+| [sms-pc-port](https://github.com/chasem-dev/sms-pc-port) | MIT since 2026-10-13 | Everything | Through the maintained engine fork only, with its notice ([engine plan](DECOMP-ENGINE-PLAN.md)) |
+| [sms-iphone-ipad](https://github.com/chasem-dev/sms-iphone-ipad) and [sms-android](https://github.com/chasem-dev/sms-android) | None (all rights reserved) | README, docs, commit messages, issues | Nothing. Facts they publish, such as a working address, may be cited |
 | [SMS Launcher](https://github.com/chasem-dev/sms-launcher) | MIT | Everything | Code only with its MIT notice in [THIRD_PARTY_NOTICES](../THIRD_PARTY_NOTICES.md). It is an Electron app, so treat it as a behavior reference |
 | [sms-english](https://github.com/chasem-dev/sms-english) and [doldecomp/sms](https://github.com/doldecomp/sms) | CC0 | Everything | Yes, with the revision cited |
 | [Dolphin](https://github.com/dolphin-emu/dolphin) | GPL-2.0-or-later | Everything | Yes, through the maintained runtime forks |

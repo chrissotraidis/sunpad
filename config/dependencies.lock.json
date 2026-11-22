@@ -75,6 +75,35 @@
       "submodulePath": "ref/ModernGekko-Template",
       "url": "https://github.com/ExpansionPak/ModernGekko-Template.git",
       "revision": "1ee85bb5e09c38f493a09f5fa6e9dc8228b23e42"
+    },
+    {
+      "name": "sms-pc-port",
+      "lane": "engine",
+      "path": "ref/sms-pc-port",
+      "parent": ".",
+      "submodulePath": "ref/sms-pc-port",
+      "url": "https://github.com/chrissotraidis/sms-pc-port.git",
+      "revision": "b3ddbc36f546b0d06c623fe26237cbd6bbf621be",
+      "upstreamUrl": "https://github.com/chasem-dev/sms-pc-port.git",
+      "upstreamRevision": "20abb7e8c2a882670c9e7bb08687cc336a9d62b9"
+    },
+    {
+      "name": "sms-english",
+      "lane": "engine",
+      "path": "ref/sms-pc-port/decomp",
+      "parent": "ref/sms-pc-port",
+      "submodulePath": "decomp",
+      "url": "https://github.com/chasem-dev/sms-english.git",
+      "revision": "967436b8c623834d38a57d34923775f45eca8861"
+    },
+    {
+      "name": "sms-mod-sdk",
+      "lane": "engine",
+      "path": "ref/sms-pc-port/sdk",
+      "parent": "ref/sms-pc-port",
+      "submodulePath": "sdk",
+      "url": "https://github.com/chasem-dev/sms-mod-sdk.git",
+      "revision": "67322b0c2cf9543847745e350f911018f13561f7"
     }
   ]
 }

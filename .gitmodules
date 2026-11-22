@@ -7,3 +7,7 @@
 [submodule "ref/ModernGekko-Template"]
 	path = ref/ModernGekko-Template
 	url = https://github.com/ExpansionPak/ModernGekko-Template.git
+[submodule "ref/sms-pc-port"]
+	path = ref/sms-pc-port
+	url = https://github.com/chrissotraidis/sms-pc-port.git
+	branch = sunpad

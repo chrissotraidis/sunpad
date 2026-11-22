@@ -22,8 +22,17 @@ Ongoing engineering work is organized in
 plan, to improve performance or save safety, or to pick up SunPad work without a
 more specific request, start at its "Start here" section and follow its goal
 loop. Record every session in [docs/IMPROVEMENT-LOG.md](docs/IMPROVEMENT-LOG.md).
-[sms-pc-port](https://github.com/chasem-dev/sms-pc-port) is a research
-reference only; do not copy its code.
+That plan covers the 0.3.x engine.
+
+## Decompilation engine
+
+SunPad is moving to an engine built from the Super Mario Sunshine
+decompilation through a maintained fork of
+[sms-pc-port](https://github.com/chasem-dev/sms-pc-port) (MIT). Follow
+[docs/DECOMP-ENGINE-PLAN.md](docs/DECOMP-ENGINE-PLAN.md) and its status table.
+Engine changes go to the fork with its MIT notice and upstream history intact.
+`sms-iphone-ipad` and `sms-android` have no license: read their documentation
+only and copy nothing from them. Never publish an engine binary.
 
 To compare SunPad with another Sunshine project or look for features to learn
 from, follow [docs/RESEARCH-LOOP.md](docs/RESEARCH-LOOP.md). Its source rules

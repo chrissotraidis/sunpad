@@ -544,3 +544,27 @@ Notes: The recipe moves to schema 2. On a Mac it keeps 0.2.3's Xcode steps
   kept private outside Git.
 Next: install the Windows-built IPA on an iPad after a verified save backup and
   check startup, gameplay, sound and a save reload before leaving draft.
+
+### 2026-11-23 decompilation engine plan: E0, E2 Simulator bring-up and E2.5
+Result: plan approved; fork pinned; the engine plays Delfino Plaza embedded in an
+  iOS Simulator app; fork captures identical to upstream; device probe pending
+Pins: SunPad 72c101a base; sms-pc-port fork b3ddbc3 on upstream 20abb7e
+  (decomp 967436b, sdk 67322b0); MoltenVK 1.4.2 (SHA-256 562a15a2...7276);
+  Homebrew LLVM 22.1.8; Xcode 27.2
+Checkpoints: check-repository.sh passes; dependency lock verified; fork's
+  macOS arm64 build matches upstream 20abb7e in every captured field of the
+  title and plaza runs with OpenGL and with Vulkan (compare.py --against)
+Notes: -DSMS_EMBED=ON builds libsms_embed.dylib (13.9 MB, iOS Simulator,
+  minimum iOS 16) exporting only the seven sms_embed_* calls and importing
+  libSystem, libc++ and CoreFoundation. The harness (scripts/engine-harness)
+  owns a CAMetalLayer, links MoltenVK statically and pulls 32 kHz audio
+  through RemoteIO. With the regress plaza input (SMS_AUTOPRESS, SMS_WARP=1,0,1,
+  30 FPS) it reached gameplay in Delfino Plaza with HUD, shadows, NPCs and the
+  FLUDD gauge. MoltenVK on the Simulator GPU rejects base-vertex draws, so the
+  fork rebinds vertex buffers there. The memory probe passes on the iOS 27.0
+  and tvOS 26.5 Simulators: MEM1 maps at 0x10000000000 and 0x7000000000, and a
+  16 MiB dylib loads inside the low window. A Release (-O3) engine build lost
+  a game symbol at link; the upstream RelWithDebInfo (-O2) flags are used.
+Next: unlock the iPhone 14 for the probe (installed as com.sunpad.engineprobe),
+  then set the device bases (E2.1) and build the device engine; E1.3 license
+  inventory; E3.1 SunPadEngineHost in the app.

@@ -115,9 +115,11 @@ holds; move to goal 4 or to measured defects.
 
 ## Ground rules
 
-- **No sms-pc-port code.** It has no license. Use its documented findings and
-  re-derive behavior from the CC0 decompilation, Dolphin and SunPad's own
-  measurements. Cite the port where a finding came from.
+- **sms-pc-port code goes through the engine fork.** sms-pc-port has been MIT
+  licensed since 2026-10-13. Its code enters SunPad only through the maintained
+  fork described in the [engine plan](DECOMP-ENGINE-PLAN.md). Work on the
+  0.3.x engine keeps re-deriving behavior from the CC0 decompilation, Dolphin
+  and SunPad's own measurements.
 - **Retail behavior is the reference.** Every native replacement and code
   generation change must match the generated original or the interpreter bit
   for bit, including CPU state the caller can observe. No fast-math, no removed
@@ -827,15 +829,17 @@ base-relative pointer layout runs on arm64 without low-memory mappings; a Metal
 GX backend exists; and the licensing of any reused port code is clear. That
 would be a new multi-month project with its own plan.
 
-**2026-11-22:** three of these conditions have changed. sms-pc-port is MIT
-licensed, runs natively on Apple silicon through a pointer-rebasing pass, and
-renders through Vulkan and MoltenVK. The proposed
-[decompilation engine plan](DECOMP-ENGINE-PLAN.md) re-evaluates this track and
-awaits the maintainer's decision.
+**2026-11-23:** the maintainer approved the
+[decompilation engine plan](DECOMP-ENGINE-PLAN.md), which replaces this track.
+sms-pc-port is MIT licensed, runs natively on Apple silicon through a
+pointer-rebasing pass, and renders through Vulkan and MoltenVK. Passes 3-6 and
+8 of this plan are suspended because they optimize the engine being replaced.
+Pass 1 and pass 10 results keep serving the 0.3.x line until the new engine
+ships.
 
 ## Not in this plan
 
-- Copying sms-pc-port code or patches.
+- Copying sms-pc-port code or patches into the 0.3.x engine.
 - A PowerPC JIT or runtime code generation on iOS.
 - Fast-math, removed exception checks or blessed SMC hashes.
 - Splitting CPU and video threads (rejected after a confirmed FIFO

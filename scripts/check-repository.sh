@@ -55,7 +55,7 @@ test -x scripts/package-tvos.sh
 test -x scripts/audit-tvos-app.sh
 test -x scripts/audit-tvos-package.sh
 
-# Only the three declared gitlinks may occupy the private reference area.
+# Only the declared gitlinks may occupy the private reference area.
 python3 - <<'PYCHECK'
 import json,subprocess
 allowed={p['path']:p['revision'] for p in json.load(open('config/dependencies.lock.json'))['repositories'] if p['parent']=='.'}
@@ -64,7 +64,7 @@ for row in subprocess.check_output(['git','ls-files','--stage'],text=True).split
     if path.startswith('ref/'):
         assert path in allowed and meta.split()==['160000',allowed[path],'0'], 'Unexpected tracked reference material: '+path
 PYCHECK
-prohibited=$(git ls-files | grep -v -E '^ref/(ModernGekko|ModernGekko-tvOS|ModernGekko-Template)$' | grep -E '(^|/)(ref|DerivedData|Provisioned|build[^/]*)/|\.(iso|gcm|rvz|wia|wbfs|gcz|dylib|ipa|xcarchive|mobileprovision|p12|pem|key|gci|sav|raw)$' || true)
+prohibited=$(git ls-files | grep -v -E '^ref/(ModernGekko|ModernGekko-tvOS|ModernGekko-Template|sms-pc-port)$' | grep -E '(^|/)(ref|DerivedData|Provisioned|build[^/]*)/|\.(iso|gcm|rvz|wia|wbfs|gcz|dylib|ipa|xcarchive|mobileprovision|p12|pem|key|gci|sav|raw)$' || true)
 if [[ -n "$prohibited" ]]; then
   echo "prohibited tracked material:" >&2
   echo "$prohibited" >&2

@@ -20,7 +20,9 @@ for pin in json.loads((root/'config/dependencies.lock.json').read_text())['repos
             sys.exit(f'Preserved modified dependency at {path}; use a fresh checkout.')
 PYCHECK
 git -C "$ROOT" submodule sync --recursive
-git -C "$ROOT" submodule update --init -- ref/ModernGekko ref/ModernGekko-tvOS ref/ModernGekko-Template
+git -C "$ROOT" submodule update --init -- ref/ModernGekko ref/ModernGekko-tvOS ref/ModernGekko-Template ref/sms-pc-port
+# The decompilation engine (docs/DECOMP-ENGINE-PLAN.md) and its two submodules.
+git -C "$ROOT/ref/sms-pc-port" submodule update --init -- decomp sdk
 for MG in "$ROOT/ref/ModernGekko" "$ROOT/ref/ModernGekko-tvOS"; do
   git -C "$MG" submodule update --init -- vendor/dolphin
   git -C "$MG/vendor/dolphin" submodule update --init -- DolRecomp

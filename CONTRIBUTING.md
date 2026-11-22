@@ -10,11 +10,12 @@ gitlinks and the dependency guide together. The Apple and tvOS lanes deliberatel
 retain different audio implementations. Do not replace either with GalaxyPad's
 runtime or silently reset an existing modified checkout.
 
-Research references are not code sources. Do not copy code, patches or assets
-from [sms-pc-port](https://github.com/chasem-dev/sms-pc-port); it has no license.
-Re-derive behavior from the CC0 GMSE01 decompilation, Dolphin and SunPad's own
-measurements, and cite the finding that led to the change. Follow the ground
-rules in the [improvement plan](docs/IMPROVEMENT-PLAN.md#ground-rules).
+The decompilation engine comes from a maintained fork of
+[sms-pc-port](https://github.com/chasem-dev/sms-pc-port), which is MIT licensed.
+Keep its notice and history, and land engine changes in the fork before
+updating the pin ([engine plan](docs/DECOMP-ENGINE-PLAN.md)). Projects without
+a license, such as `sms-iphone-ipad` and `sms-android`, are research
+references only. Do not copy their code, patches or assets.
 
 For behavioral fixes, reproduce the failure and add a focused regression where
 feasible. Run `scripts/bootstrap-dependencies.sh --sources-only` followed by

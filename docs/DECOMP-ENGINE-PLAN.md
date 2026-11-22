@@ -1,8 +1,9 @@
 # SunPad decompilation engine plan
 
 - **Date:** 2026-11-22
-- **Status:** proposed. Nothing in this plan starts until the maintainer approves
-  the decisions in [Decisions for the maintainer](#decisions-for-the-maintainer).
+- **Status:** approved by the maintainer on 2026-11-23, with the recommended
+  answer to every decision in [Decisions for the maintainer](#decisions-for-the-maintainer).
+  Work is under way, and the [status table](#status) is current.
 - **SunPad baseline:** `72c101a` on `main` (0.3.3, build 21)
 - **Engine reviewed:** [chasem-dev/sms-pc-port](https://github.com/chasem-dev/sms-pc-port)
   `21d7b639a9041d4a656ea5e8b4bfe617ad4b8fba` (2026-11-17), with `decomp`
@@ -102,11 +103,11 @@ flowchart TB
     MVK["MoltenVK (static)"]
   end
   subgraph Personal["Built by PadMint on the player's computer"]
-    Engine["SunPadEngine.dylib: sms-english game code,<br/>sms-pc-port platform layer, SunPad host backend"]
+    Engine["libsms_embed.dylib: sms-english game code,<br/>sms-pc-port platform layer, SunPad host backend"]
   end
   Disc[("Player's GMSE01 image")]
   UI --> Host
-  Host -- "C interface: start, stop, pause, input, audio, surface" --> Engine
+  Host -- "C interface: start, pause, input, audio, surface" --> Engine
   Engine -- "Vulkan calls resolved from the app" --> MVK
   MVK --> Metal["Metal"]
   Engine -- "reads at run time" --> Disc
@@ -117,28 +118,31 @@ flowchart TB
 | Component | Where | Built by | Contents |
 | --- | --- | --- | --- |
 | Engine fork | [chrissotraidis/sms-pc-port](https://github.com/chrissotraidis/sms-pc-port) (to be created), branch `sunpad`, gitlink `ref/sms-pc-port` with nested `decomp` and `sdk` | Maintainer | Upstream history plus a small, named SunPad patch series |
-| Engine library | `SunPadEngine.dylib` for iOS, iPadOS and tvOS. The desktop executable for macOS | PadMint on the player's computer | Game code and platform layer, compiled with LLVM and the `gameptr` pass |
-| Host interface | `sunpad_engine.h` in the engine fork, a plain C ABI | Both sides | Versioned struct of callbacks and calls |
+| Engine library | `libsms_embed.dylib` for iOS, iPadOS and tvOS. The desktop executable for macOS | PadMint on the player's computer | Game code and platform layer, compiled with LLVM and the `gameptr` pass |
+| Host interface | `platform/embed/sms_embed.h` in the engine fork, a plain C ABI | Both sides | Versioned config struct and seven calls |
 | App shell | This repository's `apple/` | Maintainer, published | UIKit app, MoltenVK, no game code |
 
 ### Host interface
 
 The shell owns the window, input, audio session and lifecycle. The engine owns
-the game, its timing and its rendering. One header defines the boundary, with a
-version number the shell checks before calling anything else.
+the game, its timing and its rendering. One header in the fork,
+`platform/embed/sms_embed.h`, defines the boundary, with a version number the
+shell checks before calling anything else. Its names are generic so the
+interface can be offered upstream.
 
-| Direction | Call or callback | Purpose |
-| --- | --- | --- |
-| Shell to engine | `sunpad_engine_start(config)` | Disc image path, save, cache and log folders, settings as key/value pairs, the `CAMetalLayer`, `vkGetInstanceProcAddr` |
-| Shell to engine | `sunpad_engine_set_pad(port, state)` | SunPad's normalized controller state: sticks, analog triggers, buttons |
-| Shell to engine | `sunpad_engine_pause()`, `resume()` | Stop GPU submission and audio before backgrounding, flush the card and pipeline cache |
-| Shell to engine | `sunpad_engine_resize(width, height, scale)` | Drawable size changes, rotation and external displays |
-| Shell to engine | `sunpad_engine_stats(out)` | Presented FPS, frame time, the engine's frame breakdown |
-| Shell to engine | `sunpad_engine_stop()` | Clean shutdown |
-| Engine to shell | `audio_write(samples, count)` | 32 kHz stereo blocks into the shell's audio unit |
-| Engine to shell | `rumble(port, strength)` | Forwarded to `SunPadControllerRumble` |
-| Engine to shell | `log(level, line)` | Into SunPad's diagnostics |
-| Engine to shell | `fatal(message)` | Shown to the player in place of an abort |
+| Call | Purpose |
+| --- | --- |
+| `sms_embed_version()` | Interface version, checked before anything else |
+| `sms_embed_start(config)` | Disc image path, the `CAMetalLayer`, its drawable size, the app's `vkGetInstanceProcAddr` and a rumble callback. Settings are the engine's `SMS_*` environment variables, set by the shell beforehand |
+| `sms_embed_set_pad(port, pad)` | Controller state in GameCube terms: sticks -100 to 100, analog triggers, PAD button bits |
+| `sms_embed_pause(paused)` | Pausing returns once the game has parked at its next frame with the GPU idle and new pipelines saved |
+| `sms_embed_resize(width, height)` | Drawable size changes, rotation and external displays |
+| `sms_embed_audio_pull(stream, bytes)` | The shell's audio unit pulls 32 kHz interleaved stereo 16-bit samples |
+| `sms_embed_stats(stats)` | Frames shown and the last present time |
+
+The game runs until the process ends, as on the console, so there is no stop
+call. Reimporting game data asks the player to reopen SunPad. Engine logs go
+to stderr, which the shell points at its diagnostics folder.
 
 The embedded backend replaces SDL video, events and audio on iOS and tvOS.
 SDL calls are concentrated in `platform/gx/src/gx_platform.cpp` (123 call
@@ -174,7 +178,7 @@ low window in the pass, measured for cost in E1.2.
 PadMint's [D5](https://github.com/chrissotraidis/padmint/blob/main/docs/DECISIONS.md)
 classifies decompilation ports as "recipe only" because their app contains the
 game code. SunPad keeps its "empty app plus recipe" shape instead: the
-published shell contains no game code, and PadMint builds `SunPadEngine.dylib`
+published shell contains no game code, and PadMint builds `libsms_embed.dylib`
 on the player's computer from pinned public source and inserts it, as it
 inserts `gGMSE01_recomp.dylib` today. The build no longer needs the disc. The
 engine reads the image at run time, so the disc moves from a build input to an
@@ -192,7 +196,7 @@ decompiled code ([D3 limit](https://github.com/chrissotraidis/padmint/blob/main/
 | Aspect Ratio: Original 4:3 | Engine widescreen off, default |
 | Aspect Ratio: 16:9 (experimental) | Engine widescreen: widened game camera with the HUD kept 4:3 in the centre |
 | Aspect Ratio: Fill Screen | Engine `SMS_ASPECT=stretch` |
-| Show FPS Counter | Fed from `sunpad_engine_stats` |
+| Show FPS Counter | Fed from `sms_embed_stats` |
 | 60 FPS Patch (Unstable) | Frame rate 60, the engine's timing-corrected mode, kept experimental until gate G3 passes at 60 |
 | Reduced CPU Clock 90% (Unstable) | Removed. The engine has no emulated clock |
 | Use Supported 30 FPS Mode | Becomes the "30 FPS (original)" choice of the frame-rate setting |
@@ -262,29 +266,29 @@ source only, **D** needs the disc on the Mac, **H** needs a person or device.
 
 | ID | Task | Status | Needs | Kind |
 | --- | --- | --- | --- | --- |
-| E0.1 | Rule and document updates | blocked | D1 | S |
-| E0.2 | Engine fork and gitlink | blocked | D1 | S |
-| E1.1 | Device memory and dylib placement probe | blocked | E0.2 | H |
+| E0.1 | Rule and document updates | done (2026-11-23) | D1 | S |
+| E0.2 | Engine fork and gitlink | done: fork created, `sunpad` branch pinned | D1 | S |
+| E1.1 | Device memory and dylib placement probe | in progress: Simulators pass, iPhone 14 installed, awaiting an unlocked session | E0.2 | H |
 | E1.2 | Pass cost and runtime-base fallback | blocked | E1.1 if needed | D |
-| E1.3 | License and provenance inventory | blocked | E0.2 | S |
-| E1.4 | Desktop reference numbers | blocked | E0.2 | D |
-| E2.1 | iOS, Simulator and tvOS toolchains | blocked | E1.1 | S |
-| E2.2 | SunPad build profile | blocked | E2.1 | S |
-| E2.3 | Embedded host backend | blocked | E2.2 | D |
-| E2.4 | Lifecycle | blocked | E2.3 | D |
-| E2.5 | Desktop regression of the fork | blocked | E2.3 | D |
-| E3.1 | SunPadEngineHost | blocked | E2.3 | S |
-| E3.2 | Settings mapping | blocked | E3.1 | S |
-| E3.3 | Input and rumble | blocked | E3.1 | S |
-| E3.4 | Game data import | blocked | E3.1 | S |
-| E3.5 | Save migration and transfer | blocked | E3.1 | S, H |
-| E3.6 | Diagnostics | blocked | E3.1 | S |
+| E1.3 | License and provenance inventory | ready | E0.2 | S |
+| E1.4 | Desktop reference numbers | ready | E0.2 | D |
+| E2.1 | iOS, Simulator and tvOS toolchains | in progress: iOS Simulator builds, device bases wait for E1.1 | E1.1 | S |
+| E2.2 | SunPad build profile | done in the Simulator build | E2.1 | S |
+| E2.3 | Embedded host backend | done in the Simulator (Delfino Plaza plays) | E2.2 | D |
+| E2.4 | Lifecycle | in progress: pause handshake written, untested | E2.3 | D |
+| E2.5 | Desktop regression of the fork | done: title and plaza identical to upstream | E2.3 | D |
+| E3.1 | SunPadEngineHost | ready | E2.3 | S |
+| E3.2 | Settings mapping | ready | E3.1 | S |
+| E3.3 | Input and rumble | ready | E3.1 | S |
+| E3.4 | Game data import | ready | E3.1 | S |
+| E3.5 | Save migration and transfer | ready | E3.1 | S, H |
+| E3.6 | Diagnostics | ready | E3.1 | S |
 | E3.7 | Side-by-side packaging | blocked | E3.1-E3.6 | D |
 | E3.8 | Wiring recheck | blocked | E3.7 | H |
 | E4.1 | Routes | blocked | E3.7 | D |
 | E4.2 | Device acceptance | blocked | E4.1 | H |
 | E4.3 | Tuning | blocked | E4.2 | D, H |
-| E5.1 | Mac app | blocked | E2.5 | D |
+| E5.1 | Mac app | ready | E2.5 | D |
 | E5.2 | Apple TV | blocked | E4.2 | H |
 | E6.1 | PadMint recipe for Mac hosts | blocked | E3.7 | S |
 | E6.2 | Player check | blocked | E6.1 | D |
@@ -363,15 +367,15 @@ per-platform bases from E1.1 through one header so they cannot disagree. Gate:
 links. 3 days.
 
 **E2.2 SunPad build profile.** One CMake option, `SMS_SUNPAD_EMBEDDED`, that
-builds `SunPadEngine` as a dylib exporting only the host interface, leaves out
+builds `sms_embed` as a dylib exporting only the host interface, leaves out
 the features listed above, and removes the desktop entry (`main`, the ASLR
 restart through `posix_spawn`, crash symbolication through `fork`/`exec`,
-borderless windows, HDR). Gate: `nm` shows only `sunpad_engine_*` exports and
+borderless windows, HDR). Gate: `nm` shows only `sms_embed_*` exports and
 imports limited to libSystem, libc++ and Vulkan symbols. 2 days.
 
 **E2.3 Embedded host backend.** Implement the host interface: surface from the
 shell's `CAMetalLayer`, `vkGetInstanceProcAddr` from the shell, pad state from
-`sunpad_engine_set_pad`, audio through `audio_write`, logs through `log`.
+`sms_embed_set_pad`, audio pulled through `sms_embed_audio_pull`, logs on stderr.
 Paths for the card (`SMS_SAVE_DIR`), pipeline cache and logs come from
 `config`. Gate: the iOS Simulator boots to the title and into the airstrip
 with scripted pad input, and the log shows MEM1 mapped, the Vulkan device and
@@ -399,7 +403,7 @@ goes that way.
 **E3.1 SunPadEngineHost.** A new host with the same Objective-C interface as
 `SunPadCoreHost.h` (start, stop, pause, resume, publish input, render scale,
 aspect, FPS, diagnostics), so `SunPadGameViewController` and
-`SunPadGameOverlay` keep their wiring. It loads `SunPadEngine.dylib`, checks
+`SunPadGameOverlay` keep their wiring. It loads `libsms_embed.dylib`, checks
 the interface version, and reports a missing or mismatched engine in the same
 place the missing-module message appears today. During side-by-side builds a
 build setting chooses the host. 4 days.
@@ -484,7 +488,7 @@ Gamepad. 4 days plus a device session.
 
 **E6.1 PadMint recipe for Mac hosts.** Change `padmint.json` to the new kind,
 move the disc input to the app, and replace the module steps with: bootstrap,
-build the pass plugin, build `SunPadEngine.dylib`, insert it. Add LLVM to the
+build the pass plugin, build `libsms_embed.dylib`, insert it. Add LLVM to the
 Mac tool list at PadMint's pinned version, and write the PadMint decision
 record for D3. 2 days.
 
