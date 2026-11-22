@@ -827,6 +827,12 @@ base-relative pointer layout runs on arm64 without low-memory mappings; a Metal
 GX backend exists; and the licensing of any reused port code is clear. That
 would be a new multi-month project with its own plan.
 
+**2026-11-22:** three of these conditions have changed. sms-pc-port is MIT
+licensed, runs natively on Apple silicon through a pointer-rebasing pass, and
+renders through Vulkan and MoltenVK. The proposed
+[decompilation engine plan](DECOMP-ENGINE-PLAN.md) re-evaluates this track and
+awaits the maintainer's decision.
+
 ## Not in this plan
 
 - Copying sms-pc-port code or patches.
