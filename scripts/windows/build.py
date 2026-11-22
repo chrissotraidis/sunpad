@@ -162,7 +162,9 @@ def dependencies(sources_only=False):
             die(f"Preserved modified dependency at {path}; use a fresh checkout.")
     run(GIT + ["-C", ROOT, "submodule", "sync", "--recursive"])
     run(GIT + ["-C", ROOT, "submodule", "update", "--init", "--",
-               "ref/ModernGekko", "ref/ModernGekko-tvOS", "ref/ModernGekko-Template"])
+               "ref/ModernGekko", "ref/ModernGekko-tvOS", "ref/ModernGekko-Template", "ref/sms-pc-port"])
+    # The decompilation engine (docs/DECOMP-ENGINE-PLAN.md) and its two submodules.
+    run(GIT + ["-C", ROOT / "ref/sms-pc-port", "submodule", "update", "--init", "--", "decomp", "sdk"])
     for mg in (MG, ROOT / "ref/ModernGekko-tvOS"):
         run(GIT + ["-C", mg, "submodule", "update", "--init", "--", "vendor/dolphin"])
         run(GIT + ["-C", mg / "vendor/dolphin", "submodule", "update", "--init", "--", "DolRecomp"])
