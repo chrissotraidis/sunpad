@@ -283,7 +283,7 @@ source only, **D** needs the disc on the Mac, **H** needs a person or device.
 | E3.4 | Game data import | in progress: import validates the image by SHA-256 and skips extraction | E3.1 | S |
 | E3.5 | Save migration and transfer | in progress: migration, export and import done and tested, real save loads in the Simulator, device check pending | E3.1 | S, H |
 | E3.6 | Diagnostics | done: engine log in problem reports | E3.1 | S |
-| E3.7 | Side-by-side packaging | blocked | E3.1-E3.6 | D |
+| E3.7 | Side-by-side packaging | in progress: shell and personal IPAs package and pass their audits, the shell passes release_gate.py, device install pending | E3.1-E3.6 | D |
 | E3.8 | Wiring recheck | blocked | E3.7 | H |
 | E4.1 | Routes | blocked | E3.7 | D |
 | E4.2 | Device acceptance | blocked | E4.1 | H |

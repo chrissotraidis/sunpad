@@ -45,6 +45,7 @@ python3 tests/test_tvos_contract.py
 ./tests/test-profile-tools.sh
 
 test -x scripts/package-ios.sh
+test -x scripts/package-ios-next.sh
 test -x scripts/audit-ios-package.sh
 test -x scripts/tvos-build-core-device.sh
 test -x scripts/tvos-build-core-simulator.sh
