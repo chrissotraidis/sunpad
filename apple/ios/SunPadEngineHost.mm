@@ -7,6 +7,7 @@
 #import "SunPadControllerRumble.h"
 #import "SunPadDiagnostics.h"
 #import "SunPadEngineBridge.h"
+#import "SunPadEngineSaves.h"
 
 #import <AVFAudio/AVFAudio.h>
 #import <AudioToolbox/AudioToolbox.h>
@@ -180,6 +181,12 @@ BOOL StartAudioUnit() {
                                  error:nil];
     NSString *cacheDirectory =
         NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES).firstObject;
+    // The first launch copies the Dolphin card's saves for the engine; the Dolphin card stays as it was.
+    NSError *migrationError = nil;
+    if (!SunPadMigrateGCIFolderToEngineCard([userDirectory stringByAppendingPathComponent:@"GC/USA/Card A"],
+                                            [engineDirectory stringByAppendingPathComponent:@"card-a"],
+                                            &migrationError))
+        SunPadLog(@"save migration failed: %@", migrationError.localizedDescription);
 
     SunPadSettings *settings = [SunPadSettings sharedSettings];
     _drawableSize = _layer.drawableSize;

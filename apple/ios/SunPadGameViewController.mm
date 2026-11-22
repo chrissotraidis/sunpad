@@ -11,6 +11,9 @@
 #import "SunPadGameOverlay.h"
 #import "SunPadInputMixer.h"
 #import "SunPadSaveTransfer.h"
+#if SUNPAD_DECOMP_ENGINE
+#import "SunPadEngineSaves.h"
+#endif
 #import "SunPadSettings.h"
 #import "SunPadTouchControlsVisibility.h"
 
@@ -1181,6 +1184,10 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
     (void)overlay;
     NSString *destination = [NSTemporaryDirectory()
         stringByAppendingPathComponent:@"SunPad Saves"];
+#if SUNPAD_DECOMP_ENGINE
+    if (!SunPadEngineCardToGCIFolder([self engineCardDirectory], [self saveCardDirectory], error))
+        return nil;
+#endif
     NSArray<NSURL *> *saves =
         SunPadCopySavesForExport([self saveCardDirectory], destination, error);
     SunPadLog(@"save export files=%lu", (unsigned long)saves.count);
@@ -1430,6 +1437,13 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
     return [[self sunPadSupportRoot] stringByAppendingPathComponent:@"GC/USA/Card A"];
 }
 
+#if SUNPAD_DECOMP_ENGINE
+// The decompilation engine's memory card (SunPadEngineHost sets SMS_SAVE_DIR to it).
+- (NSString *)engineCardDirectory {
+    return [[self sunPadSupportRoot] stringByAppendingPathComponent:@"Engine/card-a"];
+}
+#endif
+
 - (NSString *)saveImportStagingPath {
     return [[self sunPadSupportRoot] stringByAppendingPathComponent:@"SaveImport/pending.gci"];
 }
@@ -1500,9 +1514,24 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
 - (BOOL)applyStagedSaveImport {
     NSString *backup = nil;
     NSError *error = nil;
+#if SUNPAD_DECOMP_ENGINE
+    // The Dolphin card is the import's format: bring the engine's progress to it
+    // first, so the backup holds it, and rebuild the engine's card afterwards.
+    const BOOL pending = [NSFileManager.defaultManager fileExistsAtPath:[self saveImportStagingPath]];
+    if (pending && !SunPadEngineCardToGCIFolder([self engineCardDirectory], [self saveCardDirectory], &error)) {
+        [self presentSaveMessageWithTitle:@"Save Import Failed"
+                                  message:error.localizedDescription ?: @"SunPad could not read its saves."];
+        return NO;
+    }
+#endif
     SunPadSaveImportResult result = SunPadApplyStagedSaveImport(
         [self saveImportStagingPath], [self saveCardDirectory], [self saveBackupsRoot],
         [NSDate date], &backup, &error);
+#if SUNPAD_DECOMP_ENGINE
+    if (result == SunPadSaveImportApplied &&
+        !SunPadGCIFolderToEngineCard([self saveCardDirectory], [self engineCardDirectory], &error))
+        result = SunPadSaveImportFailed;
+#endif
     if (result == SunPadSaveImportNothingPending)
         return YES;
     SunPadLog(@"save import result=%ld backup=%@", (long)result,

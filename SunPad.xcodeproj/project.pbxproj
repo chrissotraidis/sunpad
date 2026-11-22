@@ -93,6 +93,7 @@
 		CC000000000000000000011A /* IOSurface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000204 /* IOSurface.framework */; };
 		CC000000000000000000011B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000205 /* Assets.xcassets */; };
 		CC000000000000000000011C /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000235 /* PrivacyInfo.xcprivacy */; };
+		CC0000000000000000000140 /* SunPadEngineSaves.mm in Sources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000206 /* SunPadEngineSaves.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -155,6 +156,8 @@
 		CC0000000000000000000203 /* SunPadEngineBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SunPadEngineBridge.h; sourceTree = "<group>"; };
 		CC0000000000000000000204 /* IOSurface.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOSurface.framework; path = System/Library/Frameworks/IOSurface.framework; sourceTree = SDKROOT; };
 		CC0000000000000000000205 /* SunPadNext.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SunPadNext.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CC0000000000000000000206 /* SunPadEngineSaves.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SunPadEngineSaves.mm; sourceTree = "<group>"; };
+		CC0000000000000000000207 /* SunPadEngineSaves.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SunPadEngineSaves.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -306,6 +309,8 @@
 				AA000000000000000000023B /* SunPadControllerRumble.h */,
 				CC0000000000000000000202 /* SunPadEngineBridge.mm */,
 				CC0000000000000000000203 /* SunPadEngineBridge.h */,
+				CC0000000000000000000206 /* SunPadEngineSaves.mm */,
+				CC0000000000000000000207 /* SunPadEngineSaves.h */,
 				AA0000000000000000000233 /* SunPadInputPipeEncoder.mm */,
 				AA0000000000000000000234 /* SunPadInputPipeEncoder.h */,
 				AA0000000000000000000238 /* SunPadSaveTransfer.mm */,
@@ -546,6 +551,7 @@
 				CC0000000000000000000105 /* SunPadInputMixer.mm in Sources */,
 				CC0000000000000000000107 /* SunPadEngineHost.mm in Sources */,
 				CC0000000000000000000108 /* SunPadEngineBridge.mm in Sources */,
+				CC0000000000000000000140 /* SunPadEngineSaves.mm in Sources */,
 				CC0000000000000000000109 /* SunPadAppDelegate.mm in Sources */,
 				CC000000000000000000010A /* SunPadGameViewController.mm in Sources */,
 				CC000000000000000000010B /* SunPadGameOverlay.mm in Sources */,

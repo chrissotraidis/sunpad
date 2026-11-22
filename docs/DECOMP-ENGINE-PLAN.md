@@ -281,7 +281,7 @@ source only, **D** needs the disc on the Mac, **H** needs a person or device.
 | E3.2 | Settings mapping | done: mapping and tests (tests/test-engine-bridge.sh) | E3.1 | S |
 | E3.3 | Input and rumble | in progress: input and rumble wired, device check pending | E3.1 | S |
 | E3.4 | Game data import | in progress: import validates the image by SHA-256 and skips extraction | E3.1 | S |
-| E3.5 | Save migration and transfer | ready | E3.1 | S, H |
+| E3.5 | Save migration and transfer | in progress: migration, export and import done and tested, real save loads in the Simulator, device check pending | E3.1 | S, H |
 | E3.6 | Diagnostics | ready | E3.1 | S |
 | E3.7 | Side-by-side packaging | blocked | E3.1-E3.6 | D |
 | E3.8 | Wiring recheck | blocked | E3.7 | H |
