@@ -83,7 +83,7 @@
       "parent": ".",
       "submodulePath": "ref/sms-pc-port",
       "url": "https://github.com/chrissotraidis/sms-pc-port.git",
-      "revision": "26b58ac6353085b9101626f3abc23b46f1aff046",
+      "revision": "8b900f19af5286d899256c37e7af8d5b9bbf95d3",
       "upstreamUrl": "https://github.com/chasem-dev/sms-pc-port.git",
       "upstreamRevision": "20abb7e8c2a882670c9e7bb08687cc336a9d62b9"
     },

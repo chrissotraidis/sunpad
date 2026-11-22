@@ -21,6 +21,14 @@ int main(void) {
                                   @"repeated Metal diagnostic sentinel");
         }
 
+        // The decompilation engine's log, as SunPadEngineHost writes it.
+        NSString *engineLog = [[SunPadDiagnosticsLogPath() stringByDeletingLastPathComponent]
+            stringByAppendingPathComponent:@"Engine.log"];
+        NSMutableString *engineLines = [NSMutableString stringWithString:@"[engine] dropped first line\n"];
+        for (NSUInteger index = 0; index < 200; ++index)
+            [engineLines appendFormat:@"[card] slot A: %@/card-a %lu\n", homePath, (unsigned long)index];
+        [engineLines writeToFile:engineLog atomically:YES encoding:NSUTF8StringEncoding error:nil];
+
         NSError *error = nil;
         NSString *contents = [NSString stringWithContentsOfFile:SunPadDiagnosticsLogPath()
                                                         encoding:NSUTF8StringEncoding
@@ -68,6 +76,9 @@ int main(void) {
         assert([report containsString:@"previous session sentinel"]);
         assert(![report containsString:NSHomeDirectory()]);
         assert(![report containsString:NSTemporaryDirectory()]);
+        assert([report containsString:@"[Engine Log]"]);
+        assert([report containsString:@"/card-a 199"]);
+        assert(![report containsString:@"dropped first line"]);
 
         std::cout << "SunPad guided diagnostic report tests passed\n";
     }
