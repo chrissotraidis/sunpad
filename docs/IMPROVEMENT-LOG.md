@@ -616,3 +616,25 @@ Notes: SunPadEngineSaves converts between Dolphin GCI files and the engine's
   separately forced.
 Next: unlock the iPhone 14. Then: the probe (E1.1), SunPad Next's first launch
   with the migrated save (E3.5 device), routes and hands-on play (E3.8, E4.2).
+### 2026-11-23 decompilation engine: SunPad parity pass
+Result: SunPad Next shows the game and its menu as SunPad does, and the new
+  build is installed on the iPhone 14 beside SunPad, waiting for a hands-on
+  session
+Checkpoints: tests/test-engine-bridge.sh passes with the new rows; the engine
+  builds for the iOS Simulator and devices; SunPadNext builds for both; in the
+  iOS Simulator the logos and opening movie show no skip prompt, the plaza's
+  pause menu is CONTINUE and SAVE only with Y doing nothing, and Fill Screen
+  fills the screen with the 16:9 picture
+Notes: a fork patch (decomp-patches/zzzzzzzzzzz-embed-01-retail-ui.patch) and
+  src/pause_quit.cpp add SMS_RETAIL_UI, which leaves out the pause menu's save
+  state and settings hints, its settings menu on Y, QUIT GAME and the "(A)
+  Skip" prompt. SunPad also turns off the pause tracker, the radar and co-op.
+  The host now sets the engine's variables before it loads the library: co-op
+  reads SMS_COOP in an initializer and had stayed on. Aspect modes follow
+  SunPad's: 16:9 widens the camera, Fill Screen stretches that 16:9 picture,
+  and both leave out the heat-wave shimmer. Reduced CPU Clock is hidden in
+  SunPad Next, and the 60 FPS item and the supported-mode messages describe
+  the engine. The game view keeps SunPad's drawable at the screen's size in
+  points, so the 844x390 drawable noted earlier is the same as SunPad's.
+Next: the hands-on check in DECOMP-ENGINE-PLAN.md (E3.8) on the iPhone 14,
+  with the memory probe (E1.1) and routes (E4.1) in the same session.

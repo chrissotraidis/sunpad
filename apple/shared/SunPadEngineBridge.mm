@@ -5,20 +5,17 @@
 NSDictionary<NSString *, NSString *> *SunPadEngineEnvironment(
     SunPadEngineChoices choices, NSString *engineDirectory, NSString *cacheDirectory) {
     const NSInteger scale = std::max<NSInteger>(1, std::min<NSInteger>(4, choices.renderScale));
-    NSString *widescreen = @"0";
-    NSString *aspect = @"keep";
-    if (choices.aspectRatio == SunPadAspectRatioWidescreen) {
-        widescreen = @"16:9";
-    } else if (choices.aspectRatio == SunPadAspectRatioFillScreen && choices.drawableSize.width > 0 &&
-               choices.drawableSize.height > 0) {
-        // The game's camera widened to the screen's own shape, with nothing stretched.
-        widescreen = [NSString stringWithFormat:@"%.0f:%.0f", choices.drawableSize.width,
-                                                choices.drawableSize.height];
-    }
+    // As SunPad's Dolphin engine shows them: 16:9 widens the game's camera, and
+    // Fill Screen stretches that 16:9 picture to the screen. Both leave out the
+    // heat-wave shimmer, as SunPad's wide modes always have.
+    NSString *widescreen = choices.aspectRatio == SunPadAspectRatioOriginal ? @"0" : @"16:9";
+    NSString *aspect = choices.aspectRatio == SunPadAspectRatioFillScreen ? @"stretch" : @"keep";
+    NSString *heatHaze = choices.aspectRatio == SunPadAspectRatioOriginal ? @"1" : @"0";
     return @{
         @"SMS_GX_SCALE": [NSString stringWithFormat:@"%ld", (long)scale],
         @"SMS_WIDESCREEN": widescreen,
         @"SMS_ASPECT": aspect,
+        @"SMS_HEAT_HAZE": heatHaze,
         @"SMS_FRAME_RATE": choices.sixtyFPS ? @"60" : @"30",
         @"SMS_RUMBLE": choices.rumble ? @"1" : @"0",
         @"SMS_SAVE_DIR": [engineDirectory stringByAppendingPathComponent:@"card-a"],
@@ -28,6 +25,13 @@ NSDictionary<NSString *, NSString *> *SunPadEngineEnvironment(
         @"SMS_NO_GC_ADAPTER": @"1",
         @"SMS_PRESENCE": @"0",
         @"SMS_QUIET_STUBS": @"1",
+        // The game as SunPad has always shown it: SunPad's menu holds the settings,
+        // so the PC port's own additions to the pause menu, the movies and the HUD,
+        // and its split-screen co-op, stay out.
+        @"SMS_RETAIL_UI": @"1",
+        @"SMS_PAUSE_TRACKER": @"0",
+        @"SMS_RADAR": @"0",
+        @"SMS_COOP": @"0",
     };
 }
 

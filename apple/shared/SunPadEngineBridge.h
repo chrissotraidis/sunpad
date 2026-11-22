@@ -1,6 +1,5 @@
 #pragma once
 
-#import <CoreGraphics/CoreGraphics.h>
 #import <Foundation/Foundation.h>
 
 #include "SunPadInputState.h"
@@ -17,7 +16,6 @@ typedef struct {
     SunPadAspectRatioMode aspectRatio;   // as SunPadSettings
     BOOL sixtyFPS;                       // the experimental 60 FPS choice
     BOOL rumble;                         // Controls > Controller Rumble
-    CGSize drawableSize;                 // the game view's drawable, in pixels
 } SunPadEngineChoices;
 
 /* The engine's SMS_* environment variables for these choices. Save, settings

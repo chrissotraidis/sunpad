@@ -117,9 +117,9 @@ flowchart TB
 
 | Component | Where | Built by | Contents |
 | --- | --- | --- | --- |
-| Engine fork | [chrissotraidis/sms-pc-port](https://github.com/chrissotraidis/sms-pc-port) (to be created), branch `sunpad`, gitlink `ref/sms-pc-port` with nested `decomp` and `sdk` | Maintainer | Upstream history plus a small, named SunPad patch series |
+| Engine fork | [chrissotraidis/sms-pc-port](https://github.com/chrissotraidis/sms-pc-port), branch `sunpad`, gitlink `ref/sms-pc-port` with nested `decomp` and `sdk` | Maintainer | Upstream history plus a small, named SunPad patch series |
 | Engine library | `libsms_embed.dylib` for iOS, iPadOS and tvOS. The desktop executable for macOS | PadMint on the player's computer | Game code and platform layer, compiled with LLVM and the `gameptr` pass |
-| Host interface | `platform/embed/sms_embed.h` in the engine fork, a plain C ABI | Both sides | Versioned config struct and seven calls |
+| Host interface | `platform/embed/sms_embed.h` in the engine fork, a plain C ABI | Both sides | Versioned config struct and eight calls |
 | App shell | This repository's `apple/` | Maintainer, published | UIKit app, MoltenVK, no game code |
 
 ### Host interface
@@ -133,8 +133,9 @@ interface can be offered upstream.
 | Call | Purpose |
 | --- | --- |
 | `sms_embed_version()` | Interface version, checked before anything else |
-| `sms_embed_start(config)` | Disc image path, the `CAMetalLayer`, its drawable size, the app's `vkGetInstanceProcAddr` and a rumble callback. Settings are the engine's `SMS_*` environment variables, set by the shell beforehand |
+| `sms_embed_start(config)` | Disc image path, the `CAMetalLayer`, its drawable size, the app's `vkGetInstanceProcAddr` and a rumble callback. Settings are the engine's `SMS_*` environment variables, which the shell sets before it loads the library, because some engine parts read them in the library's initializers |
 | `sms_embed_set_pad(port, pad)` | Controller state in GameCube terms: sticks -100 to 100, analog triggers, PAD button bits |
+| `sms_embed_set_scale(scale)` | Render Resolution, applied at the next frame |
 | `sms_embed_pause(paused)` | Pausing returns once the game has parked at its next frame with the GPU idle and new pipelines saved |
 | `sms_embed_resize(width, height)` | Drawable size changes, rotation and external displays |
 | `sms_embed_audio_pull(stream, bytes)` | The shell's audio unit pulls 32 kHz interleaved stereo 16-bit samples |
@@ -192,14 +193,15 @@ decompiled code ([D3 limit](https://github.com/chrissotraidis/padmint/blob/main/
 
 | SunPad today | With the new engine |
 | --- | --- |
-| Render Resolution 1x-4x | Engine internal scale (`SMS_GX_SCALE` 1-4) |
+| Render Resolution 1x-4x | Engine internal scale (`SMS_GX_SCALE` 1-4), changed at the next frame. The game view's drawable stays at the screen's size in points, as SunPad sets it today |
 | Aspect Ratio: Original 4:3 | Engine widescreen off, default |
-| Aspect Ratio: 16:9 (experimental) | Engine widescreen: widened game camera with the HUD kept 4:3 in the centre |
-| Aspect Ratio: Fill Screen | Engine `SMS_ASPECT=stretch` |
+| Aspect Ratio: 16:9 (experimental) | Engine widescreen 16:9: the game camera widened with the HUD kept 4:3 in the centre, as SunPad's GMSE01 widescreen code does today |
+| Aspect Ratio: Fill Screen | The same 16:9 picture stretched to the screen (`SMS_ASPECT=stretch`), as SunPad's custom stretch does today |
+| Heat-wave shimmer off in 16:9 and Fill Screen | Same (`SMS_HEAT_HAZE=0` in those modes) |
 | Show FPS Counter | Fed from `sms_embed_stats` |
-| 60 FPS Patch (Unstable) | Frame rate 60, the engine's timing-corrected mode, kept experimental until gate G3 passes at 60 |
-| Reduced CPU Clock 90% (Unstable) | Removed. The engine has no emulated clock |
-| Use Supported 30 FPS Mode | Becomes the "30 FPS (original)" choice of the frame-rate setting |
+| 60 FPS Patch (Unstable) | "60 FPS (Experimental)": frame rate 60, the engine's timing-corrected mode, kept experimental until gate G3 passes at 60 |
+| Reduced CPU Clock 90% (Unstable) | Not shown in SunPad Next. The engine has no emulated clock |
+| Use Supported 30 FPS Mode | Same item. It selects the original 30 FPS |
 | Controller Rumble | Engine rumble callback into `SunPadControllerRumble` |
 | Invert C-stick Up/Down, modern horizontal camera | Unchanged, applied in SunPad's input layer |
 | Controller Button Mapping, Touch Control Settings, Auto-hide and Show Touch Controls | Unchanged, shell only |
@@ -209,6 +211,30 @@ decompiled code ([D3 limit](https://github.com/chrissotraidis/padmint/blob/main/
 | Report a Problem | Adds the engine log and frame breakdown |
 
 Every changed item is rechecked by hand on iPhone and iPad (task E3.8).
+
+### The game's own screens
+
+SunPad Next shows the game as SunPad always has, with its settings in SunPad's
+menu. The PC port adds screens and prompts of its own, and SunPad turns them
+off through the engine's environment
+([SunPadEngineBridge.mm](../apple/shared/SunPadEngineBridge.mm)):
+
+| PC port addition | How it stays out |
+| --- | --- |
+| Save state and settings hints at the pause menu's top right, and its settings menu on Y | `SMS_RETAIL_UI=1`, a fork patch (`decomp-patches/zzzzzzzzzzz-embed-01-retail-ui.patch`) |
+| QUIT GAME in the pause menu | `SMS_RETAIL_UI=1` (`src/pause_quit.cpp`) |
+| "(A) Skip" over the logos and every movie, and A ending them | `SMS_RETAIL_UI=1`. Retail's own skip of a movie already seen stays |
+| Shine and blue coin tracker in the pause menu | `SMS_PAUSE_TRACKER=0` |
+| Radar | `SMS_RADAR=0`, also the engine's default |
+| Split-screen co-op | `SMS_COOP=0` |
+| Achievements, auto save, button prompts for other controllers, outfits, look and character mods | Off unless their variables are set, and SunPad sets none |
+| Save states, the warp menu, the debug overlay and character swaps | Reached only through the port's keyboard and SDL controller bindings, which the embedded engine does not read |
+| Texture packs, HD cutscenes, Discord presence, GameCube adapter | `SMS_TEXTURE_PACKS=0`, `SMS_PRESENCE=0`, `SMS_NO_GC_ADAPTER=1` |
+| Native code mods and their menu | The engine finds no `mods` folder, and iOS loads no unsigned code |
+
+The engine's fixes stay on, for example the GO! letters' growth at 60 FPS and
+the emitters restarted after a pause. SunPad Next for Mac uses the engine's own
+window, keyboard and menus for now (task E5.1).
 
 ### Engine features left out of SunPad builds at first
 
@@ -278,13 +304,13 @@ source only, **D** needs the disc on the Mac, **H** needs a person or device.
 | E2.4 | Lifecycle | done in the Simulator: 50 background cycles, one process, card unchanged, device pending | E2.3 | D |
 | E2.5 | Desktop regression of the fork | done: title and plaza identical to upstream | E2.3 | D |
 | E3.1 | SunPadEngineHost | done in the Simulator: SunPad Next boots into Delfino Plaza | E2.3 | S |
-| E3.2 | Settings mapping | done: mapping and tests (tests/test-engine-bridge.sh) | E3.1 | S |
+| E3.2 | Settings mapping | done: mapping and tests (tests/test-engine-bridge.sh). Aspect modes, heat-wave shimmer and the hidden CPU clock match SunPad, and the PC port's own screens are off | E3.1 | S |
 | E3.3 | Input and rumble | in progress: input and rumble wired, device check pending | E3.1 | S |
 | E3.4 | Game data import | in progress: import validates the image by SHA-256 and skips extraction | E3.1 | S |
 | E3.5 | Save migration and transfer | in progress: migration, export and import done and tested, real save loads in the Simulator, device check pending | E3.1 | S, H |
 | E3.6 | Diagnostics | done: engine log in problem reports | E3.1 | S |
-| E3.7 | Side-by-side packaging | in progress: shell and personal IPAs package and pass their audits, the shell passes release_gate.py, device install pending | E3.1-E3.6 | D |
-| E3.8 | Wiring recheck | blocked | E3.7 | H |
+| E3.7 | Side-by-side packaging | in progress: shell and personal IPAs package and pass their audits, the shell passes release_gate.py, installed on the iPhone 14 beside SunPad (not yet launched there) | E3.1-E3.6 | D |
+| E3.8 | Wiring recheck | ready: [hands-on check](#hands-on-check) below, needs a session with the iPhone 14 | E3.7 | H |
 | E4.1 | Routes | blocked | E3.7 | D |
 | E4.2 | Device acceptance | blocked | E4.1 | H |
 | E4.3 | Tuning | blocked | E4.2 | D, H |
@@ -453,6 +479,31 @@ audit passes and the IPA installs on the iPad Pro and iPhone 14 beside 0.3.x.
 **E3.8 Wiring recheck.** Walk every menu item and control in the mapping table
 on iPhone and iPad, with touch and with a controller, and record the result
 item by item in the log. 1 day plus a device session.
+
+#### Hands-on check
+
+SunPad Next is a separate app beside SunPad, with its own data. The iPhone 14
+copy already holds the disc image and a copy of SunPad's save. SunPad's own
+app and save are not touched.
+
+1. Open SunPad Next. It should reach the title, and file select should show
+   the Shines of your SunPad save.
+2. Play with touch, then with a controller: both sticks, A, B, X, Y, Z, L, R
+   with analog FLUDD pressure, the D-pad and START. Rumble should follow
+   Controller Rumble.
+3. Pause. The menu should look as it does in SunPad: CONTINUE and SAVE, with
+   EXIT AREA inside a level. Nothing extra appears at the top right or bottom
+   left, and Y does nothing.
+4. Save from the pause menu, close SunPad Next from the app switcher, open it
+   again and load the file. Then try Export Saves.
+5. In SunPad's menu: Render Resolution 1x to 4x changes the picture at once.
+   Aspect Ratio, 60 FPS (Experimental) and Use Supported 30 FPS Mode apply
+   after reopening. Show FPS Counter shows the engine's rate. Reduced CPU
+   Clock is absent.
+6. Leave the app and come back, and lock and unlock the phone during play.
+7. Report a Problem should offer a report that includes Engine.log.
+
+Note anything that differs from SunPad, with the step number.
 
 ### Phase E4: device performance and correctness
 

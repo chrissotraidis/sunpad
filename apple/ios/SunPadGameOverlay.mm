@@ -504,7 +504,11 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
     fpsAction.state = settings.showFPSCounter ? UIMenuElementStateOn : UIMenuElementStateOff;
 
     UIAction *sixtyFPSAction =
+#if SUNPAD_DECOMP_ENGINE
+        [UIAction actionWithTitle:@"60 FPS (Experimental, Restart Required)"
+#else
         [UIAction actionWithTitle:@"60 FPS Patch (Unstable, Restart Required)"
+#endif
                             image:[UIImage systemImageNamed:@"speedometer"]
                        identifier:nil handler:^(__kindof UIAction *action) {
         (void)action;
@@ -515,7 +519,11 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
         [weakSelf refreshMenuButton];
 
         NSString *message = currentSettings.experimental60FPS ?
+#if SUNPAD_DECOMP_ENGINE
+            @"The engine runs the game at 60 frames a second with its timing corrected. It needs about twice the work each second, so a device that cannot keep up plays slower. Close and reopen SunPad to apply it." :
+#else
             @"This patch is diagnostic only. It is not a performance boost and is known to be unsuitable for normal play. It can cause severe slowdown and game-timing, physics, animation, or audio problems. Close and reopen SunPad to enable it." :
+#endif
             @"The supported original 30 FPS mode is selected. Close and reopen SunPad to apply it.";
         UIAlertController *alert =
             [UIAlertController alertControllerWithTitle:@"Restart Required"
@@ -531,6 +539,7 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
     sixtyFPSAction.state = settings.experimental60FPS ?
         UIMenuElementStateOn : UIMenuElementStateOff;
 
+#if !SUNPAD_DECOMP_ENGINE
     UIAction *performanceAction =
         [UIAction actionWithTitle:@"Reduced CPU Clock 90% (Unstable, Restart Required)"
                             image:[UIImage systemImageNamed:@"gauge.with.dots.needle.67percent"]
@@ -559,6 +568,7 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
     }];
     performanceAction.state = settings.experimentalPerformanceMode ?
         UIMenuElementStateOn : UIMenuElementStateOff;
+#endif
 
     BOOL supportedModeSelected = !settings.experimentalPerformanceMode &&
         !settings.experimental60FPS;
@@ -579,8 +589,13 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
         UIAlertController *alert = [UIAlertController
             alertControllerWithTitle:changed ? @"Supported Mode Selected" : @"Supported Mode Active"
                              message:changed ?
+#if SUNPAD_DECOMP_ENGINE
+                @"The original 30 FPS mode is selected. Close and reopen SunPad to apply it." :
+                @"The original 30 FPS mode is already selected."
+#else
                 @"Full CPU clock and the original 30 FPS mode are selected. Close and reopen SunPad to apply them." :
                 @"Full CPU clock and the original 30 FPS mode are already selected."
+#endif
                       preferredStyle:UIAlertControllerStyleAlert];
         [alert addAction:[UIAlertAction actionWithTitle:@"OK"
                                                   style:UIAlertActionStyleDefault
@@ -592,6 +607,12 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
     supportedModeAction.state = supportedModeSelected ?
         UIMenuElementStateOn : UIMenuElementStateOff;
 
+#if SUNPAD_DECOMP_ENGINE
+    // The engine has no emulated CPU clock to reduce.
+    NSArray<UIMenuElement *> *diagnosticOptions = @[sixtyFPSAction];
+#else
+    NSArray<UIMenuElement *> *diagnosticOptions = @[performanceAction, sixtyFPSAction];
+#endif
     NSString *experimentsTitle = supportedModeSelected ?
         @"Unstable Experiments (Off)" : @"⚠︎ Unstable Experiments Enabled";
     UIMenu *experimentsMenu = [UIMenu menuWithTitle:experimentsTitle
@@ -604,7 +625,7 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
                          image:[UIImage systemImageNamed:@"wrench.and.screwdriver"]
                     identifier:nil
                        options:0
-                      children:@[performanceAction, sixtyFPSAction]],
+                      children:diagnosticOptions],
     ]];
 
     UIAction *reportProblemAction =

@@ -156,6 +156,30 @@ BOOL StartAudioUnit() {
         });
         return;
     }
+
+    NSString *engineDirectory = [userDirectory stringByAppendingPathComponent:@"Engine"];
+    NSString *cacheDirectory =
+        NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES).firstObject;
+    SunPadSettings *settings = [SunPadSettings sharedSettings];
+    _drawableSize = _layer.drawableSize;
+    _renderScale = settings.renderScale;
+    _choices = {settings.renderScale, settings.aspectRatioMode, settings.experimental60FPS,
+                settings.controllerRumble};
+    // Set before the engine loads: some of its parts read their variables as the
+    // library's initializers run. A variable already set (a developer launch, a
+    // test route) wins over SunPad's choice.
+    [SunPadEngineEnvironment(_choices, engineDirectory, cacheDirectory)
+        enumerateKeysAndObjectsUsingBlock:^(NSString *name, NSString *value, BOOL *stop) {
+            setenv(name.UTF8String, value.fileSystemRepresentation, 0);
+        }];
+
+    // The engine logs to stderr: keep it beside SunPad's own log for problem reports.
+    NSString *engineLog = [[SunPadDiagnosticsLogPath() stringByDeletingLastPathComponent]
+        stringByAppendingPathComponent:@"Engine.log"];
+    if (!freopen(engineLog.fileSystemRepresentation, "w", stderr))
+        SunPadLog(@"engine log unavailable at %@", engineLog.lastPathComponent);
+    setvbuf(stderr, NULL, _IOLBF, 0);
+
     NSString *failure = LoadEngine(modulePath);
     if (failure) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -174,37 +198,16 @@ BOOL StartAudioUnit() {
         SunPadLog(@"audio session setup failed: %@", audioSessionError);
 
     NSFileManager *fileManager = NSFileManager.defaultManager;
-    NSString *engineDirectory = [userDirectory stringByAppendingPathComponent:@"Engine"];
     [fileManager createDirectoryAtPath:[engineDirectory stringByAppendingPathComponent:@"card-a"]
            withIntermediateDirectories:YES
                             attributes:nil
                                  error:nil];
-    NSString *cacheDirectory =
-        NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES).firstObject;
     // The first launch copies the Dolphin card's saves for the engine; the Dolphin card stays as it was.
     NSError *migrationError = nil;
     if (!SunPadMigrateGCIFolderToEngineCard([userDirectory stringByAppendingPathComponent:@"GC/USA/Card A"],
                                             [engineDirectory stringByAppendingPathComponent:@"card-a"],
                                             &migrationError))
         SunPadLog(@"save migration failed: %@", migrationError.localizedDescription);
-
-    SunPadSettings *settings = [SunPadSettings sharedSettings];
-    _drawableSize = _layer.drawableSize;
-    _renderScale = settings.renderScale;
-    _choices = {settings.renderScale, settings.aspectRatioMode, settings.experimental60FPS,
-                settings.controllerRumble, _drawableSize};
-    // A variable already set (a developer launch, a test route) wins over SunPad's choice.
-    [SunPadEngineEnvironment(_choices, engineDirectory, cacheDirectory)
-        enumerateKeysAndObjectsUsingBlock:^(NSString *name, NSString *value, BOOL *stop) {
-            setenv(name.UTF8String, value.fileSystemRepresentation, 0);
-        }];
-
-    // The engine logs to stderr: keep it beside SunPad's own log for problem reports.
-    NSString *engineLog = [[SunPadDiagnosticsLogPath() stringByDeletingLastPathComponent]
-        stringByAppendingPathComponent:@"Engine.log"];
-    if (!freopen(engineLog.fileSystemRepresentation, "w", stderr))
-        SunPadLog(@"engine log unavailable at %@", engineLog.lastPathComponent);
-    setvbuf(stderr, NULL, _IOLBF, 0);
 
     if (!StartAudioUnit())
         SunPadLog(@"engine audio output failed to start");

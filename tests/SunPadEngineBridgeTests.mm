@@ -9,16 +9,21 @@ static NSDictionary<NSString *, NSString *> *Environment(SunPadEngineChoices cho
 
 int main() {
     @autoreleasepool {
-        SunPadEngineChoices choices = {1, SunPadAspectRatioOriginal, NO, YES, CGSizeMake(2532, 1170)};
+        SunPadEngineChoices choices = {1, SunPadAspectRatioOriginal, NO, YES};
         NSDictionary *environment = Environment(choices);
         assert([environment[@"SMS_GX_SCALE"] isEqualToString:@"1"]);
         assert([environment[@"SMS_WIDESCREEN"] isEqualToString:@"0"]);
         assert([environment[@"SMS_ASPECT"] isEqualToString:@"keep"]);
         assert([environment[@"SMS_FRAME_RATE"] isEqualToString:@"30"]);
+        assert([environment[@"SMS_HEAT_HAZE"] isEqualToString:@"1"]);
         assert([environment[@"SMS_RUMBLE"] isEqualToString:@"1"]);
         assert([environment[@"SMS_SAVE_DIR"] isEqualToString:@"/engine/card-a"]);
         assert([environment[@"SMS_SETTINGS"] isEqualToString:@"/engine/settings.txt"]);
         assert([environment[@"XDG_CACHE_HOME"] isEqualToString:@"/caches"]);
+        assert([environment[@"SMS_RETAIL_UI"] isEqualToString:@"1"]);
+        assert([environment[@"SMS_PAUSE_TRACKER"] isEqualToString:@"0"]);
+        assert([environment[@"SMS_RADAR"] isEqualToString:@"0"]);
+        assert([environment[@"SMS_COOP"] isEqualToString:@"0"]);
 
         choices.renderScale = 9;
         choices.aspectRatio = SunPadAspectRatioWidescreen;
@@ -27,15 +32,18 @@ int main() {
         environment = Environment(choices);
         assert([environment[@"SMS_GX_SCALE"] isEqualToString:@"4"]);
         assert([environment[@"SMS_WIDESCREEN"] isEqualToString:@"16:9"]);
+        assert([environment[@"SMS_ASPECT"] isEqualToString:@"keep"]);
         assert([environment[@"SMS_FRAME_RATE"] isEqualToString:@"60"]);
+        assert([environment[@"SMS_HEAT_HAZE"] isEqualToString:@"0"]);
         assert([environment[@"SMS_RUMBLE"] isEqualToString:@"0"]);
 
         choices.renderScale = 0;
         choices.aspectRatio = SunPadAspectRatioFillScreen;
         environment = Environment(choices);
         assert([environment[@"SMS_GX_SCALE"] isEqualToString:@"1"]);
-        assert([environment[@"SMS_WIDESCREEN"] isEqualToString:@"2532:1170"]);
-        assert([environment[@"SMS_ASPECT"] isEqualToString:@"keep"]);
+        assert([environment[@"SMS_WIDESCREEN"] isEqualToString:@"16:9"]);
+        assert([environment[@"SMS_ASPECT"] isEqualToString:@"stretch"]);
+        assert([environment[@"SMS_HEAT_HAZE"] isEqualToString:@"0"]);
 
         SunPadInputState input = {};
         input.stickX = 127;
