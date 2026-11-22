@@ -568,3 +568,25 @@ Notes: -DSMS_EMBED=ON builds libsms_embed.dylib (13.9 MB, iOS Simulator,
 Next: unlock the iPhone 14 for the probe (installed as com.sunpad.engineprobe),
   then set the device bases (E2.1) and build the device engine; E1.3 license
   inventory; E3.1 SunPadEngineHost in the app.
+
+### 2026-11-23 decompilation engine: SunPad Next in the iOS Simulator
+Result: SunPad's app shell runs the decompiled engine in the iOS Simulator,
+  from its own boot path through the title into Delfino Plaza
+Pins: sms-pc-port fork (sunpad branch, see the lock); MoltenVK 1.4.2
+Checkpoints: tests/test-engine-bridge.sh passes for every settings row and the
+  input conversion; xcodebuild builds the SunPadNext target for the Simulator
+  with SUNPAD_EMBED_ENGINE=YES; check-repository.sh passes
+Notes: SunPadNext (com.sunpad.SunPad.next, shown as "SunPad Next") builds the
+  same app sources with apple/ios/SunPadEngineHost.mm in place of
+  SunPadCoreHost.mm and MoltenVK in place of libSunPadCore.a. The host loads
+  libsms_embed.dylib from Frameworks, sets the engine's SMS_* variables from
+  SunPad's settings (apple/shared/SunPadEngineBridge.mm), plays the engine's
+  32 kHz audio through RemoteIO, sends rumble to SunPadControllerRumble, pauses
+  the engine with the GPU idle around the background and audio interruptions,
+  and writes the engine log beside SunPad's log as Engine.log. Import keeps
+  the SHA-256 check and skips extraction. The engine runs once per process, so
+  a reimport asks the player to reopen SunPad. The game view's drawable was
+  844x390 in this run, so the game drew at points instead of pixels; E4.3
+  covers it. The memory probe has still not run on the iPhone 14 (locked).
+Next: probe on the iPhone 14, then the device engine build and SunPad Next
+  on the device; E3.5 save migration; E3.7 packaging.

@@ -39,6 +39,7 @@ python3 tests/test_tvos_contract.py
 ./tests/test-generated-gmse01-audit.sh
 ./tests/test-widescreen-heatwave-fix.sh
 ./tests/test-diagnostics.sh
+./tests/test-engine-bridge.sh
 ./tests/test-game-data-setup.sh
 ./tests/test-profile-tools.sh
 

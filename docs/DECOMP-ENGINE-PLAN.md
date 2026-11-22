@@ -270,17 +270,17 @@ source only, **D** needs the disc on the Mac, **H** needs a person or device.
 | E0.2 | Engine fork and gitlink | done: fork created, `sunpad` branch pinned | D1 | S |
 | E1.1 | Device memory and dylib placement probe | in progress: Simulators pass, iPhone 14 installed, awaiting an unlocked session | E0.2 | H |
 | E1.2 | Pass cost and runtime-base fallback | blocked | E1.1 if needed | D |
-| E1.3 | License and provenance inventory | ready | E0.2 | S |
+| E1.3 | License and provenance inventory | done: every engine file family has a known license (THIRD_PARTY_NOTICES) | E0.2 | S |
 | E1.4 | Desktop reference numbers | ready | E0.2 | D |
 | E2.1 | iOS, Simulator and tvOS toolchains | in progress: iOS Simulator builds, device bases wait for E1.1 | E1.1 | S |
 | E2.2 | SunPad build profile | done in the Simulator build | E2.1 | S |
 | E2.3 | Embedded host backend | done in the Simulator (Delfino Plaza plays) | E2.2 | D |
 | E2.4 | Lifecycle | in progress: pause handshake written, untested | E2.3 | D |
 | E2.5 | Desktop regression of the fork | done: title and plaza identical to upstream | E2.3 | D |
-| E3.1 | SunPadEngineHost | ready | E2.3 | S |
-| E3.2 | Settings mapping | ready | E3.1 | S |
-| E3.3 | Input and rumble | ready | E3.1 | S |
-| E3.4 | Game data import | ready | E3.1 | S |
+| E3.1 | SunPadEngineHost | done in the Simulator: SunPad Next boots into Delfino Plaza | E2.3 | S |
+| E3.2 | Settings mapping | done: mapping and tests (tests/test-engine-bridge.sh) | E3.1 | S |
+| E3.3 | Input and rumble | in progress: input and rumble wired, device check pending | E3.1 | S |
+| E3.4 | Game data import | in progress: import validates the image by SHA-256 and skips extraction | E3.1 | S |
 | E3.5 | Save migration and transfer | ready | E3.1 | S, H |
 | E3.6 | Diagnostics | ready | E3.1 | S |
 | E3.7 | Side-by-side packaging | blocked | E3.1-E3.6 | D |
