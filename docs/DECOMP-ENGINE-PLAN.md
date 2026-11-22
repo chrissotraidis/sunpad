@@ -272,10 +272,10 @@ source only, **D** needs the disc on the Mac, **H** needs a person or device.
 | E1.2 | Pass cost and runtime-base fallback | blocked | E1.1 if needed | D |
 | E1.3 | License and provenance inventory | done: every engine file family has a known license (THIRD_PARTY_NOTICES) | E0.2 | S |
 | E1.4 | Desktop reference numbers | ready | E0.2 | D |
-| E2.1 | iOS, Simulator and tvOS toolchains | in progress: iOS Simulator builds, device bases wait for E1.1 | E1.1 | S |
-| E2.2 | SunPad build profile | done in the Simulator build | E2.1 | S |
+| E2.1 | iOS, Simulator and tvOS toolchains | done for the iOS and tvOS Simulators and devices; device base 0x7000000000 awaits E1.1 | E1.1 | S |
+| E2.2 | SunPad build profile | done: exports only sms_embed_*, imports libSystem, libc++ and CoreFoundation | E2.1 | S |
 | E2.3 | Embedded host backend | done in the Simulator (Delfino Plaza plays) | E2.2 | D |
-| E2.4 | Lifecycle | in progress: pause handshake written, untested | E2.3 | D |
+| E2.4 | Lifecycle | done in the Simulator: 50 background cycles, one process, card unchanged, device pending | E2.3 | D |
 | E2.5 | Desktop regression of the fork | done: title and plaza identical to upstream | E2.3 | D |
 | E3.1 | SunPadEngineHost | done in the Simulator: SunPad Next boots into Delfino Plaza | E2.3 | S |
 | E3.2 | Settings mapping | done: mapping and tests (tests/test-engine-bridge.sh) | E3.1 | S |

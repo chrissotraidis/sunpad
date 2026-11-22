@@ -590,3 +590,29 @@ Notes: SunPadNext (com.sunpad.SunPad.next, shown as "SunPad Next") builds the
   covers it. The memory probe has still not run on the iPhone 14 (locked).
 Next: probe on the iPhone 14, then the device engine build and SunPad Next
   on the device; E3.5 save migration; E3.7 packaging.
+
+### 2026-11-23 decompilation engine: saves, packaging, Mac, tvOS builds and lifecycle
+Result: everything up to device acceptance works in the Simulator and on this
+  Mac; the iPhone 14 has the probe, SunPad Next, the disc image and a copy of
+  its SunPad save installed, and is waiting for an unlocked session
+Checkpoints: check-repository.sh passes with tests/test-engine-saves.sh and
+  the extended diagnostics test; scripts/package-ios-next.sh audits pass for
+  the shell and the personal IPA; the shell passes release_gate.py (0
+  address-named functions); the engine builds for the iOS and tvOS Simulators
+  and devices
+Notes: SunPadEngineSaves converts between Dolphin GCI files and the engine's
+  card, keeping each migrated GCI entry so saves go back byte for byte. A real
+  progressed save (SHA-256 e7f31b78...) migrated in the Simulator and showed
+  its Shine at file select, with the Dolphin copy unchanged. Problem reports
+  now include the engine log. Device engine builds put game memory at
+  0x7000000000 (SMS_GAME_HI); tvOS builds leave out the crash symbolizer's
+  process and the alternate signal stack. SunPad Next for Mac
+  (scripts/package-macos-next.sh) played the plaza route at 34.9 ms per frame
+  with 27.5 ms idle; the test's Engine folder was moved out of the Mac's
+  SunPad data afterwards. scripts/run-engine-route.sh measured the plaza at
+  33.4 ms per frame (30 FPS) in the iOS Simulator. Fifty background cycles in
+  the Simulator paused and resumed the engine 51 times in one process with
+  the card unchanged; a background during a save or a stage load was not
+  separately forced.
+Next: unlock the iPhone 14. Then: the probe (E1.1), SunPad Next's first launch
+  with the migrated save (E3.5 device), routes and hands-on play (E3.8, E4.2).
