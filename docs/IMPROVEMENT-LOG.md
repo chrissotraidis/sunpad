@@ -660,3 +660,23 @@ Notes: the iPad's SunPad save, config and preferences were copied to the Mac
   reached the Options explanation, so the check used SMS_WARP_DIRECT.
 Next: hands-on touch and controller play on the iPad (E3.8); the iPhone 14
   when it is unlocked.
+### 2026-11-23 decompilation engine: menu and stutter logging
+Result: SunPad Next has a reorganized three-dot menu and logs stutters; the
+  0.3.x menu is unchanged
+Checkpoints: the overlay compiles for both engines with -Wall; the 0.3.x menu
+  code is byte-identical to before (the diff only adds the engine's menu),
+  and tests/test-experimental-*-config.sh pass; tests/test-engine-bridge.sh
+  passes with the logging variables
+Notes: the maintainer played SunPad Next on the iPad Pro with an Xbox
+  controller and reported it runs better than SunPad, with stutter at first
+  loads and when new parts of an area appear. The ten-second performance lines
+  held 30 FPS throughout, at 2x and at 4x, so the stutters are single frames.
+  The earlier plaza run points at pipeline creation: MoltenVK 1.4.2 offers no
+  VK_EXT_graphics_pipeline_library, so glvk builds each new pipeline whole at
+  its first draw (171 pipelines and 16.9 ms of each frame on average over the
+  first 300 frames of Delfino Plaza). SunPad Next now passes SMS_GX_HITCH_MS=50
+  and SMS_GX_STATS=300, so Engine.log names each slow frame and what it spent.
+  The installed app has no Dolphin code: its binary and engine library have no
+  Dolphin or ModernGekko symbols.
+Next: install on the iPad when the maintainer's session ends, collect the
+  stutter log from real play, then E4.3 pipeline warm-up.

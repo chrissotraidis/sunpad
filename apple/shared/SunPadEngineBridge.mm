@@ -25,6 +25,10 @@ NSDictionary<NSString *, NSString *> *SunPadEngineEnvironment(
         @"SMS_NO_GC_ADAPTER": @"1",
         @"SMS_PRESENCE": @"0",
         @"SMS_QUIET_STUBS": @"1",
+        // Engine.log, which problem reports carry: each frame over 50 ms with what
+        // it waited on, and every 300 frames the slowest frame and the pipelines made.
+        @"SMS_GX_HITCH_MS": @"50",
+        @"SMS_GX_STATS": @"300",
         // The game as SunPad has always shown it: SunPad's menu holds the settings,
         // so the PC port's own additions to the pause menu, the movies and the HUD,
         // and its split-screen co-op, stay out.

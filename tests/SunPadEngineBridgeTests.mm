@@ -24,6 +24,8 @@ int main() {
         assert([environment[@"SMS_PAUSE_TRACKER"] isEqualToString:@"0"]);
         assert([environment[@"SMS_RADAR"] isEqualToString:@"0"]);
         assert([environment[@"SMS_COOP"] isEqualToString:@"0"]);
+        assert([environment[@"SMS_GX_HITCH_MS"] isEqualToString:@"50"]);
+        assert([environment[@"SMS_GX_STATS"] isEqualToString:@"300"]);
 
         choices.renderScale = 9;
         choices.aspectRatio = SunPadAspectRatioWidescreen;

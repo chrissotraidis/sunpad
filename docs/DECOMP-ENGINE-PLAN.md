@@ -199,9 +199,9 @@ decompiled code ([D3 limit](https://github.com/chrissotraidis/padmint/blob/main/
 | Aspect Ratio: Fill Screen | The same 16:9 picture stretched to the screen (`SMS_ASPECT=stretch`), as SunPad's custom stretch does today |
 | Heat-wave shimmer off in 16:9 and Fill Screen | Same (`SMS_HEAT_HAZE=0` in those modes) |
 | Show FPS Counter | Fed from `sms_embed_stats` |
-| 60 FPS Patch (Unstable) | "60 FPS (Experimental)": frame rate 60, the engine's timing-corrected mode, kept experimental until gate G3 passes at 60 |
+| 60 FPS Patch (Unstable) | Display > Frame Rate > 60 FPS (Experimental): the engine's timing-corrected mode, kept experimental until gate G3 passes at 60 |
 | Reduced CPU Clock 90% (Unstable) | Not shown in SunPad Next. The engine has no emulated clock |
-| Use Supported 30 FPS Mode | Same item. It selects the original 30 FPS |
+| Use Supported 30 FPS Mode | Display > Frame Rate > 30 FPS (Original) |
 | Controller Rumble | Engine rumble callback into `SunPadControllerRumble` |
 | Invert C-stick Up/Down, modern horizontal camera | Unchanged, applied in SunPad's input layer |
 | Controller Button Mapping, Touch Control Settings, Auto-hide and Show Touch Controls | Unchanged, shell only |
@@ -211,6 +211,22 @@ decompiled code ([D3 limit](https://github.com/chrissotraidis/padmint/blob/main/
 | Report a Problem | Adds the engine log and frame breakdown |
 
 Every changed item is rechecked by hand on iPhone and iPad (task E3.8).
+
+### SunPad Next menu
+
+The three-dot menu in SunPad Next groups the same actions by what they are
+for. Each submenu with a choice shows the current one under its name. The
+0.3.x app keeps its menu until the old engine retires.
+
+| Menu | Items |
+| --- | --- |
+| Display | Render Resolution (1x-4x, applied at once), Aspect Ratio and Frame Rate (applied after reopening), Show FPS Counter |
+| Controls | Controller Button Mapping, Touch Control Settings, Auto-hide Touch Controls with Controller, Controller Rumble |
+| Saves | Export Saves, Import Dolphin Save (.gci) |
+| Game Data | Import or Reimport Game Data, Import from SunPad Folder, Remove Stored Game Data (shown in red, and confirmed) |
+| Report a Problem | As before |
+
+Show Touch Controls appears at the top while the touch controls are hidden.
 
 ### The game's own screens
 
@@ -308,12 +324,12 @@ source only, **D** needs the disc on the Mac, **H** needs a person or device.
 | E3.3 | Input and rumble | in progress: input and rumble wired, device check pending | E3.1 | S |
 | E3.4 | Game data import | in progress: import validates the image by SHA-256 and skips extraction | E3.1 | S |
 | E3.5 | Save migration and transfer | in progress: migration, export and import done and tested, real save loads in the Simulator, device check pending | E3.1 | S, H |
-| E3.6 | Diagnostics | done: engine log in problem reports | E3.1 | S |
+| E3.6 | Diagnostics | done: engine log in problem reports, with each frame over 50 ms and its cause, and a summary every 300 frames (slowest frame, pipelines made) | E3.1 | S |
 | E3.7 | Side-by-side packaging | in progress: shell and personal IPAs package and pass their audits, the shell passes release_gate.py, installed beside SunPad on the iPad Pro (runs) and the iPhone 14 (not yet launched) | E3.1-E3.6 | D |
 | E3.8 | Wiring recheck | ready: [hands-on check](#hands-on-check) below, needs a session with the iPhone 14 | E3.7 | H |
 | E4.1 | Routes | blocked | E3.7 | D |
 | E4.2 | Device acceptance | blocked | E4.1 | H |
-| E4.3 | Tuning | blocked | E4.2 | D, H |
+| E4.3 | Tuning | next: first-visit stutter. MoltenVK has no pipeline libraries, so each new pipeline is built on the spot (171 in the first 10 s of Delfino Plaza on the iPad). Measure warm and cold visits with the new log, then build known pipelines during stage loads | E4.2 | D, H |
 | E5.1 | Mac app | in progress: SunPad Next.app builds and plays the plaza route on this Mac, hands-on check pending | E2.5 | D |
 | E5.2 | Apple TV | blocked | E4.2 | H |
 | E6.1 | PadMint recipe for Mac hosts | blocked | E3.7 | S |
@@ -496,10 +512,10 @@ app and save are not touched.
    left, and Y does nothing.
 4. Save from the pause menu, close SunPad Next from the app switcher, open it
    again and load the file. Then try Export Saves.
-5. In SunPad's menu: Render Resolution 1x to 4x changes the picture at once.
-   Aspect Ratio, 60 FPS (Experimental) and Use Supported 30 FPS Mode apply
-   after reopening. Show FPS Counter shows the engine's rate. Reduced CPU
-   Clock is absent.
+5. In SunPad's menu, under Display: Render Resolution 1x to 4x changes the
+   picture at once. Aspect Ratio and Frame Rate apply after reopening. Show
+   FPS Counter shows the engine's rate. Saves and Game Data hold the import,
+   export and removal items.
 6. Leave the app and come back, and lock and unlock the phone during play.
 7. Report a Problem should offer a report that includes Engine.log.
 
