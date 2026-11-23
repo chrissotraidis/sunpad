@@ -638,3 +638,25 @@ Notes: a fork patch (decomp-patches/zzzzzzzzzzz-embed-01-retail-ui.patch) and
   points, so the 844x390 drawable noted earlier is the same as SunPad's.
 Next: the hands-on check in DECOMP-ENGINE-PLAN.md (E3.8) on the iPhone 14,
   with the memory probe (E1.1) and routes (E4.1) in the same session.
+### 2026-11-23 decompilation engine: SunPad Next on the iPad Pro
+Result: SunPad Next runs on the iPad Pro (12.9-inch, 6th generation, M2,
+  iPadOS 27.2.1), installed beside SunPad 0.3.3, which is unchanged
+Checkpoints: the Release build signed for development installs and launches;
+  Delfino Plaza plays at 33.4 ms per frame (30 FPS) with about 26 ms of each
+  frame idle at 865 draws per frame, render scale 2; 450 MiB resident;
+  thermal state nominal; the pause menu is CONTINUE and SAVE only, as in
+  SunPad; the iPad's save migrated on first launch and the engine card's data
+  matches the GCI byte for byte; the restored SunPad preferences gave
+  SunPad Next the iPad's touch layout and settings
+Notes: the iPad's SunPad save, config and preferences were copied to the Mac
+  first (scratch backup). The disc image came from the maintainer's verified
+  copy (SHA-256 67cec163...). MEM1 mapped at 0x7080000000, so the device base
+  needs no entitlement on this iPad. The first stage load compiled 171 Vulkan
+  pipelines (one 2.9 s frame); the pipeline cache keeps them for later runs.
+  QuickTime's screen mirroring takes the audio route, which iOS reports as an
+  audio interruption with no end, so the engine pauses until the app returns
+  to the foreground. SunPad's current engine behaves the same. The scripted
+  plaza route assumes an empty file select; with a save on file A it
+  reached the Options explanation, so the check used SMS_WARP_DIRECT.
+Next: hands-on touch and controller play on the iPad (E3.8); the iPhone 14
+  when it is unlocked.
