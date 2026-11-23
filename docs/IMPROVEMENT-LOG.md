@@ -680,3 +680,28 @@ Notes: the maintainer played SunPad Next on the iPad Pro with an Xbox
   Dolphin or ModernGekko symbols.
 Next: install on the iPad when the maintainer's session ends, collect the
   stutter log from real play, then E4.3 pipeline warm-up.
+### 2026-11-23 decompilation engine: iPhone 14 and first-visit stutter
+Result: SunPad Next runs on the iPhone 14, and a new area no longer stutters
+  while its pipelines are made; both devices have the build (engine bd9936f)
+Checkpoints: the memory probe passes on the iPhone 14 (base 0x7000000000
+  exact, task limit 0x7180000000); on the iPhone, Delfino Plaza and Bianco
+  Hills play at 33.4 ms per frame with about 850 to 900 draws per frame at 1x;
+  Bianco Hills from a cold cache made 164 pipelines in the background with no
+  frame over 50 ms in play (slowest 37 ms), and draws left out only in its
+  first seconds; the scene was complete afterwards (QuickTime screenshot);
+  the plaza with a warm cache had no frame over 45 ms in play
+Notes: the cold iPhone run before the change showed the cause: MoltenVK has
+  no pipeline libraries, so glvk made each new pipeline whole at its first
+  draw, a Metal compile of 80 to 150 ms on the A15 (218 in the plaza's first
+  seconds, single frames over a second, 2 FPS in one ten-second sample). With
+  a warm cache the same pipelines took about 0.3 ms each. The fork's
+  SMS_VK_ASYNC_PIPELINES keeps those at the draw and makes only pipelines the
+  device has not made before on background threads, listing them by hash
+  beside the pipeline cache and forgetting the list with the cache. SunPad
+  sets it. The same cold run had 95 s of black: SMS_RETAIL_UI had also turned
+  off SMS_SKIP_INTRO, so the opening movie played under the warp's black
+  screen. The retail patch now leaves out only the prompt and the A skip.
+  Each test launch ended the session open on the phone; the slow run the
+  maintainer saw was the first cold launch.
+Next: the maintainer's hands-on pass on both devices (menu, pop-in on a first
+  visit, saves); then PadMint (E6).

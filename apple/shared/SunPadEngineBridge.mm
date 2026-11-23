@@ -29,6 +29,9 @@ NSDictionary<NSString *, NSString *> *SunPadEngineEnvironment(
         // it waited on, and every 300 frames the slowest frame and the pipelines made.
         @"SMS_GX_HITCH_MS": @"50",
         @"SMS_GX_STATS": @"300",
+        // A pipeline this device has not made yet is made in the background, and
+        // what it draws appears a few frames late instead of the game stopping.
+        @"SMS_VK_ASYNC_PIPELINES": @"1",
         // The game as SunPad has always shown it: SunPad's menu holds the settings,
         // so the PC port's own additions to the pause menu, the movies and the HUD,
         // and its split-screen co-op, stay out.

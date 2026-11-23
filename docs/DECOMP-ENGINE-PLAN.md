@@ -310,7 +310,7 @@ source only, **D** needs the disc on the Mac, **H** needs a person or device.
 | --- | --- | --- | --- | --- |
 | E0.1 | Rule and document updates | done (2026-11-23) | D1 | S |
 | E0.2 | Engine fork and gitlink | done: fork created, `sunpad` branch pinned | D1 | S |
-| E1.1 | Device memory and dylib placement probe | done on the iPad Pro (M2, iPadOS 27.2.1): MEM1 maps at 0x7080000000 and the engine library loads with no extra entitlement. iPhone 14 not yet run (locked) | E0.2 | H |
+| E1.1 | Device memory and dylib placement probe | done on the iPhone 14 (A15) and the iPad Pro (M2), iOS 27.2.1: MEM1 maps at 0x7080000000 and the engine library loads with no extra entitlement. 0x10000000000 is above the iPhone's 0x7180000000 limit | E0.2 | H |
 | E1.2 | Pass cost and runtime-base fallback | blocked | E1.1 if needed | D |
 | E1.3 | License and provenance inventory | done: every engine file family has a known license (THIRD_PARTY_NOTICES) | E0.2 | S |
 | E1.4 | Desktop reference numbers | ready | E0.2 | D |
@@ -325,11 +325,11 @@ source only, **D** needs the disc on the Mac, **H** needs a person or device.
 | E3.4 | Game data import | in progress: import validates the image by SHA-256 and skips extraction | E3.1 | S |
 | E3.5 | Save migration and transfer | in progress: migration, export and import done and tested, real save loads in the Simulator, device check pending | E3.1 | S, H |
 | E3.6 | Diagnostics | done: engine log in problem reports, with each frame over 50 ms and its cause, and a summary every 300 frames (slowest frame, pipelines made) | E3.1 | S |
-| E3.7 | Side-by-side packaging | in progress: shell and personal IPAs package and pass their audits, the shell passes release_gate.py, installed beside SunPad on the iPad Pro (runs) and the iPhone 14 (not yet launched) | E3.1-E3.6 | D |
+| E3.7 | Side-by-side packaging | in progress: shell and personal IPAs package and pass their audits, the shell passes release_gate.py, installed beside SunPad on the iPhone 14 and the iPad Pro; both run | E3.1-E3.6 | D |
 | E3.8 | Wiring recheck | ready: [hands-on check](#hands-on-check) below, needs a session with the iPhone 14 | E3.7 | H |
 | E4.1 | Routes | blocked | E3.7 | D |
 | E4.2 | Device acceptance | blocked | E4.1 | H |
-| E4.3 | Tuning | next: first-visit stutter. MoltenVK has no pipeline libraries, so each new pipeline is built on the spot (171 in the first 10 s of Delfino Plaza on the iPad). Measure warm and cold visits with the new log, then build known pipelines during stage loads | E4.2 | D, H |
+| E4.3 | Tuning | first-visit stutter done: new pipelines are made in the background (SMS_VK_ASYNC_PIPELINES). Next: hands-on check of the pop-in, then frame pacing only if play shows a problem | E4.2 | D, H |
 | E5.1 | Mac app | in progress: SunPad Next.app builds and plays the plaza route on this Mac, hands-on check pending | E2.5 | D |
 | E5.2 | Apple TV | blocked | E4.2 | H |
 | E6.1 | PadMint recipe for Mac hosts | blocked | E3.7 | S |
