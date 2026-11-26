@@ -94,7 +94,7 @@ background, and spread texture uploads at loads across frames if that holds up.
 Check: a cold first visit to Delfino Plaza, Bianco Hills and Ricco Harbor on the
 iPhone 14 has no frame over 100 ms once the area is playing.
 
-**A3 Every hub area plays.** Warp into each of the eight areas (Delfino Plaza,
+**A3 Every hub area plays.** Warp into each of the nine areas (Delfino Plaza,
 Airstrip, Bianco Hills, Ricco Harbor, Gelato Beach, Pinna Park, Sirena Beach,
 Noki Bay, Pianta Village) on the iPhone 14, 60 seconds each with a mirrored
 screenshot. Check: each reaches play at 30 FPS with nothing visibly wrong. A

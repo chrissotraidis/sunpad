@@ -4,6 +4,9 @@
 - **Status:** approved by the maintainer on 2026-11-23, with the recommended
   answer to every decision in [Decisions for the maintainer](#decisions-for-the-maintainer).
   Work is under way, and the [status table](#status) is current.
+- **Next:** the maintainer chose on 2026-11-26 to replace the legacy engine
+  entirely. [FINALIZE-NEW-ENGINE.md](FINALIZE-NEW-ENGINE.md) plans the release
+  and replaces tasks E6 and E7 below.
 - **SunPad baseline:** `72c101a` on `main` (0.3.3, build 21)
 - **Engine reviewed:** [chasem-dev/sms-pc-port](https://github.com/chasem-dev/sms-pc-port)
   `21d7b639a9041d4a656ea5e8b4bfe617ad4b8fba` (2026-11-17), with `decomp`
