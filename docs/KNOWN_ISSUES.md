@@ -33,7 +33,10 @@ Last updated: 28 November 2026, for SunPad 0.4.0. Issues of the legacy engine
    engine stays paused until SunPad returns to the foreground.
 8. **Sirena Beach ran slowly in the iOS Simulator.** On 28 November 2026 it
    took 47 to 69 ms per frame there (every other area held 33.4 ms), with up to
-   122 render passes per frame. It hasn't been measured on a device yet.
+   122 render passes per frame. The engine's Mac build held 33.4 ms in the same
+   scene on an M3 Max (105 to 118 render passes, 0.08 ms of GPU wait), so the
+   Simulator's graphics path is the likely cause. It hasn't been measured on an
+   iPhone or iPad yet.
 
 ## Platforms and building
 

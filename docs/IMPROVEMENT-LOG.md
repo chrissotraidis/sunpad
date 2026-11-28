@@ -777,6 +777,9 @@ Cards, in the order done ([FINALIZE-NEW-ENGINE.md](FINALIZE-NEW-ENGINE.md)):
   hold 33.4 ms per frame except Sirena Beach: 47 to 69 ms, up to 122 render
   passes per frame, the game waiting up to 365 ms on the renderer thread.
   Sirena Beach is on every playthrough's path, so it is measured on a device
-  before D2. The iPhone 14 is still unavailable for the device part.
+  before D2. The engine's Mac build (scratch card, settings and cache) held
+  33.4 ms in the same scene on the M3 Max with 105 to 118 render passes and
+  0.08 ms of GPU wait per frame, which points at the Simulator's graphics path.
+  The iPhone 14 is still unavailable for the device part.
 - CI passes on e0a2dca (safety-and-tests, published-app, engine). The two
   earlier failures were the audit's grep -q under pipefail, fixed in 5de8a54.
