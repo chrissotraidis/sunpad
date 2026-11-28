@@ -338,12 +338,12 @@ source only, **D** needs the disc on the Mac, **H** needs a person or device.
 | E4.3 | Tuning | first-visit stutter done: new pipelines are made in the background (SMS_VK_ASYNC_PIPELINES). Next: hands-on check of the pop-in, then frame pacing only if play shows a problem | E4.2 | D, H |
 | E5.1 | Mac app | in progress: SunPad Next.app builds and plays the plaza route on this Mac, hands-on check pending | E2.5 | D |
 | E5.2 | Apple TV | blocked | E4.2 | H |
-| E6.1 | PadMint recipe for Mac hosts | blocked | E3.7 | S |
-| E6.2 | Player check | blocked | E6.1 | D |
-| E6.3 | Windows and Linux hosts | blocked | E6.2, D6 | S, D |
-| E7.1 | Beta release | blocked | G1-G5 | H |
-| E7.2 | Replacement release | blocked | E7.1 | H |
-| E7.3 | Retire the old engine | blocked | E7.2 | S |
+| E6.1 | PadMint recipe for Mac hosts | done in SunPad 0.4.0 (upstream-engine recipe, Apple Silicon Macs) | E3.7 | S |
+| E6.2 | Player check | done before tagging and after publishing v0.4.0 | E6.1 | D |
+| E6.3 | Windows and Linux hosts | moved to E8.5 | E6.2, D6 | S, D |
+| E7.1 | Beta release | skipped: on 2026-11-26 the maintainer chose to replace the legacy engine directly | G1-G5 | H |
+| E7.2 | Replacement release | done: v0.4.0 on 2026-11-28 | E7.1 | H |
+| E7.3 | Retire the old engine | done in 0.4.0 (LEGACY-ENGINE.md) | E7.2 | S |
 
 ## Follow-up after 0.4.0
 

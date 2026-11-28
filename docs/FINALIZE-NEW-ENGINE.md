@@ -4,6 +4,8 @@
 - **Status:** assigned on 2026-11-28. The maintainer said to get it done, with
   a public release used through PadMint as the end goal. That grants approval A
   and approval B in its publish-when-green form below.
+- **Result:** SunPad 0.4.0 and PadMint 0.6.11 were published on 2026-11-28.
+  The iPhone 14 was unavailable all day, so its checks moved to task E8.6.
 - **Replaces:** the multi-day version of this document (commit 0a1a21e) and
   tasks E6 and E7 of [DECOMP-ENGINE-PLAN.md](DECOMP-ENGINE-PLAN.md). On
   2026-11-26 the maintainer decided to replace the legacy engine entirely.
@@ -158,8 +160,8 @@ decision this document does not answer, or the next step is approval B.
 | C2 | PadMint catalog PR | 30 min | C1, approval A | done: [padmint#299](https://github.com/chrissotraidis/padmint/pull/299) |
 | C3 | Player check before tagging | 1 h | C1, D1 | done at 0439e8f with PadMint 0e4b696 (after two packaging fixes) |
 | D1 | Documentation | 2 h | B3 | done |
-| D2 | Release | 1 h | C3, approval B | blocked |
-| D3 | Afterwards | 15 min | D2 | blocked |
+| D2 | Release | 1 h | C3, approval B | done: v0.4.0 published, PadMint 0.6.11 published |
+| D3 | Afterwards | 15 min | D2 | done: compatibility row, E8 cards, report |
 
 **S0 Start checks and backups.** Confirm the worktree and the fork are clean
 and pushed, the pin matches the lock, and CI's last run result. Back up the

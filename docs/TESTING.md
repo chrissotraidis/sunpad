@@ -89,12 +89,18 @@ statistics. A healthy 30 FPS run shows 33.4 ms per frame.
 | PadMint `check-manifest`, `plan` and catalog audit | Pass |
 | PadMint `player-check.sh` with SunPad's checkout | Pass at `5de8a54` and again at `0439e8f` with PadMint `0e4b696` (28 November), after fixes to packaging (`4f6f98b`) and the audit (`5de8a54`) |
 | `release_gate.py` on the published app | Pass, 0 address-named functions (build from `9553186`) |
+| CI on PR #90 | `safety-and-tests`, `published-app` and `engine` pass at `ea4f56e`, merged as `44e8bf0` |
+| Published files of v0.4.0 (built from `44e8bf0`) | `SunPad-v0.4.0-ios-unsigned.ipa` (SHA-256 `fe6d4f92...0188`), `SunPad-v0.4.0-padmint.json` (`5c43d35e...248b`) and `SHA256SUMS` pass `release_gate.py` and `padmint audit`, 0 address-named functions. The app passes its package audit |
+| PadMint `player-check.sh` without SunPad's checkout, after publishing | Pass from PadMint `main` (`9b14cbb`): it cloned v0.4.0, downloaded the published app and built a personal IPA |
+| A copy PadMint built from the release, on the iPad Pro | Installed over 0.4.0 and played: the migrated 94-Shine save loads into Delfino Plaza at 30 FPS, and the card is unchanged |
+| PadMint | 0.6.11 published with SunPad's new catalog entry (Mac only), its files passing both gates |
+| iPhone 14 | Not checked: unavailable to the Mac all day |
 | Upgrade over 0.3.3 on the iPad Pro | Pass. The save migrated byte for byte, the Dolphin card is unchanged, file select shows the iPad's files (1 and 94 Shines), and the 94-Shine file loads into Delfino Plaza at 30 FPS with the iPad's touch layout and 2× setting. Loading didn't change the card |
 | Save cycle on the iPad Pro | Pass on a scratch card (`SMS_SAVE_DIR`): a new file saved from the Delfino Plaza pause menu, the card changed, and a relaunch showed file A with 1 Shine where it had shown New |
 | Sirena Beach on the iPad Pro | 33.4 ms per frame at 2× with up to 119 render passes, nominal thermal state |
 
-[FINALIZE-NEW-ENGINE.md](FINALIZE-NEW-ENGINE.md) lists the checks still to
-run before publishing, and this table gains their results.
+SunPad 0.4.0 was published on 28 November 2026
+([release](https://github.com/chrissotraidis/sunpad/releases/tag/v0.4.0)).
 
 ## Hands-on checklist
 

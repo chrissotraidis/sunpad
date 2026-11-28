@@ -53,8 +53,8 @@ Last updated: 28 November 2026, for SunPad 0.4.0. Issues of the legacy engine
 
 ## Not checked yet
 
-14. The iPhone 14 hasn't run 0.4.0 build 22 or the save cycle yet. It ran the
-    same engine as SunPad Next on 23 and 26 November.
+14. The iPhone 14 hasn't run the released 0.4.0 or its save cycle yet. It ran
+    the same engine as SunPad Next on 23 and 26 November.
 15. External displays, wired controllers, reconnecting a controller after the
     device sleeps, and long sessions for heat and battery.
 16. Issues [#12](https://github.com/chrissotraidis/sunpad/issues/12) (slowdowns)
