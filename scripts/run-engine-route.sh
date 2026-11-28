@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runs a scripted route in SunPad Next on a Simulator or a device and prints
+# Runs a scripted route in SunPad on a Simulator or a device and prints
 # the engine's frame times (docs/DECOMP-ENGINE-PLAN.md, E4.1).
 # usage: run-engine-route.sh DEVICE_OR_SIMULATOR_ID plaza|bianco|ricco|gelato [SECONDS]
 # The route is the regress plaza input: a new file on file A, then SMS_WARP
@@ -9,7 +9,7 @@ set -euo pipefail
 TARGET="${1:?device or Simulator identifier}"
 ROUTE="${2:?route}"
 SECONDS_TO_RUN="${3:-150}"
-BUNDLE="com.sunpad.SunPad.next"
+BUNDLE="com.sunpad.SunPad"
 LOG="Library/Application Support/SunPad/Logs/Engine.log"
 case "$ROUTE" in
   plaza) WARP="1,0,1" ;;

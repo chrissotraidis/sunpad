@@ -1,5 +1,5 @@
 #!/bin/sh
-# Xcode's "Embed Engine" phase of the SunPadNext target. Development builds
+# Xcode's "Embed Engine" phase of the SunPad target. Development builds
 # only (SUNPAD_EMBED_ENGINE=YES): the published app carries no game code, and
 # PadMint adds the engine it builds on the player's computer.
 set -eu

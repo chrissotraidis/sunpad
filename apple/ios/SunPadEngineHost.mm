@@ -1,5 +1,5 @@
 // SunPadCoreHost on the decompilation engine (docs/DECOMP-ENGINE-PLAN.md, E3.1).
-// The SunPad Next target builds this file in place of SunPadCoreHost.mm, so
+// The SunPad target builds this file in place of SunPadCoreHost.mm, so
 // the game view controller and overlay keep their wiring. The engine is
 // libsms_embed.dylib, which PadMint builds on the player's computer and adds
 // to the app; MoltenVK is linked into the app.

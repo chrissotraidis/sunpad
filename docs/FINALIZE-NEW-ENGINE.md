@@ -75,7 +75,7 @@ The loop asks at alignment for **approval A**, and stops once for
 
 ## Rules
 
-- Work in `/Users/chrissotraidis/.codex/worktrees/sunpad-engine-plan` on
+- Work in `~/.codex/worktrees/sunpad-engine-plan` on
   `codex/decomp-engine-plan` (PR #90). PadMint work goes in a worktree under
   `~/.codex/worktrees` from PadMint's `origin/main`, never in
   `~/GitHub/padforge`. Leave `~/GitHub/sunpad` untouched (it has a modified

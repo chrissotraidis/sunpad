@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Signs a development build of an app and its dylibs for one's own devices
-# (the engine probe, the harness, SunPad Next), with an Apple Development
+# (SunPad, the engine probe, the harness), with an Apple Development
 # identity and a provisioning profile that covers the bundle identifier.
 # usage: sign-dev-app.sh APP IDENTITY PROFILE
 set -euo pipefail

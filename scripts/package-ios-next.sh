@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Packages SunPad Next for iPhone and iPad (docs/DECOMP-ENGINE-PLAN.md, E3.7).
+# Packages SunPad for iPhone and iPad.
 # usage: package-ios-next.sh APP ENGINE|none [OUTPUT.ipa]
-#   APP     a built SunPadNext.app, or the published SunPad Next IPA
+#   APP     a built SunPad.app, or the published SunPad IPA
 #   ENGINE  the player's libsms_embed.dylib, or "none" for the published app,
 #           which carries no game code
 # Both are audited; the IPA is unsigned and must be signed before installing.
@@ -11,7 +11,7 @@ APP="${1:?usage: package-ios-next.sh APP ENGINE|none [OUTPUT.ipa]}"
 ENGINE="${2:?usage: package-ios-next.sh APP ENGINE|none [OUTPUT.ipa]}"
 VERSION="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["version"])' "$ROOT/version.json")"
 KIND="$([[ "$ENGINE" = none ]] && echo unsigned || echo personal-unsigned)"
-OUTPUT="${3:-$ROOT/artifacts/SunPad-Next-v$VERSION-ios-$KIND.ipa}"
+OUTPUT="${3:-$ROOT/artifacts/SunPad-v$VERSION-ios-$KIND.ipa}"
 MOLTENVK_LICENSE="$ROOT/ref/moltenvk/MoltenVK/LICENSE"
 WORK="$(mktemp -d "${TMPDIR:-/tmp}/sunpad-next-package.XXXXXX")"
 trap 'rm -rf "$WORK"' EXIT
@@ -19,14 +19,14 @@ fail() { echo "package-ios-next: $*" >&2; exit 1; }
 
 if [[ "$APP" = *.ipa ]]; then
   ditto -x -k "$APP" "$WORK/published"
-  APP="$WORK/published/Payload/SunPadNext.app"
+  APP="$WORK/published/Payload/SunPad.app"
   [[ ! -e "$APP/Frameworks/libsms_embed.dylib" ]] || fail "the published app already contains an engine"
 fi
 [[ -d "$APP" ]] || fail "app not found: $APP"
 [[ "$ENGINE" = none || -f "$ENGINE" ]] || fail "engine not found: $ENGINE"
 [[ -f "$MOLTENVK_LICENSE" ]] || fail "run scripts/fetch-moltenvk.sh first"
 
-STAGED="$WORK/package/Payload/SunPadNext.app"
+STAGED="$WORK/package/Payload/SunPad.app"
 mkdir -p "$(dirname "$STAGED")"
 ditto "$APP" "$STAGED"
 rm -rf "$STAGED/_CodeSignature" "$STAGED/embedded.mobileprovision" "$STAGED/SourceNotices"
@@ -43,7 +43,7 @@ mkdir -p "$STAGED/SourceNotices/licenses/MoltenVK"
 cp "$MOLTENVK_LICENSE" "$STAGED/SourceNotices/licenses/MoltenVK/LICENSE"
 
 # Audit: an arm64 iOS 16 app with MoltenVK and no game code of its own.
-EXECUTABLE="$STAGED/SunPadNext"
+EXECUTABLE="$STAGED/SunPad"
 xcrun vtool -show-build "$EXECUTABLE" | grep -q 'platform IOS$' || fail "the app is not an iOS device build"
 xcrun vtool -show-build "$EXECUTABLE" | grep -q 'minos 16.0' || fail "the app does not target iOS 16"
 nm "$EXECUTABLE" | grep -q ' _vkGetInstanceProcAddr$' || fail "the app does not contain MoltenVK"
@@ -63,7 +63,7 @@ fi
 
 find "$WORK/package" -exec touch -h -t 200001010000 {} +
 mkdir -p "$(dirname "$OUTPUT")"
-(cd "$WORK/package" && find Payload \( -type f -o -type l \) -print | LC_ALL=C sort | zip -X -q -y "$WORK/SunPadNext.ipa" -@)
-mv "$WORK/SunPadNext.ipa" "$OUTPUT"
+(cd "$WORK/package" && find Payload \( -type f -o -type l \) -print | LC_ALL=C sort | zip -X -q -y "$WORK/SunPad.ipa" -@)
+mv "$WORK/SunPad.ipa" "$OUTPUT"
 echo "IPA: $OUTPUT"
 shasum -a 256 "$OUTPUT"
