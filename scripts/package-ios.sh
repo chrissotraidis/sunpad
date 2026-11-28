@@ -4,7 +4,8 @@
 #   APP     a built SunPad.app, or the published SunPad IPA
 #   ENGINE  the player's libsms_embed.dylib, or "none" for the published app,
 #           which carries no game code
-# Both are audited; the IPA is unsigned and must be signed before installing.
+# Both are audited (audit-ios-package.sh); the IPA is unsigned and must be
+# signed before installing.
 set -euo pipefail
 ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
 APP="${1:?usage: package-ios.sh APP ENGINE|none [OUTPUT.ipa]}"
@@ -42,28 +43,14 @@ cp "$ROOT/LICENSE" "$ROOT/THIRD_PARTY_NOTICES.md" "$ROOT/docs/INSTALL_IPA.md" "$
 mkdir -p "$STAGED/SourceNotices/licenses/MoltenVK"
 cp "$MOLTENVK_LICENSE" "$STAGED/SourceNotices/licenses/MoltenVK/LICENSE"
 
-# Audit: an arm64 iOS 16 app with MoltenVK and no game code of its own.
-EXECUTABLE="$STAGED/SunPad"
-xcrun vtool -show-build "$EXECUTABLE" | grep -q 'platform IOS$' || fail "the app is not an iOS device build"
-xcrun vtool -show-build "$EXECUTABLE" | grep -q 'minos 16.0' || fail "the app does not target iOS 16"
-nm "$EXECUTABLE" | grep -q ' _vkGetInstanceProcAddr$' || fail "the app does not contain MoltenVK"
-! nm "$EXECUTABLE" | grep -q -E ' _SMS_main$| _sms_embed_start$' || fail "the app contains game code"
-! find "$STAGED" \( -iname '*.iso' -o -iname '*.gcm' -o -iname '*.gci' -o -name 'gGMSE01*' \) | grep -q . ||
-  fail "the app contains game data, saves or a translated module"
-if [[ "$ENGINE" = none ]]; then
-  [[ ! -e "$STAGED/Frameworks/libsms_embed.dylib" ]] || fail "the published app contains an engine"
-else
-  LIBRARY="$STAGED/Frameworks/libsms_embed.dylib"
-  xcrun vtool -show-build "$LIBRARY" | grep -q 'platform IOS$' || fail "the engine is not an iOS device build"
-  xcrun vtool -show-build "$LIBRARY" | grep -q 'minos 16.0' || fail "the engine does not target iOS 16"
-  [[ -z "$(nm -gU "$LIBRARY" | awk '{print $3}' | grep -v '^_sms_embed_')" ]] || fail "the engine exports more than sms_embed_*"
-  [[ -z "$(otool -L "$LIBRARY" | tail -n +2 | awk '{print $1}' | grep -v -E '^(@rpath/libsms_embed.dylib|/usr/lib/libSystem.B.dylib|/usr/lib/libc\+\+.1.dylib|/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation)$')" ]] ||
-    fail "the engine links more than libSystem, libc++ and CoreFoundation"
-fi
-
 find "$WORK/package" -exec touch -h -t 200001010000 {} +
 mkdir -p "$(dirname "$OUTPUT")"
 (cd "$WORK/package" && find Payload \( -type f -o -type l \) -print | LC_ALL=C sort | zip -X -q -y "$WORK/SunPad.ipa" -@)
 mv "$WORK/SunPad.ipa" "$OUTPUT"
+if [[ "$ENGINE" = none ]]; then
+  SUNPAD_APP_ONLY=1 "$ROOT/scripts/audit-ios-package.sh" "$OUTPUT"
+else
+  "$ROOT/scripts/audit-ios-package.sh" "$OUTPUT"
+fi
 echo "IPA: $OUTPUT"
 shasum -a 256 "$OUTPUT"

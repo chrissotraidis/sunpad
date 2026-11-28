@@ -24,6 +24,8 @@ ENGINE="$ROOT/ref/sms-pc-port"
   exit 1
 }
 
+# Source and build paths in the library (assertion messages) become relative.
+PATHS="-ffile-prefix-map=$ENGINE=sms-pc-port -ffile-prefix-map=$BUILD=build"
 cmake -S "$ENGINE" -B "$BUILD" -G Ninja \
   -DCMAKE_BUILD_TYPE=RelWithDebInfo \
   -DCMAKE_SYSTEM_NAME="$SYSTEM" \
@@ -36,6 +38,11 @@ cmake -S "$ENGINE" -B "$BUILD" -G Ninja \
   -DCMAKE_RANLIB=/usr/bin/ranlib \
   -DSMS_ARCH=64 \
   -DSMS_EMBED=ON \
-  -DSMS_GX_BUILD_TESTS=OFF
+  -DSMS_GX_BUILD_TESTS=OFF \
+  -DCMAKE_C_FLAGS="$PATHS" \
+  -DCMAKE_CXX_FLAGS="$PATHS"
 cmake --build "$BUILD" --target sms
+# Debug information stays in the build folder: a player's copy carries no paths
+# from the computer that built it.
+strip -S "$BUILD/libsms_embed.dylib"
 echo "$BUILD/libsms_embed.dylib"
