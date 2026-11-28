@@ -738,3 +738,31 @@ Cards, in the order done ([FINALIZE-NEW-ENGINE.md](FINALIZE-NEW-ENGINE.md)):
   published app and a player copy (published app plus the device engine) pass.
 - C1: padmint.json is an upstream-engine recipe with the disc chosen in the
   app, Mac only, Homebrew LLVM as a player tool. PadMint check-manifest passes.
+- C2: PadMint branch codex/sunpad-0.4.0-engine (328c5e8), PR padmint#299:
+  catalog entry for the new engine (iOS on Apple silicon Macs, Windows and
+  Linux notes, the disc imported in the app, brew install cmake ninja llvm)
+  and the COMPATIBILITY row. audit-catalog --recipe and the catalog tests pass.
+- C3: player-check.sh from the C2 branch, Apple's Python 3.9 and an empty
+  PadMint folder. Run 1 stopped at packaging: the recipe bootstraps without
+  MoltenVK, which package-ios.sh wanted for its license. package-ios.sh now
+  reuses the license the published app carries (4f6f98b). Run 2 failed the
+  audit's MoltenVK check: nm piped into grep -q under pipefail fails when grep
+  stops early (CI showed the same, "IO failure on output stream: Broken pipe").
+  The audit reads each tool's output whole first (5de8a54). Run 3 passed at
+  5de8a54 and built a personal IPA (SHA-256 9c07c42f...6229).
+- D1: README and every current document rewritten for the new engine
+  (9553186), RELEASE-0.4.0.md written, legacy-era documents given a dated
+  history note with their links to rewritten pages moved to
+  legacy-engine-final. config/dependency-migration.json removed (c376fd7) and
+  app comments updated (5b831a5). check-repository.sh passes, and every local
+  link and anchor resolves.
+- B2 (part): the signed 0.4.0 Release build (engine bd9936f) installed over
+  SunPad 0.3.3 on the iPad after a fresh backup
+  (~/.codex/scratch/backup-2026-11-28-ipad-b2, save identical to S0). First
+  launch created Engine/card-a: its .dat and direntry match the 0.3.3 GCI byte
+  for byte, and the Dolphin card's hashes are unchanged. The app booted to the
+  engine, then paused behind iOS's "Unable to Verify App": the iPad's VPN
+  keeps it from checking the developer certificate. Not checked yet: loading
+  the save in game, settings and Remove Stored Game Data.
+- The published app built from 9553186 passes its audit and release_gate.py
+  (0 address-named functions).
