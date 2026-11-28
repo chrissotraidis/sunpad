@@ -1,7 +1,9 @@
 # Goal loop: SunPad 0.4.0 on the new engine, in one day
 
 - **Date:** 2026-11-28
-- **Status:** for alignment. Nothing below has started.
+- **Status:** assigned on 2026-11-28. The maintainer said to get it done, with
+  a public release used through PadMint as the end goal. That grants approval A
+  and approval B in its publish-when-green form below.
 - **Replaces:** the multi-day version of this document (commit 0a1a21e) and
   tasks E6 and E7 of [DECOMP-ENGINE-PLAN.md](DECOMP-ENGINE-PLAN.md). On
   2026-11-26 the maintainer decided to replace the legacy engine entirely.
@@ -13,12 +15,12 @@ as its only engine, built through PadMint and installing over 0.3.x with saves
 and settings kept. Before the legacy engine leaves the repository, record it
 completely and tag its last commit, so it can be restored later.
 
-Short form for assigning:
+Short form:
 
-> Release SunPad 0.4.0 on the decompilation engine today, following
-> docs/FINALIZE-NEW-ENGINE.md in chrissotraidis/sunpad. Keep to its scope,
-> time boxes and cut rules, record and tag the legacy engine before removing
-> it, and stop only at the approval points it names.
+> Release SunPad 0.4.0 on the decompilation engine, usable through PadMint,
+> following docs/FINALIZE-NEW-ENGINE.md in chrissotraidis/sunpad: record and
+> tag the legacy engine, remove it, update PadMint, rewrite the docs, and
+> publish once every check before publishing passes.
 
 ## Done when
 
@@ -66,10 +68,10 @@ The loop asks at alignment for **approval A**, and stops once for
 
 - **Approval A, at alignment:** push the tag `legacy-engine-final` and the
   branch `legacy-engine` on `72c101a`, and open (not merge) a PadMint PR.
-- **Approval B, at the end:** merge PR #90 and the PadMint PR, tag and publish
-  v0.4.0, and release PadMint if the catalog change needs it. The maintainer
-  can instead approve publishing as soon as every check before it passes, and
-  then the loop finishes without stopping.
+- **Approval B, publish when green:** merge PR #90 and the PadMint PR, tag and
+  publish v0.4.0, and release PadMint if the catalog change needs it, once S0
+  to C3 are done and their checks pass. Granted on 2026-11-28. A failed check
+  stops the loop before this point.
 
 ## Rules
 
@@ -87,6 +89,10 @@ The loop asks at alignment for **approval A**, and stops once for
 - Test launches end the session open on that device. Close test apps and shut
   down Simulators afterwards, and leave Simulators already running alone.
 - Recheck every menu item's wiring after changing the app's menu.
+- A locked or disconnected device: ask the maintainer to unlock it, say which
+  card needs it, and continue with cards that do not.
+- Installing over SunPad 0.3.3 fails on signing: stop B2, never uninstall,
+  and ask. B3 waits for B2.
 - Record source, CI, device and release results separately.
 
 ## Schedule
