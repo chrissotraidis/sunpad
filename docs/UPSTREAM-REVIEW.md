@@ -27,7 +27,7 @@ full-game certification.
 ## Source and JIT evidence
 
 The [lock](../config/dependencies.lock.json) records exact fork commits and upstream
-bases. The [migration record](../config/dependency-migration.json) maps all five
+bases. The [migration record](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/config/dependency-migration.json) maps all five
 historical snapshots to source commits. Each lane preserves the corresponding
 applied source tree. Deliberate graph-only changes select maintained RecompCore and
 DolRecomp URLs and nested commits. Upstream history, licenses and contributor

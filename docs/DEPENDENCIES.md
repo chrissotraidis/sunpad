@@ -28,7 +28,7 @@ DolRecomp. The template is a third root submodule. Runtime/compiler origins are
 [DolRecomp](https://github.com/ExpansionPak/DolRecomp). See [credits](../CREDITS.md).
 
 The [dependency lock](../config/dependencies.lock.json) records upstream bases and
-URLs. The [migration record](../config/dependency-migration.json) maps historical
+URLs. The [migration record](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/config/dependency-migration.json) maps historical
 patch hashes to fork commits. Historical patches remain for older release and
 external donor references, not as a second maintained build path.
 

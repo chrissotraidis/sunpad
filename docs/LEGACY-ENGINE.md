@@ -218,7 +218,8 @@ Removed from `main` for 0.4.0, in the commits listed under
 - **Gitlinks and lock entries:** `ref/ModernGekko`, `ref/ModernGekko-tvOS`,
   `ref/ModernGekko-Template` and their nested repositories.
 - **Patches:** `patches/` (`ModernGekko/`, `ModernGekko-dolphin/`,
-  `README.md`).
+  `README.md`), and `config/dependency-migration.json`, which mapped their
+  hashes to fork commits.
 - **App:** `apple/ios/SunPadCoreHost.mm`, `apple/ios/SunPadDiscExtractor.{h,mm}`,
   `apple/shared/SunPadInputPipeEncoder.{h,mm}`, `apple/tvos/` and the
   `SunPadTV` target, `apple/macos/SunPad`, `default-config.ini`,
