@@ -649,7 +649,7 @@ investment.
 
 Repository and pinned-source evidence:
 
-- [`scripts/ios-build-core-device.sh`](../scripts/ios-build-core-device.sh) -
+- [`scripts/ios-build-core-device.sh`](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/scripts/ios-build-core-device.sh) -
   current separate core/module cross-build shape
 - [`apple/ios/SunPadCoreHost.mm`](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/apple/ios/SunPadCoreHost.mm) - runtime
   configuration, module loading, input pipe, lifecycle, and audio ownership

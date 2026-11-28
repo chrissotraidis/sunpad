@@ -7,20 +7,15 @@ cd "$ROOT"
 git diff --check
 python3 scripts/dependency-lock.py
 python3 tests/test_dependency_lock.py
-python3 tests/test_build_jobs.py
-python3 tests/test_package_output.py
-python3 tests/test_gcpipe.py
-python3 tests/test_bench_route.py
-python3 tests/test_windows_build.py
 ./tests/test-ipa-module.sh
 
-for script in scripts/*.sh tests/*.sh apple/macos/SunPad apple/macos/next/SunPadNext; do
+for script in scripts/*.sh tests/*.sh apple/macos/next/SunPadNext; do
   bash -n "$script"
 done
 
 python3 -c 'import ast,pathlib; [ast.parse(p.read_text(), filename=str(p)) for p in pathlib.Path("scripts").glob("**/*.py")]'
 python3 -c 'import json,pathlib; [json.loads(p.read_text()) for p in pathlib.Path("apple").glob("**/Assets.xcassets/**/Contents.json")]'
-plutil -lint apple/ios/Info.plist apple/macos/Info.plist apple/macos/next/Info.plist
+plutil -lint apple/ios/Info.plist apple/macos/next/Info.plist
 [[ "$(plutil -extract LSApplicationCategoryType raw apple/ios/Info.plist)" == "public.app-category.games" ]] || { echo "check-repository.sh: check failed (line 22)" >&2; exit 1; }
 [[ "$(plutil -extract LSSupportsGameMode raw apple/ios/Info.plist)" == "true" ]] || { echo "check-repository.sh: check failed (line 23)" >&2; exit 1; }
 [[ "$(plutil -extract GCSupportsGameMode raw apple/ios/Info.plist)" == "true" ]] || { echo "check-repository.sh: check failed (line 24)" >&2; exit 1; }
@@ -30,14 +25,11 @@ plutil -lint apple/ios/Info.plist apple/macos/Info.plist apple/macos/next/Info.p
 ./tests/test-controller-rumble.sh
 ./tests/test-controller-mapping.sh
 ./tests/test-controller-slots.sh
-./tests/test-generated-gmse01-audit.sh
 ./tests/test-diagnostics.sh
 ./tests/test-engine-bridge.sh
 ./tests/test-engine-saves.sh
 ./tests/test-game-data-setup.sh
-./tests/test-profile-tools.sh
 
-test -x scripts/package-ios.sh
 test -x scripts/package-ios-next.sh
 test -x scripts/audit-ios-package.sh
 
