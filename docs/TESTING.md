@@ -86,7 +86,7 @@ statistics. A healthy 30 FPS run shows 33.4 ms per frame.
 | `check-repository.sh` and `dependency-lock.py` | Pass after every removal commit |
 | Published app and player copy audits | Pass |
 | PadMint `check-manifest`, `plan` and catalog audit | Pass |
-| PadMint `player-check.sh` with SunPad's checkout | Pass at `5de8a54` (28 November), after fixes to packaging (`4f6f98b`) and the audit (`5de8a54`) |
+| PadMint `player-check.sh` with SunPad's checkout | Pass at `5de8a54` and again at `0439e8f` with PadMint `0e4b696` (28 November), after fixes to packaging (`4f6f98b`) and the audit (`5de8a54`) |
 | `release_gate.py` on the published app | Pass, 0 address-named functions (build from `9553186`) |
 | Upgrade over 0.3.3 on the iPad Pro | Installed. The save migrated byte for byte and the Dolphin card is unchanged. Loading it in game is waiting for iOS to verify the developer certificate |
 

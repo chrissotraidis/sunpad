@@ -781,5 +781,8 @@ Cards, in the order done ([FINALIZE-NEW-ENGINE.md](FINALIZE-NEW-ENGINE.md)):
   33.4 ms in the same scene on the M3 Max with 105 to 118 render passes and
   0.08 ms of GPU wait per frame, which points at the Simulator's graphics path.
   The iPhone 14 is still unavailable for the device part.
+- C3 again: player-check.sh from PadMint 0e4b696 passed at 0439e8f, the commit
+  to merge apart from these notes. Its personal IPA (SHA-256 6d80fd2c...8f14)
+  is kept for the device check.
 - CI passes on e0a2dca (safety-and-tests, published-app, engine). The two
   earlier failures were the audit's grep -q under pipefail, fixed in 5de8a54.
