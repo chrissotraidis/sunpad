@@ -1,21 +1,21 @@
 #!/usr/bin/env bash
 # Packages SunPad for iPhone and iPad.
-# usage: package-ios-next.sh APP ENGINE|none [OUTPUT.ipa]
+# usage: package-ios.sh APP ENGINE|none [OUTPUT.ipa]
 #   APP     a built SunPad.app, or the published SunPad IPA
 #   ENGINE  the player's libsms_embed.dylib, or "none" for the published app,
 #           which carries no game code
 # Both are audited; the IPA is unsigned and must be signed before installing.
 set -euo pipefail
 ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
-APP="${1:?usage: package-ios-next.sh APP ENGINE|none [OUTPUT.ipa]}"
-ENGINE="${2:?usage: package-ios-next.sh APP ENGINE|none [OUTPUT.ipa]}"
+APP="${1:?usage: package-ios.sh APP ENGINE|none [OUTPUT.ipa]}"
+ENGINE="${2:?usage: package-ios.sh APP ENGINE|none [OUTPUT.ipa]}"
 VERSION="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["version"])' "$ROOT/version.json")"
 KIND="$([[ "$ENGINE" = none ]] && echo unsigned || echo personal-unsigned)"
 OUTPUT="${3:-$ROOT/artifacts/SunPad-v$VERSION-ios-$KIND.ipa}"
 MOLTENVK_LICENSE="$ROOT/ref/moltenvk/MoltenVK/LICENSE"
-WORK="$(mktemp -d "${TMPDIR:-/tmp}/sunpad-next-package.XXXXXX")"
+WORK="$(mktemp -d "${TMPDIR:-/tmp}/sunpad-package.XXXXXX")"
 trap 'rm -rf "$WORK"' EXIT
-fail() { echo "package-ios-next: $*" >&2; exit 1; }
+fail() { echo "package-ios: $*" >&2; exit 1; }
 
 if [[ "$APP" = *.ipa ]]; then
   ditto -x -k "$APP" "$WORK/published"

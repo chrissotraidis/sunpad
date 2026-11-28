@@ -30,7 +30,8 @@ plutil -lint apple/ios/Info.plist apple/macos/next/Info.plist
 ./tests/test-engine-saves.sh
 ./tests/test-game-data-setup.sh
 
-test -x scripts/package-ios-next.sh
+test -x scripts/package-ios.sh
+test -x scripts/build-ios-app.sh
 test -x scripts/audit-ios-package.sh
 
 # Only the declared gitlinks may occupy the private reference area.
