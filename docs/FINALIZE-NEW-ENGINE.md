@@ -147,7 +147,7 @@ decision this document does not answer, or the next step is approval B.
 | --- | --- | --- | --- | --- |
 | S0 | Start checks and backups | 30 min | — | done (iPhone backup pending) |
 | A1 | Save cycle on a device | 1 h | S0 | done in the Simulator, device check before D2 |
-| A3 | Every area plays | 1 h | S0 | ready |
+| A3 | Every area plays | 1 h | S0 | every area plays in the Simulator, Sirena Beach slow there. Device run before D2 |
 | R1 | Legacy record | 1.5 h | S0 | done |
 | R2 | Legacy tag and branch | 10 min | R1, approval A | done |
 | B1 | The engine becomes the SunPad app | 1 h | A1 | done |

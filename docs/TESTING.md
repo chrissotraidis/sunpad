@@ -77,6 +77,7 @@ statistics. A healthy 30 FPS run shows 33.4 ms per frame.
 | 23 Nov 2026 | iPhone 14 (A15), iOS 27.2.1 | SunPad Next, engine `bd9936f` | Memory probe: game memory at `0x7000000000`, limit `0x7180000000`. Delfino Plaza and Bianco Hills at 33.4 ms per frame at 1×. Bianco Hills from a cold cache made 164 pipelines in the background, slowest frame in play 37 ms |
 | 26 Nov 2026 | iPhone 14 | SunPad Next, engine `bd9936f` | The maintainer played and found it substantially better than 0.3.3. Slowest area-load frame 232.8 ms (130 texture uploads) |
 | 28 Nov 2026 | iOS Simulator (iPhone 17e) | SunPad 0.4.0 build 22 | Plaza route at 33.4 ms per frame. Save from the pause menu on a scratch card, relaunch showed file A with one Shine, load left the card unchanged, GCI export and import byte-identical |
+| 28 Nov 2026 | iOS Simulator (iPhone 17e) | SunPad 0.4.0 build 22 | Every area from a new game (`SMS_WARP=0..9,0`, `SMS_WARP_DIRECT=1`, scratch card, 55 s each): Airstrip, Delfino Plaza, Bianco Hills, Ricco Harbor, Gelato Beach, Pinna Park, Sirena Beach, Delfino Hotel, Pianta Village and Noki Bay load and draw correctly with no fault. All held 33.4 ms per frame except Sirena Beach, at 47 to 69 ms with up to 122 render passes per frame, the game waiting up to 365 ms on the renderer thread |
 
 ## SunPad 0.4.0 release checks
 

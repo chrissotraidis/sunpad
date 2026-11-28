@@ -31,33 +31,36 @@ Last updated: 28 November 2026, for SunPad 0.4.0. Issues of the legacy engine
 7. **QuickTime screen mirroring pauses the game.** Mirroring takes the audio
    route, which iOS reports as an audio interruption without an end, so the
    engine stays paused until SunPad returns to the foreground.
+8. **Sirena Beach ran slowly in the iOS Simulator.** On 28 November 2026 it
+   took 47 to 69 ms per frame there (every other area held 33.4 ms), with up to
+   122 render passes per frame. It hasn't been measured on a device yet.
 
 ## Platforms and building
 
-8. **PadMint builds SunPad only on Apple silicon Macs.** Windows and Linux PCs
+9. **PadMint builds SunPad only on Apple silicon Macs.** Windows and Linux PCs
    can't make 0.4.0 yet. PadMint says so on those hosts.
-9. **Homebrew LLVM is required.** The engine needs a compiler that loads its
+10. **Homebrew LLVM is required.** The engine needs a compiler that loads its
    pointer pass, and Apple's Clang can't. Players run `brew install cmake
    ninja llvm` once.
-10. **No Mac or Apple TV app on the new engine yet.** Copies of 0.3.x keep
+11. **No Mac or Apple TV app on the new engine yet.** Copies of 0.3.x keep
     working. See [MACOS.md](MACOS.md) and [TVOS.md](TVOS.md).
-11. **LiveContainer is unverified** ([install guide](INSTALL_IPA.md#livecontainer-status)).
+12. **LiveContainer is unverified** ([install guide](INSTALL_IPA.md#livecontainer-status)).
 
 ## Upgrading
 
-12. **The extracted copy 0.3.x kept stays until you remove it.** About 1.4 GB
+13. **The extracted copy 0.3.x kept stays until you remove it.** About 1.4 GB
     in `GameData/GMSE01`, freed by a reimport or **Remove Stored Game Data**.
-13. **Going back to 0.3.x doesn't bring 0.4.0's progress.** The 0.3.x save
+14. **Going back to 0.3.x doesn't bring 0.4.0's progress.** The 0.3.x save
     files stay as they were. Export Saves on 0.4.0 and Import Dolphin Save on
     0.3.x carry newer progress back.
 
 ## Not checked yet
 
-14. A save, quit and reload in game on a device (passed in the iOS Simulator,
+15. A save, quit and reload in game on a device (passed in the iOS Simulator,
     and a real 0.3.x save migrated byte for byte on the iPad Pro).
-15. External displays, wired controllers, reconnecting a controller after the
+16. External displays, wired controllers, reconnecting a controller after the
     device sleeps, and long sessions for heat and battery.
-16. Issues [#12](https://github.com/chrissotraidis/sunpad/issues/12) (slowdowns)
+17. Issues [#12](https://github.com/chrissotraidis/sunpad/issues/12) (slowdowns)
     and [#54](https://github.com/chrissotraidis/sunpad/issues/54) (the app
     won't launch) were reported on the legacy engine. Their reporters haven't
     tried 0.4.0.

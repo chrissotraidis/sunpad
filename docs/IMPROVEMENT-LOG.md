@@ -739,9 +739,12 @@ Cards, in the order done ([FINALIZE-NEW-ENGINE.md](FINALIZE-NEW-ENGINE.md)):
 - C1: padmint.json is an upstream-engine recipe with the disc chosen in the
   app, Mac only, Homebrew LLVM as a player tool. PadMint check-manifest passes.
 - C2: PadMint branch codex/sunpad-0.4.0-engine (328c5e8), PR padmint#299:
-  catalog entry for the new engine (iOS on Apple silicon Macs, Windows and
-  Linux notes, the disc imported in the app, brew install cmake ninja llvm)
-  and the COMPATIBILITY row. audit-catalog --recipe and the catalog tests pass.
+  catalog entry for the new engine (iOS on Apple silicon Macs, the disc
+  imported in the app, brew install cmake ninja llvm) and the COMPATIBILITY
+  row. 0e4b696 drops ios_hosts, so Windows and Linux show SunPad under "Needs
+  Apple Silicon Mac" like other Mac-only games: with an explicit host list the
+  page had switched its headings, which failed test_later. audit-catalog
+  --recipe and all 539 tests pass on Apple's Python.
 - C3: player-check.sh from the C2 branch, Apple's Python 3.9 and an empty
   PadMint folder. Run 1 stopped at packaging: the recipe bootstraps without
   MoltenVK, which package-ios.sh wanted for its license. package-ios.sh now
@@ -766,3 +769,14 @@ Cards, in the order done ([FINALIZE-NEW-ENGINE.md](FINALIZE-NEW-ENGINE.md)):
   the save in game, settings and Remove Stored Game Data.
 - The published app built from 9553186 passes its audit and release_gate.py
   (0 address-named functions).
+- A3 (Simulator part): every area from a new game in the iOS Simulator
+  (SMS_WARP=0..9,0 with SMS_WARP_DIRECT=1, a scratch card, 55 s each): the
+  Airstrip, Delfino Plaza, Bianco Hills, Ricco Harbor, Gelato Beach, Pinna
+  Park, Sirena Beach, the Delfino Hotel, Pianta Village and Noki Bay load and
+  draw correctly with no fault (screenshots in ~/.codex/scratch/a3-sim). All
+  hold 33.4 ms per frame except Sirena Beach: 47 to 69 ms, up to 122 render
+  passes per frame, the game waiting up to 365 ms on the renderer thread.
+  Sirena Beach is on every playthrough's path, so it is measured on a device
+  before D2. The iPhone 14 is still unavailable for the device part.
+- CI passes on e0a2dca (safety-and-tests, published-app, engine). The two
+  earlier failures were the audit's grep -q under pipefail, fixed in 5de8a54.
