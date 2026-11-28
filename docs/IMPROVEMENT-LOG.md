@@ -784,5 +784,23 @@ Cards, in the order done ([FINALIZE-NEW-ENGINE.md](FINALIZE-NEW-ENGINE.md)):
 - C3 again: player-check.sh from PadMint 0e4b696 passed at 0439e8f, the commit
   to merge apart from these notes. Its personal IPA (SHA-256 6d80fd2c...8f14)
   is kept for the device check.
+- B2: passed on the iPad once it could verify the developer again (19:22).
+  File select showed the migrated files (1 and 94 Shines), and the 94-Shine
+  file loaded into Delfino Plaza at 30 FPS (94 Shines, 59 blue coins, 24
+  lives) with the iPad's touch layout and its 2x setting. The engine card and
+  the Dolphin card kept their hashes. Remove Stored Game Data wasn't tapped,
+  to keep the iPad's game data: GameData holds the image and the 0.3.x
+  extracted tree (415 files under GameData/GMSE01), and the action deletes the
+  whole GameData folder (gameOverlayRequestsGameDataRemoval).
+- A1 on the iPad: on a scratch card in tmp (SMS_SAVE_DIR), a new file warped to
+  Delfino Plaza, saved from the pause menu (CONTINUE, SAVE, "Saving file...",
+  devicectl screenshots), the card's .dat changed, and a relaunch showed file A
+  with 1 Shine where the card had shown New. The reload left the scratch card
+  unchanged, and the player's card kept its hash.
+- A3 on the iPad: Sirena Beach (SMS_WARP=6,0, scratch card) held 33.4 ms per
+  frame at 2x with 110 to 119 render passes and a nominal thermal state, so
+  the Simulator's 47 to 69 ms was the Simulator. The other areas ran only in
+  the Simulator and, for the plaza and Bianco Hills, on both devices on 23
+  November. The iPhone 14 stayed unavailable all day.
 - CI passes on e0a2dca (safety-and-tests, published-app, engine). The two
   earlier failures were the audit's grep -q under pipefail, fixed in 5de8a54.

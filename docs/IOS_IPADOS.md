@@ -20,8 +20,9 @@ both on iOS and iPadOS 27.2.1, from 23 to 28 November 2026:
 | Bianco Hills at 30 FPS | Yes, 1× | Not run |
 | Hands-on play | Yes, the maintainer (26 November) | Yes, the maintainer, Xbox controller (23 November) |
 | Game memory at `0x7000000000` with no extra entitlement | Yes | Yes |
-| 0.3.x save migrated byte for byte | Not yet | Yes |
-| Save, quit and reload in game | Not yet | Not yet (passed in the iOS Simulator) |
+| 0.3.x save migrated byte for byte and loaded in game | Not yet | Yes |
+| Save, quit and reload in game | Not yet | Yes, on a scratch card |
+| Sirena Beach at 30 FPS | Not run | Yes, 2× |
 
 [TESTING.md](TESTING.md) has the full record and what remains.
 

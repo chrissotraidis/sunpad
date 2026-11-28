@@ -82,8 +82,9 @@ SunPad 0.4.0's engine:
   maintainer's play session, at 1x on the iPhone and 2x and 4x on the iPad.
 - made shaders the device had not seen before in the background, so a first
   visit to an area shows new objects a moment late instead of stopping.
-- migrated a real 0.3.x save byte for byte on the iPad, and saved and reloaded
-  a game in the iOS Simulator.
+- updated a 0.3.x install in place on the iPad, where its saves migrated byte
+  for byte and a 94-Shine file loaded in game, and saved and reloaded a new
+  file there.
 
 The legacy engine ran the iPhone 14 at 23 to 27 FPS. Short hitches (up to about
 230 ms) remain when an area loads. **Original 30 FPS is the supported default.**

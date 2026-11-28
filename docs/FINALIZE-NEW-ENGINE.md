@@ -145,13 +145,13 @@ decision this document does not answer, or the next step is approval B.
 
 | ID | Card | Box | Needs | Status |
 | --- | --- | --- | --- | --- |
-| S0 | Start checks and backups | 30 min | — | done (iPhone backup pending) |
-| A1 | Save cycle on a device | 1 h | S0 | done in the Simulator, device check before D2 |
-| A3 | Every area plays | 1 h | S0 | every area plays in the Simulator, Sirena Beach slow there. Device run before D2 |
+| S0 | Start checks and backups | 30 min | — | done (the iPhone was unavailable all day, so it has no backup) |
+| A1 | Save cycle on a device | 1 h | S0 | done on the iPad (scratch card) and in the Simulator |
+| A3 | Every area plays | 1 h | S0 | every area in the Simulator, Sirena Beach at 30 FPS on the iPad. iPhone unavailable |
 | R1 | Legacy record | 1.5 h | S0 | done |
 | R2 | Legacy tag and branch | 10 min | R1, approval A | done |
 | B1 | The engine becomes the SunPad app | 1 h | A1 | done |
-| B2 | Upgrade over 0.3.3 on the iPad | 30 min | B1 | installed over 0.3.3 on the iPad: save migrated byte for byte, Dolphin card unchanged. In-game check waits for iOS to verify the developer |
+| B2 | Upgrade over 0.3.3 on the iPad | 30 min | B1 | done on the iPad: saves migrate and load in game, settings kept |
 | B3 | Remove the legacy engine | 1 h | B2, R2 | done |
 | B4 | Published app and its audits | 30 min | B3 | done |
 | C1 | PadMint recipe | 1 h | B4 | done: PadMint check-manifest, plan and a player-check build pass |
