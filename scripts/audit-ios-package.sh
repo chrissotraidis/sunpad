@@ -48,10 +48,14 @@ engine="$app/Frameworks/libsms_embed.dylib"
 [[ "$(find "$extract_root/Payload" -mindepth 1 -maxdepth 1 -type d -name '*.app' | wc -l | tr -d ' ')" = 1 ]] ||
   fail "IPA must contain exactly one app"
 [[ "$(lipo -archs "$executable")" = arm64 ]] || fail "app is not arm64-only"
-vtool -show-build "$executable" | grep -Eq 'platform +IOS$' || fail "app is not an iPhoneOS product"
-vtool -show-build "$executable" | grep -Eq 'minos +16\.0$' || fail "app minimum OS is not iOS 16.0"
-nm "$executable" | grep -q ' _vkGetInstanceProcAddr$' || fail "the app does not contain MoltenVK"
-! nm "$executable" | grep -q -E ' _SMS_main$| _sms_embed_start$' || fail "the app contains game code"
+# Each tool's output is read whole before it is searched: under pipefail, grep -q
+# stopping early would fail the check whenever the tool is still writing.
+app_build="$(vtool -show-build "$executable")"
+app_symbols="$(nm "$executable")"
+grep -Eq 'platform +IOS$' <<<"$app_build" || fail "app is not an iPhoneOS product"
+grep -Eq 'minos +16\.0$' <<<"$app_build" || fail "app minimum OS is not iOS 16.0"
+grep -q ' _vkGetInstanceProcAddr$' <<<"$app_symbols" || fail "the app does not contain MoltenVK"
+! grep -q -E ' _SMS_main$| _sms_embed_start$' <<<"$app_symbols" || fail "the app contains game code"
 plist() { /usr/libexec/PlistBuddy -c "Print :$1" "$app/Info.plist"; }
 [[ "$(plist CFBundleIdentifier)" = com.sunpad.SunPad ]] || fail "unexpected bundle identifier"
 [[ "$(plist CFBundleDisplayName)" = SunPad ]] || fail "unexpected display name"
@@ -62,8 +66,9 @@ plist() { /usr/libexec/PlistBuddy -c "Print :$1" "$app/Info.plist"; }
 [[ "$(plist LSSupportsOpeningDocumentsInPlace)" = true ]] || fail "opening Documents in place is not enabled"
 if [[ "$APP_ONLY" != 1 ]]; then
   [[ "$(lipo -archs "$engine")" = arm64 ]] || fail "the engine is not arm64-only"
-  vtool -show-build "$engine" | grep -Eq 'platform +IOS$' || fail "the engine is not an iPhoneOS product"
-  vtool -show-build "$engine" | grep -Eq 'minos +16\.0$' || fail "the engine does not target iOS 16.0"
+  engine_build="$(vtool -show-build "$engine")"
+  grep -Eq 'platform +IOS$' <<<"$engine_build" || fail "the engine is not an iPhoneOS product"
+  grep -Eq 'minos +16\.0$' <<<"$engine_build" || fail "the engine does not target iOS 16.0"
   [[ -z "$(nm -gU "$engine" | awk '{print $3}' | grep -v '^_sms_embed_')" ]] || fail "the engine exports more than sms_embed_*"
   [[ -z "$(otool -L "$engine" | tail -n +2 | awk '{print $1}' | grep -v -E '^(@rpath/libsms_embed.dylib|/usr/lib/libSystem.B.dylib|/usr/lib/libc\+\+.1.dylib|/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation)$')" ]] ||
     fail "the engine links more than libSystem, libc++ and CoreFoundation"

@@ -29,7 +29,8 @@ PAIRS=()
 for i in "${!NAMES[@]}"; do PAIRS+=("${NAMES[i]}=${VALUES[i]}"); done
 OUT="$(mktemp -d "${TMPDIR:-/tmp}/sunpad-route.XXXXXX")"
 
-if xcrun simctl list devices | grep -q "$TARGET"; then
+SIMULATORS="$(xcrun simctl list devices)"
+if grep -q "$TARGET" <<<"$SIMULATORS"; then
   SIMULATOR_PAIRS=()
   for pair in "${PAIRS[@]}"; do SIMULATOR_PAIRS+=("SIMCTL_CHILD_$pair"); done
   env "${SIMULATOR_PAIRS[@]}" xcrun simctl launch --terminate-running-process "$TARGET" "$BUNDLE" >/dev/null
