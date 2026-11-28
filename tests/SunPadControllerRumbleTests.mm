@@ -12,7 +12,7 @@ int main(void) {
         SunPadControllerRumble *rumble = [SunPadControllerRumble sharedRumble];
         assert(rumble == [SunPadControllerRumble sharedRumble]);
 
-        // Off by default: the runtime falls back to Dolphin's own output path.
+        // Off by default: nothing rumbles until the setting allows it.
         assert(!rumble.allowed);
         assert(!SunPadSetRumble(true));
         assert(!SunPadSetRumble(false));

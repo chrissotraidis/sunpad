@@ -428,7 +428,7 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
     [self addSubview:_menuButton];
 }
 
-// The engine build's menu. The old engine keeps its own below until it retires.
+// The three-dot menu: Display, Controls, Saves, Game Data, Report a Problem.
 - (UIMenu *)buildMenu {
     __weak SunPadGameOverlay *weakSelf = self;
     SunPadSettings *settings = [SunPadSettings sharedSettings];

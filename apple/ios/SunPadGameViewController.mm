@@ -218,8 +218,8 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
     return count;
 }
 
-/* UIView whose backing layer is a CAMetalLayer: the ModernGekko Metal video
- * backend renders directly into this layer (Dolphin owns the drawable). */
+/* UIView whose backing layer is a CAMetalLayer: the engine draws into it
+ * through MoltenVK (VK_EXT_metal_surface) and owns its drawables. */
 @interface SunPadMetalSurfaceView : UIView
 + (Class)layerClass;
 @end

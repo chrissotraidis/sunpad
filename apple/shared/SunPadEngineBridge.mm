@@ -5,7 +5,7 @@
 NSDictionary<NSString *, NSString *> *SunPadEngineEnvironment(
     SunPadEngineChoices choices, NSString *engineDirectory, NSString *cacheDirectory) {
     const NSInteger scale = std::max<NSInteger>(1, std::min<NSInteger>(4, choices.renderScale));
-    // As SunPad's Dolphin engine shows them: 16:9 widens the game's camera, and
+    // As SunPad 0.3.x showed them: 16:9 widens the game's camera, and
     // Fill Screen stretches that 16:9 picture to the screen. Both leave out the
     // heat-wave shimmer, as SunPad's wide modes always have.
     NSString *widescreen = choices.aspectRatio == SunPadAspectRatioOriginal ? @"0" : @"16:9";
