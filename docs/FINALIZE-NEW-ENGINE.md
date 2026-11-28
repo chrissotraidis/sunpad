@@ -149,12 +149,12 @@ decision this document does not answer, or the next step is approval B.
 | A1 | Save cycle on a device | 1 h | S0 | done in the Simulator, device check before D2 |
 | A3 | Every area plays | 1 h | S0 | ready |
 | R1 | Legacy record | 1.5 h | S0 | done |
-| R2 | Legacy tag and branch | 10 min | R1, approval A | waiting |
-| B1 | The engine becomes the SunPad app | 1 h | A1 | blocked |
-| B2 | Upgrade over 0.3.3 on the iPad | 30 min | B1 | blocked |
-| B3 | Remove the legacy engine | 1 h | B2, R2 | blocked |
-| B4 | Published app and its audits | 30 min | B3 | blocked |
-| C1 | PadMint recipe | 1 h | B4 | blocked |
+| R2 | Legacy tag and branch | 10 min | R1, approval A | done |
+| B1 | The engine becomes the SunPad app | 1 h | A1 | done |
+| B2 | Upgrade over 0.3.3 on the iPad | 30 min | B1 | waiting for the iPad to reach the internet, before D2 |
+| B3 | Remove the legacy engine | 1 h | B2, R2 | done |
+| B4 | Published app and its audits | 30 min | B3 | done |
+| C1 | PadMint recipe | 1 h | B4 | done (device build pending) |
 | C2 | PadMint catalog PR | 30 min | C1, approval A | blocked |
 | C3 | Player check before tagging | 1 h | C1, D1 | blocked |
 | D1 | Documentation | 2 h | B3 | blocked |

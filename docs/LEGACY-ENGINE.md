@@ -273,4 +273,17 @@ gitlinks from the restored lock. Restore PadMint's catalog entry as above.
 
 | Order | Commit | What it reverts |
 | --- | --- | --- |
-| — | to be filled in by card B3 | — |
+| 1 | `2576d0d` | PadMint recipe for the new engine (or restore [legacy/padmint.json](legacy/padmint.json)) |
+| 2 | `25260e3` | The engine-layout package audit |
+| 3 | `d7251ea` | CI for the published app and the engine |
+| 4 | `dd0c46f` | `package-ios.sh` and `build-ios-app.sh` for the engine app |
+| 5 | `9ead6ca` | Gitlinks, lock entries and `patches/` |
+| 6 | `d40ec83` | Legacy build scripts and tests |
+| 7 | `f2cc059` | Legacy app code (host, extractor, input pipe, legacy menu) |
+| 8 | `44a305e` | The Apple TV app |
+| 9 | `ef1856c` | The engine app taking the SunPad target and identity |
+
+Later commits on `main` touch the same files (documentation in particular),
+so expect conflicts to resolve by hand. Reverting all nine leaves the engine
+fork pinned beside the legacy engine, as it was in the 0.3.x line's last
+development builds.

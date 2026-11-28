@@ -721,3 +721,20 @@ Cards, in the order done ([FINALIZE-NEW-ENGINE.md](FINALIZE-NEW-ENGINE.md)):
   front of D2.
 - R1: docs/LEGACY-ENGINE.md, with the legacy recipe, catalog entry, lock and
   .gitmodules copied verbatim into docs/legacy/.
+- R2: tag legacy-engine-final (annotated) and branch legacy-engine on 72c101a.
+- B1: the SunPadNext target became SunPad (com.sunpad.SunPad, SunPad, 0.4.0
+  build 22). Device and Simulator builds pass, and the Simulator played the
+  plaza route at 33.4 ms per frame under the new identity.
+- B2: not done. The iPad reaches the Mac but iOS cannot verify the developer
+  certificate without internet, so the app waits behind "Unable to Verify App".
+  B2 moves in front of D2 with the device save check.
+- B3: removed in separate commits (44a305e Apple TV, f2cc059 app code via
+  unifdef, d40ec83 scripts and tests, 9ead6ca gitlinks, lock and patches,
+  d7251ea CI, dd0c46f renames). check-repository.sh passed after each. Links
+  in documents to removed files now point at legacy-engine-final.
+- B4: audit-ios-package.sh audits the engine layout and package-ios.sh runs
+  it. The audit caught build paths in the engine (assertion file names and the
+  debug map); build-engine.sh now maps them and strips the debug map. The
+  published app and a player copy (published app plus the device engine) pass.
+- C1: padmint.json is an upstream-engine recipe with the disc chosen in the
+  app, Mac only, Homebrew LLVM as a player tool. PadMint check-manifest passes.
