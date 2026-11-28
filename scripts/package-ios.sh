@@ -25,6 +25,8 @@ if [[ "$APP" = *.ipa ]]; then
 fi
 [[ -d "$APP" ]] || fail "app not found: $APP"
 [[ "$ENGINE" = none || -f "$ENGINE" ]] || fail "engine not found: $ENGINE"
+# A player's Mac has no ref/moltenvk: the published app already carries the license.
+[[ -f "$MOLTENVK_LICENSE" ]] || MOLTENVK_LICENSE="$APP/SourceNotices/licenses/MoltenVK/LICENSE"
 [[ -f "$MOLTENVK_LICENSE" ]] || fail "run scripts/fetch-moltenvk.sh first"
 
 STAGED="$WORK/package/Payload/SunPad.app"
