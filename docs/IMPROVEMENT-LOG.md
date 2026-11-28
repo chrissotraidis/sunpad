@@ -802,5 +802,9 @@ Cards, in the order done ([FINALIZE-NEW-ENGINE.md](FINALIZE-NEW-ENGINE.md)):
   the Simulator's 47 to 69 ms was the Simulator. The other areas ran only in
   the Simulator and, for the plaza and Bianco Hills, on both devices on 23
   November. The iPhone 14 stayed unavailable all day.
+- D2 preparation: main's branch protection still required the removed jobs
+  apple-build (ios) and apple-build (tvos), so PR #90 could never merge. The
+  required checks are now safety-and-tests, published-app and engine, recorded
+  in LEGACY-ENGINE.md for a revert.
 - CI passes on e0a2dca (safety-and-tests, published-app, engine). The two
   earlier failures were the audit's grep -q under pipefail, fixed in 5de8a54.

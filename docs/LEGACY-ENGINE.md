@@ -272,6 +272,11 @@ Revert the removal commits on `main` newest first, then the commit that made
 the engine the SunPad app, then run `bootstrap-dependencies.sh` to restore the
 gitlinks from the restored lock. Restore PadMint's catalog entry as above.
 
+On 28 November 2026, main's branch protection stopped requiring the legacy CI
+jobs: its required checks went from `safety-and-tests`, `apple-build (ios)` and
+`apple-build (tvos)` to `safety-and-tests`, `published-app` and `engine`.
+Restore the old list with the reverted workflow, or pull requests can't merge.
+
 | Order | Commit | What it reverts |
 | --- | --- | --- |
 | 1 | `c376fd7` | `config/dependency-migration.json`, the legacy patch record |
