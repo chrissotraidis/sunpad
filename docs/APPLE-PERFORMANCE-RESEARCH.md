@@ -1,5 +1,12 @@
 # Apple-platform performance research
 
+> [!NOTE]
+> **History (28 November 2026).** This document describes the legacy engine,
+> the game's PowerPC code translated ahead of time on a Dolphin-derived runtime,
+> which SunPad used through 0.3.x. SunPad 0.4.0 replaced it with the
+> decompilation engine. See the [legacy engine record](LEGACY-ENGINE.md) and,
+> for the current app, [ARCHITECTURE.md](ARCHITECTURE.md).
+
 - **Working date:** 2026-08-13
 - **Targets:** iPhone and iPad, original 30 FPS mode, native 1x first
 - **Status:** investigation record; not a release claim or a shipping change
@@ -7,7 +14,7 @@
   described below is ready to answer a specific question
 
 This document turns the August 2026 slowdown investigation into a repeatable
-plan. It supplements [TECH-DEBT.md](TECH-DEBT.md), which contains the broader
+plan. It supplements [TECH-DEBT.md](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/docs/TECH-DEBT.md), which contains the broader
 performance history and the separate experimental-60-FPS analysis.
 
 ## October 2026 update

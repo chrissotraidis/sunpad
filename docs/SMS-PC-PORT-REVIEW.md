@@ -1,5 +1,12 @@
 # sms-pc-port research review
 
+> [!NOTE]
+> **History (28 November 2026).** This document describes the legacy engine,
+> the game's PowerPC code translated ahead of time on a Dolphin-derived runtime,
+> which SunPad used through 0.3.x. SunPad 0.4.0 replaced it with the
+> decompilation engine. See the [legacy engine record](LEGACY-ENGINE.md) and,
+> for the current app, [ARCHITECTURE.md](ARCHITECTURE.md).
+
 > **Superseded in part (2026-11-23).** sms-pc-port added an MIT license on
 > 2026-10-13, builds natively for Apple silicon, and renders through Vulkan and
 > MoltenVK. The license, arm64 and renderer findings below are out of date. The
@@ -154,7 +161,7 @@ coaster rates, boss timers, ripples, smoke, particles and sound frame work.
 SunPad's 60 FPS Patch is a six-line Gecko code. It sustained near-60 FPS at
 real-time speed on a physical iPad but was judged unusable in hands-on play,
 and the exact symptoms were not recorded
-([TECH-DEBT](TECH-DEBT.md#unresolved)). Objects running at twice their intended
+([TECH-DEBT](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/docs/TECH-DEBT.md#unresolved)). Objects running at twice their intended
 rate would match that verdict. This is an inference until the scene matrix
 classifies the failures, but the port's patch list is a map of where to look.
 

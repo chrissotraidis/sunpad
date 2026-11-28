@@ -1,5 +1,12 @@
 # SunPad Android feasibility
 
+> [!NOTE]
+> **History (28 November 2026).** This document describes the legacy engine,
+> the game's PowerPC code translated ahead of time on a Dolphin-derived runtime,
+> which SunPad used through 0.3.x. SunPad 0.4.0 replaced it with the
+> decompilation engine. See the [legacy engine record](LEGACY-ENGINE.md) and,
+> for the current app, [ARCHITECTURE.md](ARCHITECTURE.md).
+
 - **Assessment date:** 2026-08-11
 - **SunPad source assessed:** `e130332cf13cc35456f8116a35056ce98ccf8d7a`
 - **ModernGekko source assessed:** `048c426ba3db0369e40826d22ad3adcce7fe7c58`
@@ -659,11 +666,11 @@ Repository and pinned-source evidence:
   current staged import, validation, storage, and boot contract
 - [`apple/ios/SunPadGameOverlay.mm`](../apple/ios/SunPadGameOverlay.mm) - touch,
   menu, settings, editing, and accessibility behavior to reproduce
-- [`docs/ARCHITECTURE.md`](ARCHITECTURE.md) - current execution and platform
+- [`docs/ARCHITECTURE.md`](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/docs/ARCHITECTURE.md) - current execution and platform
   layering
-- [`docs/LEGAL_AND_PROVENANCE.md`](LEGAL_AND_PROVENANCE.md) - distribution and
+- [`docs/LEGAL_AND_PROVENANCE.md`](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/docs/LEGAL_AND_PROVENANCE.md) - distribution and
   user-data boundary
-- [`docs/TESTING.md`](TESTING.md) - Apple runtime evidence and acceptance model
+- [`docs/TESTING.md`](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/docs/TESTING.md) - Apple runtime evidence and acceptance model
 - [ModernGekko at the pinned source](https://github.com/ExpansionPak/ModernGekko/tree/048c426ba3db0369e40826d22ad3adcce7fe7c58)
 - [Vendored RecompCore/Dolphin at the pinned source](https://github.com/ExpansionPak/RecompCore/tree/e13ab348f13cd67879f6db6e9d7185410f8f62c6)
 - [DolRecomp at the pinned source](https://github.com/ExpansionPak/DolRecomp/tree/93b881c8f73df1d64a88491f2aa50c7c9ed2384d)

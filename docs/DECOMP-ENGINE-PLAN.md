@@ -5,8 +5,10 @@
   answer to every decision in [Decisions for the maintainer](#decisions-for-the-maintainer).
   Work is under way, and the [status table](#status) is current.
 - **Next:** the maintainer chose on 2026-11-26 to replace the legacy engine
-  entirely. [FINALIZE-NEW-ENGINE.md](FINALIZE-NEW-ENGINE.md) plans the release
-  and replaces tasks E6 and E7 below.
+  entirely. [FINALIZE-NEW-ENGINE.md](FINALIZE-NEW-ENGINE.md) planned SunPad
+  0.4.0, which makes this engine SunPad's only engine, and replaced tasks E6
+  and E7 below. Work after 0.4.0 is in
+  [Follow-up after 0.4.0](#follow-up-after-040).
 - **SunPad baseline:** `72c101a` on `main` (0.3.3, build 21)
 - **Engine reviewed:** [chasem-dev/sms-pc-port](https://github.com/chasem-dev/sms-pc-port)
   `21d7b639a9041d4a656ea5e8b4bfe617ad4b8fba` (2026-11-17), with `decomp`
@@ -35,6 +37,7 @@ this plan, and is then retired.
 - [Rules and documents that change on approval](#rules-and-documents-that-change-on-approval)
 - [Decisions for the maintainer](#decisions-for-the-maintainer)
 - [Status](#status)
+- [Follow-up after 0.4.0](#follow-up-after-040)
 - [Phases and task cards](#phases-and-task-cards)
 - [Acceptance gates](#acceptance-gates)
 - [Risks](#risks)
@@ -341,6 +344,72 @@ source only, **D** needs the disc on the Mac, **H** needs a person or device.
 | E7.1 | Beta release | blocked | G1-G5 | H |
 | E7.2 | Replacement release | blocked | E7.1 | H |
 | E7.3 | Retire the old engine | blocked | E7.2 | S |
+
+## Follow-up after 0.4.0
+
+Task cards for the work SunPad 0.4.0 left out, added on 28 November 2026.
+Each follows the loop in [FINALIZE-NEW-ENGINE.md](FINALIZE-NEW-ENGINE.md#the-loop):
+one purpose per commit, its checks, a line in
+[IMPROVEMENT-LOG.md](IMPROVEMENT-LOG.md), and its status here.
+
+| ID | Card | Needs | Status |
+| --- | --- | --- | --- |
+| E8.1 | Area-load hitches | — | ready |
+| E8.2 | 60 FPS on devices | — | ready |
+| E8.3 | Mac app | — | ready |
+| E8.4 | Apple TV app | — | ready |
+| E8.5 | Windows and Linux PadMint hosts | — | ready |
+| E8.6 | Device checks 0.4.0 left open | a device session | ready |
+| E8.7 | Build settings: `-O3` and `disk_gb` | — | ready |
+| E8.8 | Host interface names | — | ready |
+| E8.9 | Upstream offers | the maintainer's decision | waiting |
+
+**E8.1 Area-load hitches.** The slowest load frame in the maintainer's
+iPhone 14 play took 232.8 ms for 130 texture uploads. Spread uploads over
+frames in the fork's Vulkan path, or start them during the load's black
+screen. **Done when** no frame in Delfino Plaza, Bianco Hills and Ricco Harbor
+loads exceeds 100 ms on the iPhone 14 with a warm pipeline cache.
+
+**E8.2 60 FPS on devices.** Run the plaza and Bianco routes with
+`SMS_FRAME_RATE=60` on the iPhone 14 and the iPad Pro, then play each for ten
+minutes. **Done when** the results and any timing faults are recorded, and the
+menu label says what they show.
+
+**E8.3 Mac app.** Make `apple/macos/next` the SunPad Mac app (named SunPad,
+built and inserted by PadMint like the iPhone engine, kept personal), restore
+PadMint's Mac target, and check the migration of a 0.3.x Mac save. **Done
+when** a PadMint-built copy plays on this Mac with keyboard and controller.
+
+**E8.4 Apple TV app.** A tvOS target around `SunPadEngineHost.mm` with
+focus-driven setup, the image imported from a Mac or the network, and storage
+in `Library/Caches`. The engine already builds for tvOS ([TVOS.md](TVOS.md)).
+**Done when** it plays on Apple TV hardware with an Extended Gamepad and a
+0.3.x tvOS save migrates.
+
+**E8.5 Windows and Linux PadMint hosts.** As E6.3 below: a standalone
+`gameptr` tool in place of the pass plugin, and the system headers the
+open-source SDK must provide. **Done when** an engine built on each host
+matches the Mac build's route captures and PadMint's player check passes there.
+
+**E8.6 Device checks 0.4.0 left open.** External displays, wired controllers,
+reconnecting a controller after sleep, an hour's session for heat and battery,
+and the reporters of issues #12 and #54 on 0.4.0. **Done when** each has a
+dated result in [TESTING.md](TESTING.md).
+
+**E8.7 Build settings.** Find the game symbol a `-O3` build lost at link and
+measure `-O3` against `-O2` on the routes, and set `disk_gb` in
+`padmint.json` from a measured clean PadMint build. **Done when** both are
+decided with numbers.
+
+**E8.8 Host interface names.** Rename `SunPadCoreHost`'s 0.3.x terms
+(`gameRoot`, `modulePath`, `currentVPS`, `currentPerformanceProfile`) to the
+engine's, with every caller in the same commit. **Done when** the app builds
+and the hands-on checklist in [TESTING.md](TESTING.md#hands-on-checklist)
+passes.
+
+**E8.9 Upstream offers.** The ten fork commits
+([DEPENDENCIES.md](DEPENDENCIES.md#engine-sources)) and the drafted note to
+chasem-dev wait for the maintainer, who sends them himself.
 
 ## Phases and task cards
 

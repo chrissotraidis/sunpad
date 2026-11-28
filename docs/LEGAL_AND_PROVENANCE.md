@@ -1,64 +1,68 @@
-# Legal and Provenance
+# Legal and provenance
 
-Last updated: 2026-10-07
+Last updated: 28 November 2026, for SunPad 0.4.0.
 
 ## Project license
 
-SunPad's original source and integration work is licensed under
-[GNU GPL version 3 or later](../LICENSE). Distributed source and binaries must
-also comply with the licenses and notice requirements of incorporated upstream
-components. See [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md) and
-[DEPENDENCIES.md](DEPENDENCIES.md). A dependency's own license and copyright
-remain in force; the SunPad license does not replace them.
+SunPad's own source (the app, its scripts and documentation) is licensed under
+the [GNU GPL version 3 or later](../LICENSE). Each dependency keeps its own
+license and copyright, listed in [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md)
+and [DEPENDENCIES.md](DEPENDENCIES.md).
 
-## Non-goals
+## What is published and what isn't
 
-SunPad will not:
+- **Published:** SunPad's source, and the app built from it with MoltenVK
+  (`SunPad-vVERSION-ios-unsigned.ipa`). It contains no game code: the
+  package audit fails if it holds the engine or engine symbols, and the
+  maintainer's release gate runs on every published file.
+- **Never published:** the engine (`libsms_embed.dylib`), which is compiled
+  from decompiled game code, and any app that contains it. PadMint builds it
+  on the player's own Mac from the pinned public sources and adds it to the
+  published app. The recipe marks this with
+  `publication.public_binaries: false`.
+- **Never included anywhere:** disc images, extracted game files, textures,
+  audio, saves or signing material.
 
-- Redistribute Super Mario Sunshine or any Nintendo copyrighted assets.
-- Commit disc images, extracted filesystems, textures, audio, or user saves.
-- Claim affiliation with or endorsement by Nintendo.
-- Misrepresent static recompilation as a complete clean-room rewrite if Dolphin-derived runtime services remain.
+SunPad doesn't claim affiliation with or endorsement by Nintendo.
 
 ## User-supplied game data
 
-Users must provide their own legally obtained Super Mario Sunshine disc image. The current local development target is:
+Players provide their own Super Mario Sunshine disc image, which SunPad checks
+before importing:
 
 - Game ID: `GMSE01`
 - Region: USA
 - Revision: 0
+- Size: 1,459,978,240 bytes
 - SHA-256: `67cec1634e641227a4cd51e6a0b277730cb9a1adaa867530c9e66de45373e51d`
 
-## Third-party open-source components
+## The engine's sources
 
-See [DEPENDENCIES.md](DEPENDENCIES.md). Major runtime/recompiler components are
-GPL/Dolphin-derived and impose corresponding source, license, notice, and other
-obligations on distributed binaries that incorporate them. The
-developer-preview IPA includes the GMSE01 ahead-of-time recompiled executable
-module required to run the supported game, but no disc image, extracted assets,
-saves, settings, or signing material. The packaging audit enforces that
-boundary; users still provide their own supported image.
+- [sms-pc-port](https://github.com/chasem-dev/sms-pc-port) has been MIT
+  licensed since 13 October 2026 (commit `f359091196`). SunPad's
+  [fork](https://github.com/chrissotraidis/sms-pc-port) keeps its history,
+  license and author credit.
+- [sms-english](https://github.com/chasem-dev/sms-english) and the
+  [doldecomp/sms](https://github.com/doldecomp/sms) decompilation it continues
+  are CC0-1.0. The decompiled code describes the original game's program, so
+  the compiled engine is treated as game-derived and stays personal. This is a
+  provenance rule, not a legal determination.
+- [sms-mod-sdk](https://github.com/chasem-dev/sms-mod-sdk) is MIT.
 
-## Provenance of research claims
+Code from repositories without a license, such as the read-only
+`sms-iphone-ipad` notes the engine plan consulted, is never copied.
 
-- “ReShine” is referenced only as community-reported evidence via ModernGekko credits; no public Sunshine ReShine tree was located at research time.
-- Matching decompilation progress is tracked separately from SunPad’s static-recompilation product path.
+## The legacy engine
 
-## Research references
+SunPad 0.3.x and earlier ran a Dolphin-derived, GPL-licensed runtime with the
+game's PowerPC code translated ahead of time, and their IPAs included that
+GMSE01 module. Their provenance is in
+[LEGAL_AND_PROVENANCE.md at legacy-engine-final](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/docs/LEGAL_AND_PROVENANCE.md)
+and the [legacy engine record](LEGACY-ENGINE.md).
 
-- [sms-pc-port](https://github.com/chasem-dev/sms-pc-port) has no license file,
-  so its code is all rights reserved by default. SunPad cites its documented
-  findings and does not copy its code, patches or assets. See the
-  [research review](SMS-PC-PORT-REVIEW.md).
-- [sms-english](https://github.com/chasem-dev/sms-english) is CC0-1.0. Its GMSE01
-  symbol map may become a pinned, hash-checked build input that is fetched at
-  build time and never committed here, like the other game-derived build
-  outputs. This is a provenance rule, not a legal determination.
+## Release traceability
 
-## Source maintenance and release traceability
-
-See the [engineering review](UPSTREAM-REVIEW.md) and [credits](../CREDITS.md).
-Maintained fork pins and packaged source references improve traceability. They do
-not establish complete historical build provenance or resolve all questions about
-distribution of game-derived executable modules. New releases require their own
-frozen source/build records and matching notices.
+Pinned commits and the bundled source references show which sources a release
+was packaged from. They don't prove where a separately built engine came from.
+Each release records its own sources, tools, artifact hashes and checks
+([RELEASE-0.4.0.md](RELEASE-0.4.0.md)).

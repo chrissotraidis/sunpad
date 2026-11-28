@@ -1,8 +1,15 @@
 # Preview 13: maintained-fork release
 
+> [!NOTE]
+> **History (28 November 2026).** This document describes the legacy engine,
+> the game's PowerPC code translated ahead of time on a Dolphin-derived runtime,
+> which SunPad used through 0.3.x. SunPad 0.4.0 replaced it with the
+> decompilation engine. See the [legacy engine record](LEGACY-ENGINE.md) and,
+> for the current app, [ARCHITECTURE.md](ARCHITECTURE.md).
+
 Preview 13 supplies unsigned iPhone/iPad and experimental Apple TV IPAs, both
 version 0.1.0 build 13. It rebuilds the runtime and GMSE01 module from the
-[maintained dependency graph](DEPENDENCIES.md), with the Apple and tvOS audio
+[maintained dependency graph](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/docs/DEPENDENCIES.md), with the Apple and tvOS audio
 implementations kept separate. It includes the revised credits, original
 third-party license texts and recursive source references. It introduces no new
 gameplay feature or performance claim.
@@ -54,7 +61,7 @@ packages do not establish byte-for-byte reproducibility across compiler versions
 ## Installation and validation limits
 
 Sign both the app and nested module with your own identity. Follow the
-[iOS installation guide](INSTALL_IPA.md) or [Apple TV guide](INSTALL_TVOS.md).
+[iOS installation guide](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/docs/INSTALL_IPA.md) or [Apple TV guide](INSTALL_TVOS.md).
 Back up saves first and preserve the existing signing identity and bundle ID for
 an in-place update. Do not uninstall to resolve a signing mismatch.
 

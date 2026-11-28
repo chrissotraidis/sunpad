@@ -188,16 +188,16 @@ The static-recomp idle hint was `MAIN_STATICRECOMP_IDLE_PC`.
 
 | Measurement | Result | Source |
 | --- | --- | --- |
-| iPhone 14, native 1x, 30 FPS, nominal thermal state | 25.7–27.1 FPS, 0.872–0.910 speed | [TESTING.md](TESTING.md), 13 August 2026 |
+| iPhone 14, native 1x, 30 FPS, nominal thermal state | 25.7–27.1 FPS, 0.872–0.910 speed | [TESTING.md](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/docs/TESTING.md), 13 August 2026 |
 | iPhone 14, serious thermal state | 23.0–25.9 FPS, 0.785–0.875 speed | same |
 | iPhone 14, worst interval | 0.759 speed, game thread near 100% of one core | [APPLE-PERFORMANCE-RESEARCH.md](APPLE-PERFORMANCE-RESEARCH.md) |
 | What full speed would have needed | about 24% less work on the critical path | same |
-| iPhone 15 Pro (player report) | 29.9–30.0 FPS in five of six samples, about 484 MiB resident | [TESTING.md](TESTING.md), report `SP-133DE3C9` |
-| iPad Pro 12.9-inch (M2) | 30 FPS in the supported mode | [STATUS.md](STATUS.md) |
-| 60 FPS Patch, iPad | 59.7–60.0 FPS in telemetry, judged unusable in hands-on play | [TESTING.md](TESTING.md) |
-| Reduced CPU Clock 90% | CPU headroom in traces, then visual corruption at 4x and unusably slow on iPad | [STATUS.md](STATUS.md) |
-| Dual-core CPU and video threads | Rejected: GX FIFO desynchronization | [TESTING.md](TESTING.md) |
-| QoS changes alone | 22.0–27.7 FPS, no gain | [TESTING.md](TESTING.md) |
+| iPhone 15 Pro (player report) | 29.9–30.0 FPS in five of six samples, about 484 MiB resident | [TESTING.md](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/docs/TESTING.md), report `SP-133DE3C9` |
+| iPad Pro 12.9-inch (M2) | 30 FPS in the supported mode | [STATUS.md](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/docs/STATUS.md) |
+| 60 FPS Patch, iPad | 59.7–60.0 FPS in telemetry, judged unusable in hands-on play | [TESTING.md](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/docs/TESTING.md) |
+| Reduced CPU Clock 90% | CPU headroom in traces, then visual corruption at 4x and unusably slow on iPad | [STATUS.md](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/docs/STATUS.md) |
+| Dual-core CPU and video threads | Rejected: GX FIFO desynchronization | [TESTING.md](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/docs/TESTING.md) |
+| QoS changes alone | 22.0–27.7 FPS, no gain | [TESTING.md](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/docs/TESTING.md) |
 
 For comparison, the new engine played Delfino Plaza and Bianco Hills on the
 iPhone 14 at 30.0 FPS (33.4 ms per frame) on 23 November 2026

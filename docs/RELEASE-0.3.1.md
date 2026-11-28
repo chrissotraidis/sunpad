@@ -1,5 +1,12 @@
 # SunPad 0.3.1 — Windows builds without a Python install
 
+> [!NOTE]
+> **History (28 November 2026).** This document describes the legacy engine,
+> the game's PowerPC code translated ahead of time on a Dolphin-derived runtime,
+> which SunPad used through 0.3.x. SunPad 0.4.0 replaced it with the
+> decompilation engine. See the [legacy engine record](LEGACY-ENGINE.md) and,
+> for the current app, [ARCHITECTURE.md](ARCHITECTURE.md).
+
 Version 0.3.1, build 19, fixes the experimental Windows build route from 0.3.0.
 On a PC without its own Python installation, which is most Windows PCs, the
 build stopped at the start of the iPhone module stage:

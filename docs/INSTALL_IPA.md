@@ -1,86 +1,69 @@
 # Install your personal SunPad IPA
 
 > [!IMPORTANT]
-> **The public app is an empty shell, not a ready-to-play IPA.** Follow the
-> README's **Get SunPad** route on an Apple silicon Mac with Xcode. PadMint
-> translates your own GMSE01 USA revision 0 disc image and adds its module to
-> the published app. Keep the resulting personal IPA local; never upload it.
+> **The published app has no game engine.** Follow the README's
+> [Get SunPad](https://github.com/chrissotraidis/sunpad#get-sunpad) steps on an
+> Apple silicon Mac with Xcode and Homebrew. PadMint compiles the engine from
+> the decompilation's public source and adds it to the published app. Keep the
+> resulting personal IPA to yourself: it contains the compiled game code.
 
-Use the complete unsigned arm64 IPA saved by PadMint in Downloads, on an iPhone
-or iPad running iOS/iPadOS 16 or newer. It must be re-signed with your own Apple
-identity before installation. The public shell alone does not contain the
-required `gGMSE01_recomp.dylib` game module.
+Use the unsigned arm64 IPA PadMint saved in Downloads, on an iPhone or iPad
+running iOS or iPadOS 16 or later.
 
-1. Use your personal IPA produced by PadMint, not the public shell or an old preview.
-2. Re-sign the IPA with a sideloading workflow you trust, making sure the
-   nested `gGMSE01_recomp.dylib` is signed along with the app.
-3. Install and open it. On first launch, choose **Choose ISO or GCM** and select
-   your own legally obtained `GMSE01` USA revision 0 ISO/GCM image. To replace
-   it later, use **••• → Game Data & Saves → Import or Reimport Game Data**.
+1. Use the personal IPA PadMint made. The published IPA alone opens to a
+   message asking for a PadMint copy.
+2. Sign and install it with a sideloading tool you trust (AltStore Classic,
+   SideStore or Sideloadly), making sure the nested
+   `Frameworks/libsms_embed.dylib` is signed with the app.
+3. Open SunPad. On first launch, choose **Choose ISO or GCM** and select your
+   own Super Mario Sunshine USA revision 0 (`GMSE01`) ISO or GCM image. To
+   replace it later, use **••• → Game Data → Import or Reimport Game Data**.
 
-If selecting the image through a Files provider does not work, put it directly
-in **Files → On My iPhone/iPad → SunPad**, then choose **••• → Game Data & Saves
-→ Import from SunPad Folder**. SunPad keeps the dropped file in Documents and
-imports a validated private copy, so remove the dropped file yourself only
-after the game has launched successfully if you want to reclaim that space.
+If choosing the image through a Files provider doesn't work, put it in
+**Files → On My iPhone/iPad → SunPad**, then choose **••• → Game Data →
+Import from SunPad Folder**. SunPad checks the image's SHA-256 and keeps a
+private copy, which the engine reads directly. Delete the dropped file
+yourself after the game starts if you want the space back.
 
-The complete personal IPA contains the open-source SunPad/ModernGekko runtime
-and its required GMSE01 ahead-of-time recompiled executable module. It contains no disc image,
-extracted game assets, save, settings, certificate, or provisioning profile.
-It is not an App Store, TestFlight, or computer-free installation release.
+The personal IPA contains SunPad's app, MoltenVK and the engine compiled on
+your Mac. It contains no disc image, extracted game files, save, settings,
+certificate or provisioning profile. It isn't an App Store, TestFlight or
+computer-free release.
 
-When updating, preserve the same bundle identifier/signing setup and install
-in place. Back up your saves first; uninstalling can remove private game data
-and saves.
+## Updating from 0.3.x
 
-## Historical Preview 13
+Install 0.4.0 over the existing SunPad with the same bundle identifier
+(`com.sunpad.SunPad`) and signing setup. On first launch:
 
-`SunPad-0.1.0-preview.13-unsigned.ipa` is a retired download, not the current
-PadMint route. For a retained historical copy, verify the SHA-256 recorded in
-the release notes and GitHub asset digest. Preview 13 rebuilt the app and
-GMSE01 module from the maintained, pinned forks and included complete source
-notices. Existing Sunshine fixes and the supported Original 30 FPS mode
-remained in place. See the [release record](PREVIEW-13.md) for build provenance
-and testing limits; it does not establish acceptance of a newly generated IPA.
+- your 0.3.x saves are copied to the new engine's memory card. The 0.3.x save
+  files stay as they were, so going back to 0.3.x finds them unchanged
+  (without progress made on 0.4.0).
+- your touch layout, controller mapping and settings carry over.
+- the disc image you imported is used as it is. The extracted copy 0.3.x also
+  kept (about 1.4 GB) stays until you reimport or choose **Remove Stored Game
+  Data**.
+
+Export your saves first anyway (**••• → Saves → Export Saves…**). Uninstalling
+removes SunPad's data and saves, and a different bundle identifier or team
+installs a separate app with none of them.
+
+## Old previews
+
+Preview IPAs and 0.3.x copies used the legacy engine and its
+`gGMSE01_recomp.dylib` module. See the
+[legacy engine record](LEGACY-ENGINE.md) and the
+[0.3.x install guide](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/docs/INSTALL_IPA.md).
 
 ## LiveContainer status
 
-LiveContainer is not currently a supported or verified SunPad launch path. One
-user reports that Preview 1 does not work there, but no actionable environment,
-signature, or log evidence has been collected. The supported preview workflow
-remains re-signing both Mach-O files and installing the IPA normally.
+LiveContainer isn't a supported or verified install path, and SunPad 0.4.0
+hasn't been tried in it. The engine is a library in `Frameworks`, which
+LiveContainer signs with the rest of the guest app, and SunPad finds it
+through `NSBundle.mainBundle`, which LiveContainer redirects to the guest
+app. Neither has been checked in practice.
 
-A bounded August 11, 2026 source/package audit found no obvious structural
-conflict to patch in SunPad. At upstream LiveContainer commit
-[`fe4c0ea`](https://github.com/LiveContainer/LiveContainer/blob/fe4c0ea7607322f7a2c7aa3111d7082054b14c8b/ZSign/zsign.mm#L262-L285),
-the ZSign path recursively enumerates and signs every regular 64-bit Mach-O in
-the guest bundle rather than only files under `Frameworks`. LiveContainer also
-[redirects `NSBundle.mainBundle` to the guest app](https://github.com/LiveContainer/LiveContainer/blob/fe4c0ea7607322f7a2c7aa3111d7082054b14c8b/README.md#patching-nsbundlemainbundle).
-The audited SunPad IPA contains `SunPad.app/gGMSE01_recomp.dylib` and
-`DeviceModuleRelativePath = gGMSE01_recomp.dylib`, so the current evidence does
-not support moving the module or changing the loader speculatively. This is a
-source-level compatibility finding, not proof that SunPad launches there.
-
-Before reporting a failure, use a current official LiveContainer build, run its
-JIT-Less Mode Diagnose when applicable, and use the app-specific **Force
-Re-sign** action if diagnosis succeeds. LiveContainer's own
-[signing troubleshooting](https://livecontainer.github.io/docs/faq/installing-livecontainer)
-recommends those checks for invalid-signature failures.
-
-For a useful LiveContainer investigation, record:
-
-- exact IPA filename and SHA-256;
-- LiveContainer version and download source;
-- device model and OS version;
-- signing and JIT settings;
-- result of JIT-Less Mode Diagnose and Force Re-sign, when applicable;
-- signature/identity output for both `SunPad.app/SunPad` and
-  `SunPad.app/gGMSE01_recomp.dylib`;
-- whether a window appears and the first visible error;
-- LiveContainer launch output and a privacy-reviewed **••• → Share Diagnostic
-  Log…** snapshot; and
-- whether the same IPA works after a normal complete re-sign and installation.
-
-Do not attach the game image, extracted game assets, saves, signing material,
-or a device container. A LiveContainer launch failure does not by itself show
-that the audited IPA or normal installation path is broken.
+To report a LiveContainer failure, include the IPA's SHA-256, LiveContainer's
+version and source, the device and OS version, the signing and JIT settings,
+the first visible error, LiveContainer's launch output, and whether the same
+IPA works when installed normally. Never attach the game image, extracted
+game files, saves, signing material or a device container.
