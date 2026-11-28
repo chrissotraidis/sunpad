@@ -3,7 +3,7 @@
   "id": "sunpad",
   "name": "SunPad",
   "game": "Super Mario Sunshine (GameCube, GMSE01 rev 0)",
-  "kind": "disc-translation",
+  "kind": "upstream-engine",
   "status": "experimental",
   "inputs": [
     {
@@ -11,135 +11,12 @@
       "formats": [
         "iso"
       ],
-      "when": "build",
-      "description": "Your own GMSE01 USA revision 0 disc image; prepare-game.sh checks its SHA-256 and extracts it privately."
+      "when": "in-app",
+      "description": "Your own GMSE01 USA revision 0 disc image. Choose it in SunPad after installing (Game Data > Import or Reimport Game Data); SunPad checks its SHA-256."
     }
   ],
   "targets": {
     "ios": {
-      "hosts": {
-        "macos-arm64": "experimental",
-        "linux-x86_64": "experimental",
-        "linux-arm64": "experimental",
-        "windows-x86_64": "experimental",
-        "windows-arm64": "experimental"
-      },
-      "tools": [
-        "git",
-        "cmake",
-        "ninja",
-        "libcxx"
-      ],
-      "published_app": "SunPad-v{version}-ios-unsigned.ipa",
-      "output": "ipa",
-      "check": "ipa",
-      "ios_module": {
-        "file": "{repo}/build/ios-module-padmint/gGMSE01_recomp.dylib",
-        "into": "gGMSE01_recomp.dylib",
-        "on": [
-          "windows",
-          "linux"
-        ]
-      },
-      "steps": [
-        {
-          "stage": "dependencies",
-          "on": [
-            "macos",
-            "linux"
-          ],
-          "command": [
-            "{repo}/scripts/bootstrap-dependencies.sh"
-          ]
-        },
-        {
-          "stage": "dependencies",
-          "on": [
-            "windows"
-          ],
-          "command": [
-            "{python}",
-            "{repo}/scripts/windows/build.py",
-            "dependencies"
-          ]
-        },
-        {
-          "stage": "prepare",
-          "on": [
-            "macos",
-            "linux"
-          ],
-          "command": [
-            "{repo}/scripts/prepare-game.sh",
-            "{disc}"
-          ]
-        },
-        {
-          "stage": "prepare",
-          "on": [
-            "windows"
-          ],
-          "command": [
-            "{python}",
-            "{repo}/scripts/windows/build.py",
-            "prepare",
-            "{disc}"
-          ]
-        },
-        {
-          "stage": "translate",
-          "on": [
-            "macos"
-          ],
-          "command": [
-            "{repo}/scripts/ios-build-core-device.sh"
-          ]
-        },
-        {
-          "stage": "package",
-          "on": [
-            "macos"
-          ],
-          "command": [
-            "{repo}/scripts/package-ios.sh",
-            "{app}",
-            "{repo}/build/ios-module-device/gGMSE01_recomp.dylib",
-            "{output}"
-          ]
-        },
-        {
-          "stage": "module",
-          "on": [
-            "linux"
-          ],
-          "command": [
-            "{repo}/scripts/build-ios-module.sh",
-            "{ios_toolchain}",
-            "{repo}/build/ios-module-padmint"
-          ],
-          "env": {
-            "SUNPAD_JOBS": "{jobs}"
-          }
-        },
-        {
-          "stage": "module",
-          "on": [
-            "windows"
-          ],
-          "command": [
-            "{python}",
-            "{repo}/scripts/windows/build.py",
-            "module",
-            "{ios_toolchain}",
-            "{repo}/build/ios-module-padmint"
-          ],
-          "env": {
-            "SUNPAD_JOBS": "{jobs}"
-          }
-        }
-      ]
-    },
-    "macos": {
       "hosts": {
         "macos-arm64": "experimental"
       },
@@ -148,57 +25,31 @@
         "cmake",
         "ninja"
       ],
-      "output": "zip",
-      "check": "none",
+      "published_app": "SunPad-v{version}-ios-unsigned.ipa",
+      "output": "ipa",
+      "check": "ipa",
       "steps": [
         {
           "stage": "dependencies",
           "command": [
-            "{repo}/scripts/bootstrap-dependencies.sh"
-          ]
-        },
-        {
-          "stage": "prepare",
-          "command": [
-            "{repo}/scripts/prepare-game.sh",
-            "{disc}"
+            "{repo}/scripts/bootstrap-dependencies.sh",
+            "--sources-only"
           ]
         },
         {
           "stage": "compile",
           "command": [
-            "{repo}/scripts/package-macos-app.sh"
-          ]
-        },
-        {
-          "stage": "version",
-          "command": [
-            "{python}",
-            "-c",
-            "import json,plistlib,sys\nv=json.load(open(sys.argv[1]))\np=sys.argv[2]+'/Contents/Info.plist'\nwith open(p,'rb') as f: info=plistlib.load(f)\ninfo['CFBundleShortVersionString']=v['version']\ninfo['CFBundleVersion']=str(v['build'])\nwith open(p,'wb') as f: plistlib.dump(info,f)\n",
-            "{repo}/version.json",
-            "{repo}/build-macos/SunPad.app"
-          ]
-        },
-        {
-          "stage": "sign",
-          "command": [
-            "/usr/bin/codesign",
-            "--force",
-            "--deep",
-            "--sign",
-            "-",
-            "{repo}/build-macos/SunPad.app"
+            "{repo}/scripts/build-engine.sh",
+            "iphoneos",
+            "{work}/engine"
           ]
         },
         {
           "stage": "package",
           "command": [
-            "/usr/bin/ditto",
-            "-c",
-            "-k",
-            "--keepParent",
-            "{repo}/build-macos/SunPad.app",
+            "{repo}/scripts/package-ios.sh",
+            "{app}",
+            "{work}/engine/libsms_embed.dylib",
             "{output}"
           ]
         }
@@ -206,7 +57,7 @@
     }
   },
   "requirements": {
-    "disk_gb": 30,
+    "disk_gb": 8,
     "tools": [
       {
         "name": "git",
@@ -230,22 +81,18 @@
         "name": "python3",
         "version_args": [
           "--version"
-        ],
-        "hosts": [
-          "macos-arm64",
-          "linux-x86_64",
-          "linux-arm64"
         ]
       },
       {
-        "name": "rg",
+        "name": "/opt/homebrew/opt/llvm/bin/llvm-config",
+        "label": "Homebrew LLVM",
         "version_args": [
           "--version"
         ],
+        "player": true,
+        "note": "SunPad's engine is compiled with Homebrew's LLVM, whose compiler can load the engine's pointer pass (Apple's cannot). Once: install Homebrew (brew.sh), run brew install llvm in Terminal, then run PadMint again.",
         "hosts": [
-          "macos-arm64",
-          "linux-x86_64",
-          "linux-arm64"
+          "macos-arm64"
         ]
       },
       {
@@ -272,56 +119,12 @@
         "hosts": [
           "macos-arm64"
         ]
-      },
-      {
-        "name": "%ProgramFiles(x86)%/Microsoft Visual Studio/Installer/vswhere.exe",
-        "label": "Visual Studio C++ build tools",
-        "version_args": [
-          "-latest",
-          "-products",
-          "*",
-          "-requires",
-          "Microsoft.VisualStudio.Component.VC.Tools.x86.x64",
-          "-property",
-          "catalog_productDisplayVersion"
-        ],
-        "min_version": "17",
-        "player": true,
-        "hosts": [
-          "windows-x86_64"
-        ],
-        "targets": [
-          "ios"
-        ],
-        "note": "SunPad translates your disc with tools built by Visual Studio's C++ compiler. Once: install the free Build Tools for Visual Studio 2022 or newer (visualstudio.microsoft.com/visual-cpp-build-tools), choose the \"Desktop development with C++\" workload and click Install, then run PadMint again."
-      },
-      {
-        "name": "%ProgramFiles(x86)%/Microsoft Visual Studio/Installer/vswhere.exe",
-        "label": "Visual Studio C++ build tools",
-        "version_args": [
-          "-latest",
-          "-products",
-          "*",
-          "-requires",
-          "Microsoft.VisualStudio.Component.VC.Tools.ARM64",
-          "-property",
-          "catalog_productDisplayVersion"
-        ],
-        "min_version": "17",
-        "player": true,
-        "hosts": [
-          "windows-arm64"
-        ],
-        "targets": [
-          "ios"
-        ],
-        "note": "SunPad translates your disc with tools built by Visual Studio's C++ compiler. Once: install the free Build Tools for Visual Studio 2022 or newer (visualstudio.microsoft.com/visual-cpp-build-tools), choose the \"Desktop development with C++\" workload, make sure \"MSVC ARM64 build tools\" is ticked on the right and click Install, then run PadMint again."
       }
     ]
   },
-  "notes": "On a Mac, ios-build-core-device.sh builds gGMSE01_recomp.dylib with Xcode in build/ios-module-device and package-ios.sh places it in the published app. On Linux and Windows, scripts/build-ios-module.sh or scripts/windows/build.py builds it with PadMint's open-source iPhone SDK in build/ios-module-padmint, and PadMint checks its imports and adds it to the published app.",
+  "notes": "PadMint fetches the pinned engine sources (chrissotraidis/sms-pc-port with the sms-english decompilation), builds libsms_embed.dylib with scripts/build-engine.sh and Homebrew LLVM, and package-ios.sh adds it to the published app and audits the result. The disc is not used by the build: SunPad imports it on the device.",
   "publication": {
     "public_binaries": false,
-    "reason": "The release publishes the app without game code; PadMint adds the module translated from the player's own disc, which stays personal."
+    "reason": "The release publishes the app without the engine. The engine is compiled from decompiled game code on the player's Mac and stays personal."
   }
 }
