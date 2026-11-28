@@ -1,15 +1,15 @@
 {
   "game": "Super Mario Sunshine",
   "system": "GameCube",
-  "type": "recomp",
+  "type": "decomp",
   "project": "SunPad",
   "status": "in-progress",
-  "toolchain": "DolRecomp",
+  "toolchain": "sms-pc-port",
   "original": {
     "region": "USA",
     "revision": "0",
     "serial": "GMSE01"
   },
-  "approach": "Ahead-of-time game-code recompilation with ModernGekko and the Dolphin-derived RecompCore runtime.",
-  "notes": "Experimental Apple-platform project. Device coverage, full-game validation and performance work remain ongoing."
+  "approach": "The Super Mario Sunshine decompilation compiled natively through a fork of sms-pc-port, drawing through MoltenVK to Metal, in an iPhone and iPad app. Versions before 0.4.0 used ahead-of-time recompilation with ModernGekko.",
+  "notes": "Experimental Apple-platform project. iPhone and iPad from 0.4.0; Mac and Apple TV on the new engine are not available yet."
 }

@@ -5,34 +5,33 @@
 </p>
 
 <p align="center">
-  <img alt="iOS and iPadOS artifact target 16+" src="https://img.shields.io/badge/iOS%20%2F%20iPadOS%20target-16%2B-0A84FF?logo=apple">
-  <img alt="Experimental tvOS target 17+" src="https://img.shields.io/badge/tvOS%20experimental-17%2B-0A84FF?logo=apple">
-  <img alt="Configured macOS target 14+" src="https://img.shields.io/badge/macOS%20target-14%2B-0A84FF?logo=apple">
-  <img alt="Metal renderer" src="https://img.shields.io/badge/renderer-Metal-5E5CE6">
-  <img alt="Ahead-of-time game code" src="https://img.shields.io/badge/game%20code-ahead--of--time-FF9F0A">
-  <img alt="Experimental preview" src="https://img.shields.io/badge/preview-experimental-FFD60A">
+  <img alt="iOS and iPadOS 16+" src="https://img.shields.io/badge/iOS%20%2F%20iPadOS-16%2B-0A84FF?logo=apple">
+  <img alt="Metal through MoltenVK" src="https://img.shields.io/badge/renderer-Metal%20via%20MoltenVK-5E5CE6">
+  <img alt="Native decompiled game code" src="https://img.shields.io/badge/game%20code-native%20decompilation-FF9F0A">
+  <img alt="Experimental" src="https://img.shields.io/badge/status-experimental-FFD60A">
   <img alt="Game image not included" src="https://img.shields.io/badge/game%20image-not%20included-FF453A">
   <a href="https://github.com/chrissotraidis/padmint"><img alt="Build SunPad with PadMint" src="https://img.shields.io/badge/PadMint-build%20your%20own-3EB489"></a>
   <a href="https://discord.gg/xwHfUD2bxW"><img alt="Join the SunPad Discord" src="https://img.shields.io/badge/Discord-Join%20the%20community-5865F2?logo=discord&amp;logoColor=white"></a>
 </p>
 
-**Super Mario Sunshine on iPhone, iPad, Apple silicon Mac, and experimental Apple TV through ahead-of-time recompilation.**
-SunPad brings together Metal rendering, touch controls, controller support, and
-local game-image import. Supply your own supported copy of the game.
+**Super Mario Sunshine on iPhone and iPad, running the game's decompiled code natively.**
+SunPad brings touch controls, controller support, rumble and local game-image
+import to the Super Mario Sunshine decompilation. Supply your own supported copy
+of the game.
 
-Built with [ModernGekko](https://github.com/ExpansionPak/ModernGekko), by Hyperway,
-ExpansionPak and contributors, and [DolRecomp](https://github.com/ExpansionPak/DolRecomp),
-on the [RecompCore](https://github.com/ExpansionPak/RecompCore) /
-[Dolphin](https://github.com/dolphin-emu/dolphin) runtime. SunPad provides the Apple
-app and Sunshine-specific integration. See [full credits](CREDITS.md), including
-Apple TV contributions and AI/artwork provenance.
+Since 0.4.0, SunPad's engine is [sms-pc-port](https://github.com/chasem-dev/sms-pc-port)
+by chasem-dev and contributors (MIT), which compiles the
+[Super Mario Sunshine decompilation](https://github.com/chasem-dev/sms-english)
+(from [doldecomp/sms](https://github.com/doldecomp/sms), CC0) as native code. SunPad
+keeps a [maintained fork](https://github.com/chrissotraidis/sms-pc-port) on the
+`sunpad` branch that adds an embedded build for Apple apps, and draws through
+[MoltenVK](https://github.com/KhronosGroup/MoltenVK) to Metal. SunPad provides the
+iPhone and iPad app. See [full credits](CREDITS.md), including AI and artwork
+provenance.
 
-**Maintained forks:** [ModernGekko](https://github.com/chrissotraidis/ModernGekko),
-[RecompCore](https://github.com/chrissotraidis/RecompCore), and
-[DolRecomp](https://github.com/chrissotraidis/DolRecomp).
-Runtime and compiler dependencies use pinned submodules. The
-[source graph](docs/DEPENDENCIES.md#maintained-source-graph) records the separate
-Apple and tvOS versions.
+SunPad 0.3.x ran a different engine: the game's PowerPC code translated ahead of
+time on a Dolphin-derived runtime (ModernGekko). The
+[legacy engine record](docs/LEGACY-ENGINE.md) describes it and how to bring it back.
 
 > [!NOTE]
 > **AI disclosure:** SunPad uses substantial AI assistance for code, tests,
@@ -43,156 +42,129 @@ Apple and tvOS versions.
 
 ## Get SunPad
 
-**No Mac? (experimental)** Since 0.3.0, PadMint can build SunPad for iPhone or
-iPad on a Windows PC. Install the free [Build Tools for Visual
-Studio](https://visualstudio.microsoft.com/visual-cpp-build-tools/) with
-"Desktop development with C++", then use [PadMint for
-Windows](https://github.com/chrissotraidis/padmint/releases/latest) the same way
-as on a Mac and install the IPA with Sideloadly. The first build takes a few
-hours and needs about 30 GB free. A copy built on Windows 11 ARM64 has been
-installed and played on an iPad; a native x64 PC hasn't been tried yet, so
-please report how it goes. Linux builds are experimental too
-([details](docs/BUILDING.md)). SunPad can't use [GitHub's
-Mac](https://github.com/chrissotraidis/padmint#no-mac-build-on-githubs-mac),
-because that would mean uploading your game file.
+The app on the [releases page](https://github.com/chrissotraidis/sunpad/releases/latest)
+contains no game code. Its engine is compiled from decompiled game code, so it
+can't be published: [PadMint](https://github.com/chrissotraidis/padmint) builds it
+on your own Mac.
 
-**iOS/iPadOS 27:** v0.2.1 includes the scene-startup correction missing from
-v0.2.0. The published package declares the new startup configuration; physical
-iOS/iPadOS 27 and the affected reporter's result still need confirmation. See
-[startup evidence and remaining checks](docs/IOS27_STARTUP.md).
+You need an Apple silicon Mac with full Xcode and its iOS platform, and
+[Homebrew](https://brew.sh). Once, in Terminal:
 
-The app on the [releases page](https://github.com/chrissotraidis/sunpad/releases/latest) contains no
-game code. On an Apple silicon Mac with Xcode, download
-[PadMint](https://github.com/chrissotraidis/padmint/releases/latest), unzip it, double-click
-`PadMint.command`, then in the PadMint page that opens in your browser choose SunPad and your own GMSE01
-disc image and click **Make my copy**. PadMint translates the
-game from your disc, adds it to the published app and saves your SunPad IPA in your Downloads
-folder; install it with AltStore Classic, SideStore or Sideloadly. The IPA it makes contains code
-translated from your disc: keep it for yourself. With PadMint 0.5.5 or newer you can also choose
-**This Mac**: PadMint builds `SunPad.app` from your disc and saves it as a zip; move it to Applications.
-To build it by hand, see [build and run locally](docs/MACOS.md).
+```sh
+brew install cmake ninja llvm
+```
 
-Apple TV requires Mac-side game-data staging and an Extended Gamepad. Its storage
-is purgeable, so [back up your saves](docs/TVOS.md) before replacing the app.
-Preview 13 rebuilds both platforms from the maintained forks; see the
-[release record](docs/PREVIEW-13.md) for provenance and testing limits.
+Then download [PadMint](https://github.com/chrissotraidis/padmint/releases/latest),
+unzip it and double-click `PadMint.command`. In the PadMint page that opens in your
+browser, choose SunPad and click **Make my copy**. PadMint builds the engine,
+adds it to the published app and saves your SunPad IPA in your Downloads folder.
+Install it with AltStore Classic, SideStore or Sideloadly. The IPA contains the
+compiled game code: keep it for yourself.
+
+Open SunPad and choose your own disc image: **••• → Game Data → Import or
+Reimport Game Data**.
+
+**Upgrading from 0.3.x:** install over the existing app with the same signing
+setup. Your saves and settings carry over on first launch, and the old save
+files stay as they were. Remove Stored Game Data or a reimport frees the
+extracted copy 0.3.x kept (about 1.4 GB).
+
+**Not in 0.4.0:** PadMint builds the new engine only on Apple silicon Macs, so
+Windows and Linux PCs can't make SunPad 0.4.0 yet. The Mac app and the Apple TV
+app are not available on the new engine yet. Copies of 0.3.x keep working.
 
 ## Current status
 
-Development gameplay, Files import, touch input, and in-place updates have been
-exercised on a 12.9-inch iPad Pro (6th generation). iPhone 14 performance is below
-the iPad experience. Mac gameplay coverage and exact-artifact Apple TV gameplay,
-audio, controller, and save acceptance remain open.
+On 23 to 28 November 2026, on an iPhone 14 (A15) and a 12.9-inch iPad Pro (M2),
+SunPad 0.4.0's engine:
 
-**Original 30 FPS is the supported default.** The OS badges describe build targets,
-not verified minimum-device compatibility. See [known issues](docs/KNOWN_ISSUES.md)
-and [dated testing evidence](docs/TESTING.md) for the remaining limits.
+- held 30 FPS (33.4 ms per frame) in Delfino Plaza, Bianco Hills and a
+  maintainer's play session, at 1x on the iPhone and 2x and 4x on the iPad.
+- made shaders the device had not seen before in the background, so a first
+  visit to an area shows new objects a moment late instead of stopping.
+- updated a 0.3.x install in place on the iPad, where its saves migrated byte
+  for byte and a 94-Shine file loaded in game, and saved and reloaded a new
+  file there.
 
-Next up are save durability and speed on older iPhones. The
-[improvement plan](docs/IMPROVEMENT-PLAN.md) describes that work. It draws on
-research into [sms-pc-port](https://github.com/chasem-dev/sms-pc-port), a
-decompilation-based PC port of the game ([research review](docs/SMS-PC-PORT-REVIEW.md)).
+The legacy engine ran the iPhone 14 at 23 to 27 FPS. Short hitches (up to about
+230 ms) remain when an area loads. **Original 30 FPS is the supported default.**
+See [known issues](docs/KNOWN_ISSUES.md) and [testing evidence](docs/TESTING.md).
 
 ## Frequently asked questions
 
 <details>
-<summary><strong>Is this native recompilation or emulation? Does it use JIT?</strong></summary>
+<summary><strong>Is this emulation? Does it use Dolphin or a JIT?</strong></summary>
 
-Both techniques are involved. Covered PowerPC game code is recompiled ahead of
-time into native ARM64. The Dolphin-derived runtime supplies GameCube graphics,
-audio, memory, timing, and input behavior, with Metal rendering.
+No. The game's code comes from the Super Mario Sunshine decompilation, compiled
+ahead of time as native arm64 code like any app. sms-pc-port replaces the
+GameCube's hardware and SDK with its own renderer, audio mixer and services, and
+SunPad's fork draws through MoltenVK to Metal. Nothing is translated or
+interpreted while you play, and SunPad 0.4.0 contains no Dolphin code.
 
-iPhone and iPad use interpreter fallback for unrecompiled code, with no runtime
-PowerPC JIT. Mac uses JitArm64 for uncovered code before returning to the AOT
-module. SunPad is a game-specific integration, not a general GameCube loader or a
-from-scratch rewrite. See the [architecture](docs/ARCHITECTURE.md) and
-[upstream review](docs/UPSTREAM-REVIEW.md), including the existing ARM64 fallback fix.
-
-</details>
-
-<details>
-<summary><strong>How is SunPad different from the Super Mario Sunshine PC port?</strong></summary>
-
-[sms-pc-port](https://github.com/chasem-dev/sms-pc-port) compiles the game's
-decompilation as native PC code for Windows, Linux and x86 Macs (Apple silicon
-through Rosetta 2). SunPad translates the original game code ahead of time and
-runs it on a Dolphin-derived runtime, which is what lets it run on iPhone, iPad
-and Apple silicon.
-
-The projects share no code. SunPad uses the PC port's published findings as
-research for its [improvement plan](docs/IMPROVEMENT-PLAN.md); the
-[research review](docs/SMS-PC-PORT-REVIEW.md) explains what carries over and
-what does not.
+The decompilation matches about 73% of the game's functions byte for byte and
+99.6% approximately ([progress](https://github.com/chasem-dev/sms-english/blob/main/PROGRESS.md)),
+so a rare difference from the original game is possible. Report one with a
+screenshot. See the [architecture](docs/ARCHITECTURE.md).
 
 </details>
 
 <details>
 <summary><strong>Which game image do I need, and how do I import it?</strong></summary>
 
-Use your own supported **Super Mario Sunshine USA, revision 0 (`GMSE01`)** raw
-ISO/GCM image. Other regions, revisions, modified images, and compressed formats
-are not supported by the current import path. The exact development image hash
-is recorded in [game-data provenance](docs/LEGAL_AND_PROVENANCE.md).
+Use your own **Super Mario Sunshine USA, revision 0 (`GMSE01`)** raw ISO/GCM
+image. Other regions, revisions, modified images and compressed formats are not
+supported. The exact image hash is in [game-data provenance](docs/LEGAL_AND_PROVENANCE.md).
 
-On iPhone/iPad, open **••• → Game Data & Saves → Import or Reimport Game Data**,
-select the image in Files, and leave SunPad open while it validates and extracts.
-A failed reimport keeps the previous working data. Removing stored game data
-requires confirmation and keeps saves separately.
+On iPhone or iPad, open **••• → Game Data → Import or Reimport Game Data** and
+select the image in Files, or copy it into SunPad's folder in Files and use
+**Import from SunPad Folder**. SunPad checks the image and keeps a private copy,
+which the engine reads directly. A failed reimport keeps the previous working data.
+Removing stored game data asks first and never touches saves.
 
-On Mac, choose the image in the launcher and select **Extract and Play**.
-Apple TV uses the [Mac-side staging guide](docs/INSTALL_TVOS.md).
-SunPad does not download games. Never attach game images, extracted assets,
-generated modules, or saves to an issue or pull request.
+SunPad does not download games. Never attach game images, saves or builds to an
+issue or pull request.
 
 </details>
 
 <details>
-<summary><strong>How do controls and customization work?</strong></summary>
+<summary><strong>How do controls and settings work?</strong></summary>
 
-Touch controls provide movement, camera, D-pad, face buttons, and analog FLUDD
+Touch controls provide movement, camera, D-pad, face buttons and analog FLUDD
 pressure. Slide along **R** for more pressure and into its final quarter for a
 full press. **••• → Controls** opens touch-layout settings and controller mapping.
-A connected physical controller can hide the touch overlay automatically.
+A connected controller can hide the touch overlay automatically.
 
-See the [control guide](docs/CONTROLS.md) for layout editing, spray controls,
-button mapping, and controller-handoff limits, or [Mac keyboard defaults](docs/MACOS.md#controls-and-data).
-Original 4:3 is the default display mode. Experimental 16:9 and Fill Screen
-settings apply on the next launch.
+**••• → Display** holds Render Resolution (applied at once), Aspect Ratio and
+Frame Rate (applied after reopening) and the FPS counter. See the
+[control guide](docs/CONTROLS.md).
 
 </details>
 
 <details>
-<summary><strong>Can I use 60 FPS or the performance experiments?</strong></summary>
+<summary><strong>Can I play at 60 FPS?</strong></summary>
 
-They are diagnostic options, not recommended play modes. Physical-iPad testing
-found both the **60 FPS Patch** and **Reduced CPU Clock 90%** unsuitable for normal
-play. They can affect timing, audio, physics, and rendering.
-
-Use **••• → Unstable Experiments → Use Supported 30 FPS Mode** to disable them
-for the next launch. Broader device performance, audio, lifecycle, and full-game
-validation remain work in progress. New levels, cheats, and extensive mods are
-not promised features.
-The [improvement plan](docs/IMPROVEMENT-PLAN.md#pass-8-real-60-fps) describes how
-a correct 60 FPS mode could be built later for Macs and newer iPads.
+**••• → Display → Frame Rate → 60 FPS (Experimental)** runs the engine's 60 FPS
+mode, which corrects the game's timing. It needs about twice the work each
+second, so a device that can't keep up plays slower. It has not been checked
+hands-on yet: 30 FPS is the supported default.
 
 </details>
 
 <details>
 <summary><strong>Will an update preserve my save?</strong></summary>
 
-Update in place with the same app/signing identity. Uninstalling or changing
-bundle/signing boundaries can remove or disconnect local data, so back up first.
-Apple TV stores game data and saves in purgeable cache storage and needs
-[separate backups](docs/TVOS.md). Never assume an app reinstall restores a save.
+Update in place with the same app and signing identity. Uninstalling or changing
+the bundle or signing can remove or disconnect local data, so export your saves
+first (**••• → Saves → Export Saves…**). Never assume a reinstall restores a
+save.
 
 </details>
 
 <details>
 <summary><strong>Does LiveContainer work?</strong></summary>
 
-LiveContainer is not a supported or verified install path. Users have reported
-launch failures, but the cause remains unconfirmed. Use the normal signed IPA
-installation path in the [installation guide](docs/INSTALL_IPA.md). If reporting
+LiveContainer is not a supported or verified install path. Use the normal signed
+IPA installation in the [installation guide](docs/INSTALL_IPA.md). If reporting
 a LiveContainer failure, include its copied launch error or crash report.
 
 </details>
@@ -203,6 +175,7 @@ Open **••• → Report a Problem…**, describe what happened, and review t
 report and GitHub draft before sharing. Include the device, app version, scene,
 and reproduction steps. For visual issues, add a screenshot and the reviewed
 `Latest-SunPad-Diagnostic.log` from SunPad's Files-visible `Diagnostics` folder.
+The report includes the engine's log, which names each slow frame and its cause.
 
 Never upload game data, saves, signing material, or a device container. If the app
 cannot reopen, find its crash report under **Settings → Privacy & Security →
@@ -212,24 +185,23 @@ Analytics & Improvements → Analytics Data**. [Open a bug report](https://githu
 
 [`.recomp.json`](.recomp.json) describes SunPad for project directories using
 the [recomp.board format](https://recomp.fyi/spec). It contains public project
-facts only, is maintained manually, and is not a build input. The optional
-remote schema reference is omitted to avoid an editor lookup.
+facts only, is maintained manually, and is not a build input.
 
-Development uses an Apple silicon Mac, Xcode 26.x, CMake, Ninja, ripgrep, Git,
-and Python 3. Start in a clean checkout:
+Development uses an Apple silicon Mac, full Xcode (27.2 checked), Homebrew
+LLVM, CMake, Ninja, Git and Python 3. In a clean checkout:
 
 ```sh
-./scripts/bootstrap-dependencies.sh
-./scripts/prepare-game.sh /path/to/GMSE01.iso
+./scripts/bootstrap-dependencies.sh     # engine sources and MoltenVK, no game data
+./scripts/check-repository.sh
+./scripts/build-engine.sh iphonesimulator
 ```
 
-Bootstrap verifies pinned fork sources without applying patches or downloading
-game data. It preserves modified old dependency trees. For source checks without
-game inputs, use `--sources-only`, then run `./scripts/check-repository.sh`.
+Then build the `SunPad` scheme with `SUNPAD_EMBED_ENGINE=YES` to put a development
+engine in the app. Game data is imported in the app as players do.
 
 [Build instructions](docs/BUILDING.md) · [Contribution policy](CONTRIBUTING.md) ·
-[Dependency pins](docs/DEPENDENCIES.md) · [Engineering review](docs/UPSTREAM-REVIEW.md) ·
-[Improvement plan](docs/IMPROVEMENT-PLAN.md)
+[Dependency pins](docs/DEPENDENCIES.md) · [Engine plan](docs/DECOMP-ENGINE-PLAN.md) ·
+[Legacy engine](docs/LEGACY-ENGINE.md)
 
 ## Community and support
 
@@ -245,8 +217,8 @@ with your device, its OS version, and the steps that led to it.
 
 SunPad is an unofficial community project, unaffiliated with Nintendo. Nintendo's
 game, characters, artwork, and trademarks belong to their respective rights holders.
-SunPad's integration is [GPL-3.0-or-later](LICENSE). Upstream components retain
-their own licenses and attribution. See [third-party notices](THIRD_PARTY_NOTICES.md)
+SunPad's app is [GPL-3.0-or-later](LICENSE). The engine and other components
+retain their own licenses and attribution. See [third-party notices](THIRD_PARTY_NOTICES.md)
 and [legal and provenance details](docs/LEGAL_AND_PROVENANCE.md).
 
 ## Legal

@@ -1,0 +1,41 @@
+#!/bin/bash
+# SunPad Next for Mac: the decompilation engine's own window, input and sound
+# (docs/DECOMP-ENGINE-PLAN.md, E5.1). Remembers the player's disc image,
+# carries SunPad's Mac saves over once, and keeps SunPad's keyboard layout.
+set -euo pipefail
+
+CONTENTS="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+DATA="$HOME/Library/Application Support/SunPad"
+ENGINE="$DATA/Engine"
+mkdir -p "$ENGINE/card-a"
+
+# Keys: SunPad's layout, kept in the data folder so players can change it.
+[[ -f "$ENGINE/bindings.txt" ]] || cp "$CONTENTS/Resources/bindings.txt" "$ENGINE/bindings.txt"
+
+# The first launch copies the Dolphin card's saves; the Dolphin card stays as it was.
+"$CONTENTS/MacOS/sunpad-saves" migrate "$DATA/GC/USA/Card A" "$ENGINE/card-a" || true
+
+# The disc image: asked for once, then remembered.
+DISC_FILE="$ENGINE/disc-path"
+DISC=""
+[[ -f "$DISC_FILE" ]] && DISC="$(cat "$DISC_FILE")"
+if [[ ! -f "$DISC" ]]; then
+  DISC="$(osascript -e 'POSIX path of (choose file with prompt "Choose your Super Mario Sunshine disc image (GMSE01, USA)" of type {"iso", "gcm", "ciso"})' 2>/dev/null || true)"
+  [[ -n "$DISC" ]] || exit 0
+  if [[ "$(head -c 6 "$DISC")" != "GMSE01" ]]; then
+    osascript -e 'display alert "SunPad needs the USA disc of Super Mario Sunshine (GMSE01)." as critical' >/dev/null
+    exit 1
+  fi
+  printf '%s' "$DISC" > "$DISC_FILE"
+fi
+
+export SMS_SAVE_DIR="$ENGINE/card-a"
+export SMS_SETTINGS="$ENGINE/settings.txt"
+export SMS_BINDINGS="$ENGINE/bindings.txt"
+export XDG_CACHE_HOME="$HOME/Library/Caches/SunPad"
+export SMS_GX_BACKEND="${SMS_GX_BACKEND:-vulkan}"
+export SMS_FRAME_RATE="${SMS_FRAME_RATE:-30}"
+export SMS_MOUSE_CAMERA="${SMS_MOUSE_CAMERA:-0}"
+export SMS_PRESENCE="${SMS_PRESENCE:-0}"
+cd "$ENGINE"
+exec "$CONTENTS/MacOS/sms" "$DISC" 2>>"$ENGINE/engine.log"

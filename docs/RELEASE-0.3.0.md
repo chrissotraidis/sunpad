@@ -1,5 +1,12 @@
 # SunPad 0.3.0 — build it on a Windows PC
 
+> [!NOTE]
+> **History (28 November 2026).** This document describes the legacy engine,
+> the game's PowerPC code translated ahead of time on a Dolphin-derived runtime,
+> which SunPad used through 0.3.x. SunPad 0.4.0 replaced it with the
+> decompilation engine. See the [legacy engine record](LEGACY-ENGINE.md) and,
+> for the current app, [ARCHITECTURE.md](ARCHITECTURE.md).
+
 Version 0.3.0, build 18, lets PadMint build a personal SunPad for iPhone and
 iPad on Windows (ARM64 and x64) and Linux (ARM64 and x86-64), all marked
 experimental. The app itself is unchanged from 0.2.3.

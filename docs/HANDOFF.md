@@ -1,5 +1,12 @@
 # Maintainer Notes
 
+> [!NOTE]
+> **History (28 November 2026).** This document describes the legacy engine,
+> the game's PowerPC code translated ahead of time on a Dolphin-derived runtime,
+> which SunPad used through 0.3.x. SunPad 0.4.0 replaced it with the
+> decompilation engine. See the [legacy engine record](LEGACY-ENGINE.md) and,
+> for the current app, [ARCHITECTURE.md](ARCHITECTURE.md).
+
 Last updated: 2026-10-07
 
 This is a public maintainer summary, not a machine-specific handoff. SunPad is
@@ -35,7 +42,7 @@ Build the desired development target after preparation:
 ```
 
 The physical-device workflow also requires local signing and separate
-provisioning of the locally generated module. See [BUILDING.md](BUILDING.md).
+provisioning of the locally generated module. See [BUILDING.md](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/docs/BUILDING.md).
 It is not IPA distribution packaging. Use an in-place install when preserving
 device data, and never use a removing CoreDevice container overlay for updates.
 
@@ -57,7 +64,7 @@ device data, and never use a removing CoreDevice container overlay for updates.
   artifacts still need minimum-OS inspection and oldest-target runtime tests.
 
 The evidence-ranked performance diagnosis and future implementation queue live
-in [TECH-DEBT.md](TECH-DEBT.md). Start there before changing 60 FPS, AOT
+in [TECH-DEBT.md](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/docs/TECH-DEBT.md). Start there before changing 60 FPS, AOT
 generation, fallback behavior, vertex loading, renderer synchronization, or
 performance diagnostics.
 
@@ -86,5 +93,5 @@ Agents continuing that work follow its
 ## Reporting
 
 Record the git revision, target, OS/device, commands, game revision, observed
-runtime behavior, and remaining gap in [TESTING.md](TESTING.md). Do not convert
+runtime behavior, and remaining gap in [TESTING.md](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/docs/TESTING.md). Do not convert
 configured or source-inspected behavior into a physical-acceptance claim.

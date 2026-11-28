@@ -8,9 +8,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/* Hosts the ModernGekko / Dolphin-derived compatibility runtime inside the
- * SunPad iOS/iPadOS app. Owns the game thread, the CAMetalLayer render
- * surface handed to the Metal video backend, and the pipe-input bridge. */
+/* Hosts the decompilation engine (libsms_embed.dylib) inside the SunPad
+ * iOS/iPadOS app, implemented in SunPadEngineHost.mm. Owns the engine's
+ * thread, the CAMetalLayer it draws to through MoltenVK, its audio and its
+ * controller input. gameRoot and modulePath keep their 0.3.x names: modulePath
+ * is the engine library and the disc image is read directly. */
 @interface SunPadCoreHost : NSObject
 
 - (instancetype)initWithLayer:(CAMetalLayer *)layer NS_DESIGNATED_INITIALIZER;

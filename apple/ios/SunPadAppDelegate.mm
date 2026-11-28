@@ -113,10 +113,10 @@ static void SunPadApplyExperimentSafetyMigration(void) {
 }
 
 - (void)beginSaveFlushGraceForApplication:(UIApplication *)application {
-    // Dolphin's GCI-folder backend flushes one second after writes stop. The
-    // runtime was paused in applicationWillResignActive, so keep the process
-    // alive briefly enough for that existing save thread to finish without
-    // forcing a shutdown or reaching into its private memory-card state.
+    // The engine writes its card with an atomic rename, and the pause in
+    // applicationWillResignActive returns once the game has parked at its next
+    // frame. Keep the process alive briefly so a save already under way
+    // finishes before iOS suspends it.
     __block UIBackgroundTaskIdentifier task = UIBackgroundTaskInvalid;
     __weak SunPadAppDelegate *weakSelf = self;
     task = [application beginBackgroundTaskWithName:@"SunPad save flush grace"

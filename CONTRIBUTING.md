@@ -4,36 +4,34 @@ Keep changes simple and explain the concrete problem they solve. Recheck any
 controls or navigation you change. Preserve upstream names, licenses, authorship,
 game data, saves, settings, signing identities and concurrent work.
 
-Runtime changes belong in the maintained ModernGekko/RecompCore forks. Compiler
-changes belong in DolRecomp. Use reviewable commits and update full SHA pins,
-gitlinks and the dependency guide together. The Apple and tvOS lanes deliberately
-retain different audio implementations. Do not replace either with GalaxyPad's
-runtime or silently reset an existing modified checkout.
-
-Research references are not code sources. Do not copy code, patches or assets
-from [sms-pc-port](https://github.com/chasem-dev/sms-pc-port); it has no license.
-Re-derive behavior from the CC0 GMSE01 decompilation, Dolphin and SunPad's own
-measurements, and cite the finding that led to the change. Follow the ground
-rules in the [improvement plan](docs/IMPROVEMENT-PLAN.md#ground-rules).
+SunPad's engine comes from a maintained fork of
+[sms-pc-port](https://github.com/chasem-dev/sms-pc-port), which is MIT licensed.
+Keep its notice and history, and land engine changes in the fork, on its
+`sunpad` branch, before updating the pin. Update the gitlink and
+`config/dependencies.lock.json` together with full SHAs
+([DEPENDENCIES.md](docs/DEPENDENCIES.md#updating-the-engine)). Never reset an
+existing modified checkout. Projects without a license, such as
+`sms-iphone-ipad` and `sms-android`, are research references only. Don't copy
+their code, patches or assets.
 
 For behavioral fixes, reproduce the failure and add a focused regression where
-feasible. Run `scripts/bootstrap-dependencies.sh --sources-only` followed by
-`scripts/check-repository.sh`. Runtime/API changes also need a clean Apple runtime
-and host build. CI builds both the iOS and tvOS Simulator lanes without game data.
-Private generated-module and physical-gameplay validation are separate gates.
-Experiments stay opt-in until justified by measured correctness and hardware tests.
+feasible. Run `scripts/bootstrap-dependencies.sh` followed by
+`scripts/check-repository.sh`. Engine or interface changes also need
+`scripts/build-engine.sh` for `iphoneos` and `iphonesimulator`, an app build,
+and a route ([TESTING.md](docs/TESTING.md)). CI builds the published app and the
+device engine without game data. Device gameplay is a separate check.
+Experiments stay opt-in until measured correctness and device tests justify them.
 
-New releases must record the app commit, recursive dependency commits, toolchain,
-SDK, flags, exact generated-module inputs and artifact hashes. Retain corresponding
-redistributable source and original notices with reproduction instructions.
-Packaging source references alone do not prove an externally supplied binary's
-provenance. Describe missing historical evidence honestly.
+Releases record the app commit, the engine pins, the toolchain and SDK, and the
+artifact hashes, and keep the corresponding source and original notices with
+reproduction steps. Packaged source references alone don't prove where a
+separately built engine came from. Describe missing evidence honestly.
 
 AI-assisted changes receive the same review and validation. Follow the receiving
 project's contribution policy before submitting upstream. Never attach game
-images, extracted assets, saves, generated modules, credentials or signing material
-to an issue or pull request. A build or synthetic test is not physical gameplay,
-audio, full-game or minimum-device acceptance.
+images, extracted files, saves, engine binaries, credentials or signing material
+to an issue or pull request. A build or synthetic test isn't gameplay, audio,
+full-game or minimum-device acceptance.
 
 By contributing, you agree that your contribution is licensed under the
 repository's GPL-3.0-or-later license. Review diagnostic logs for personal paths

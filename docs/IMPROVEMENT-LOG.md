@@ -544,3 +544,267 @@ Notes: The recipe moves to schema 2. On a Mac it keeps 0.2.3's Xcode steps
   kept private outside Git.
 Next: install the Windows-built IPA on an iPad after a verified save backup and
   check startup, gameplay, sound and a save reload before leaving draft.
+
+### 2026-11-23 decompilation engine plan: E0, E2 Simulator bring-up and E2.5
+Result: plan approved; fork pinned; the engine plays Delfino Plaza embedded in an
+  iOS Simulator app; fork captures identical to upstream; device probe pending
+Pins: SunPad 72c101a base; sms-pc-port fork b3ddbc3 on upstream 20abb7e
+  (decomp 967436b, sdk 67322b0); MoltenVK 1.4.2 (SHA-256 562a15a2...7276);
+  Homebrew LLVM 22.1.8; Xcode 27.2
+Checkpoints: check-repository.sh passes; dependency lock verified; fork's
+  macOS arm64 build matches upstream 20abb7e in every captured field of the
+  title and plaza runs with OpenGL and with Vulkan (compare.py --against)
+Notes: -DSMS_EMBED=ON builds libsms_embed.dylib (13.9 MB, iOS Simulator,
+  minimum iOS 16) exporting only the seven sms_embed_* calls and importing
+  libSystem, libc++ and CoreFoundation. The harness (scripts/engine-harness)
+  owns a CAMetalLayer, links MoltenVK statically and pulls 32 kHz audio
+  through RemoteIO. With the regress plaza input (SMS_AUTOPRESS, SMS_WARP=1,0,1,
+  30 FPS) it reached gameplay in Delfino Plaza with HUD, shadows, NPCs and the
+  FLUDD gauge. MoltenVK on the Simulator GPU rejects base-vertex draws, so the
+  fork rebinds vertex buffers there. The memory probe passes on the iOS 27.0
+  and tvOS 26.5 Simulators: MEM1 maps at 0x10000000000 and 0x7000000000, and a
+  16 MiB dylib loads inside the low window. A Release (-O3) engine build lost
+  a game symbol at link; the upstream RelWithDebInfo (-O2) flags are used.
+Next: unlock the iPhone 14 for the probe (installed as com.sunpad.engineprobe),
+  then set the device bases (E2.1) and build the device engine; E1.3 license
+  inventory; E3.1 SunPadEngineHost in the app.
+
+### 2026-11-23 decompilation engine: SunPad Next in the iOS Simulator
+Result: SunPad's app shell runs the decompiled engine in the iOS Simulator,
+  from its own boot path through the title into Delfino Plaza
+Pins: sms-pc-port fork (sunpad branch, see the lock); MoltenVK 1.4.2
+Checkpoints: tests/test-engine-bridge.sh passes for every settings row and the
+  input conversion; xcodebuild builds the SunPadNext target for the Simulator
+  with SUNPAD_EMBED_ENGINE=YES; check-repository.sh passes
+Notes: SunPadNext (com.sunpad.SunPad.next, shown as "SunPad Next") builds the
+  same app sources with apple/ios/SunPadEngineHost.mm in place of
+  SunPadCoreHost.mm and MoltenVK in place of libSunPadCore.a. The host loads
+  libsms_embed.dylib from Frameworks, sets the engine's SMS_* variables from
+  SunPad's settings (apple/shared/SunPadEngineBridge.mm), plays the engine's
+  32 kHz audio through RemoteIO, sends rumble to SunPadControllerRumble, pauses
+  the engine with the GPU idle around the background and audio interruptions,
+  and writes the engine log beside SunPad's log as Engine.log. Import keeps
+  the SHA-256 check and skips extraction. The engine runs once per process, so
+  a reimport asks the player to reopen SunPad. The game view's drawable was
+  844x390 in this run, so the game drew at points instead of pixels; E4.3
+  covers it. The memory probe has still not run on the iPhone 14 (locked).
+Next: probe on the iPhone 14, then the device engine build and SunPad Next
+  on the device; E3.5 save migration; E3.7 packaging.
+
+### 2026-11-23 decompilation engine: saves, packaging, Mac, tvOS builds and lifecycle
+Result: everything up to device acceptance works in the Simulator and on this
+  Mac; the iPhone 14 has the probe, SunPad Next, the disc image and a copy of
+  its SunPad save installed, and is waiting for an unlocked session
+Checkpoints: check-repository.sh passes with tests/test-engine-saves.sh and
+  the extended diagnostics test; scripts/package-ios-next.sh audits pass for
+  the shell and the personal IPA; the shell passes release_gate.py (0
+  address-named functions); the engine builds for the iOS and tvOS Simulators
+  and devices
+Notes: SunPadEngineSaves converts between Dolphin GCI files and the engine's
+  card, keeping each migrated GCI entry so saves go back byte for byte. A real
+  progressed save (SHA-256 e7f31b78...) migrated in the Simulator and showed
+  its Shine at file select, with the Dolphin copy unchanged. Problem reports
+  now include the engine log. Device engine builds put game memory at
+  0x7000000000 (SMS_GAME_HI); tvOS builds leave out the crash symbolizer's
+  process and the alternate signal stack. SunPad Next for Mac
+  (scripts/package-macos-next.sh) played the plaza route at 34.9 ms per frame
+  with 27.5 ms idle; the test's Engine folder was moved out of the Mac's
+  SunPad data afterwards. scripts/run-engine-route.sh measured the plaza at
+  33.4 ms per frame (30 FPS) in the iOS Simulator. Fifty background cycles in
+  the Simulator paused and resumed the engine 51 times in one process with
+  the card unchanged; a background during a save or a stage load was not
+  separately forced.
+Next: unlock the iPhone 14. Then: the probe (E1.1), SunPad Next's first launch
+  with the migrated save (E3.5 device), routes and hands-on play (E3.8, E4.2).
+### 2026-11-23 decompilation engine: SunPad parity pass
+Result: SunPad Next shows the game and its menu as SunPad does, and the new
+  build is installed on the iPhone 14 beside SunPad, waiting for a hands-on
+  session
+Checkpoints: tests/test-engine-bridge.sh passes with the new rows; the engine
+  builds for the iOS Simulator and devices; SunPadNext builds for both; in the
+  iOS Simulator the logos and opening movie show no skip prompt, the plaza's
+  pause menu is CONTINUE and SAVE only with Y doing nothing, and Fill Screen
+  fills the screen with the 16:9 picture
+Notes: a fork patch (decomp-patches/zzzzzzzzzzz-embed-01-retail-ui.patch) and
+  src/pause_quit.cpp add SMS_RETAIL_UI, which leaves out the pause menu's save
+  state and settings hints, its settings menu on Y, QUIT GAME and the "(A)
+  Skip" prompt. SunPad also turns off the pause tracker, the radar and co-op.
+  The host now sets the engine's variables before it loads the library: co-op
+  reads SMS_COOP in an initializer and had stayed on. Aspect modes follow
+  SunPad's: 16:9 widens the camera, Fill Screen stretches that 16:9 picture,
+  and both leave out the heat-wave shimmer. Reduced CPU Clock is hidden in
+  SunPad Next, and the 60 FPS item and the supported-mode messages describe
+  the engine. The game view keeps SunPad's drawable at the screen's size in
+  points, so the 844x390 drawable noted earlier is the same as SunPad's.
+Next: the hands-on check in DECOMP-ENGINE-PLAN.md (E3.8) on the iPhone 14,
+  with the memory probe (E1.1) and routes (E4.1) in the same session.
+### 2026-11-23 decompilation engine: SunPad Next on the iPad Pro
+Result: SunPad Next runs on the iPad Pro (12.9-inch, 6th generation, M2,
+  iPadOS 27.2.1), installed beside SunPad 0.3.3, which is unchanged
+Checkpoints: the Release build signed for development installs and launches;
+  Delfino Plaza plays at 33.4 ms per frame (30 FPS) with about 26 ms of each
+  frame idle at 865 draws per frame, render scale 2; 450 MiB resident;
+  thermal state nominal; the pause menu is CONTINUE and SAVE only, as in
+  SunPad; the iPad's save migrated on first launch and the engine card's data
+  matches the GCI byte for byte; the restored SunPad preferences gave
+  SunPad Next the iPad's touch layout and settings
+Notes: the iPad's SunPad save, config and preferences were copied to the Mac
+  first (scratch backup). The disc image came from the maintainer's verified
+  copy (SHA-256 67cec163...). MEM1 mapped at 0x7080000000, so the device base
+  needs no entitlement on this iPad. The first stage load compiled 171 Vulkan
+  pipelines (one 2.9 s frame); the pipeline cache keeps them for later runs.
+  QuickTime's screen mirroring takes the audio route, which iOS reports as an
+  audio interruption with no end, so the engine pauses until the app returns
+  to the foreground. SunPad's current engine behaves the same. The scripted
+  plaza route assumes an empty file select; with a save on file A it
+  reached the Options explanation, so the check used SMS_WARP_DIRECT.
+Next: hands-on touch and controller play on the iPad (E3.8); the iPhone 14
+  when it is unlocked.
+### 2026-11-23 decompilation engine: menu and stutter logging
+Result: SunPad Next has a reorganized three-dot menu and logs stutters; the
+  0.3.x menu is unchanged
+Checkpoints: the overlay compiles for both engines with -Wall; the 0.3.x menu
+  code is byte-identical to before (the diff only adds the engine's menu),
+  and tests/test-experimental-*-config.sh pass; tests/test-engine-bridge.sh
+  passes with the logging variables
+Notes: the maintainer played SunPad Next on the iPad Pro with an Xbox
+  controller and reported it runs better than SunPad, with stutter at first
+  loads and when new parts of an area appear. The ten-second performance lines
+  held 30 FPS throughout, at 2x and at 4x, so the stutters are single frames.
+  The earlier plaza run points at pipeline creation: MoltenVK 1.4.2 offers no
+  VK_EXT_graphics_pipeline_library, so glvk builds each new pipeline whole at
+  its first draw (171 pipelines and 16.9 ms of each frame on average over the
+  first 300 frames of Delfino Plaza). SunPad Next now passes SMS_GX_HITCH_MS=50
+  and SMS_GX_STATS=300, so Engine.log names each slow frame and what it spent.
+  The installed app has no Dolphin code: its binary and engine library have no
+  Dolphin or ModernGekko symbols.
+Next: install on the iPad when the maintainer's session ends, collect the
+  stutter log from real play, then E4.3 pipeline warm-up.
+### 2026-11-23 decompilation engine: iPhone 14 and first-visit stutter
+Result: SunPad Next runs on the iPhone 14, and a new area no longer stutters
+  while its pipelines are made; both devices have the build (engine bd9936f)
+Checkpoints: the memory probe passes on the iPhone 14 (base 0x7000000000
+  exact, task limit 0x7180000000); on the iPhone, Delfino Plaza and Bianco
+  Hills play at 33.4 ms per frame with about 850 to 900 draws per frame at 1x;
+  Bianco Hills from a cold cache made 164 pipelines in the background with no
+  frame over 50 ms in play (slowest 37 ms), and draws left out only in its
+  first seconds; the scene was complete afterwards (QuickTime screenshot);
+  the plaza with a warm cache had no frame over 45 ms in play
+Notes: the cold iPhone run before the change showed the cause: MoltenVK has
+  no pipeline libraries, so glvk made each new pipeline whole at its first
+  draw, a Metal compile of 80 to 150 ms on the A15 (218 in the plaza's first
+  seconds, single frames over a second, 2 FPS in one ten-second sample). With
+  a warm cache the same pipelines took about 0.3 ms each. The fork's
+  SMS_VK_ASYNC_PIPELINES keeps those at the draw and makes only pipelines the
+  device has not made before on background threads, listing them by hash
+  beside the pipeline cache and forgetting the list with the cache. SunPad
+  sets it. The same cold run had 95 s of black: SMS_RETAIL_UI had also turned
+  off SMS_SKIP_INTRO, so the opening movie played under the warp's black
+  screen. The retail patch now leaves out only the prompt and the A skip.
+  Each test launch ended the session open on the phone; the slow run the
+  maintainer saw was the first cold launch.
+Next: the maintainer's hands-on pass on both devices (menu, pop-in on a first
+  visit, saves); then PadMint (E6).
+### 2026-11-28 SunPad 0.4.0 release loop
+Cards, in the order done ([FINALIZE-NEW-ENGINE.md](FINALIZE-NEW-ENGINE.md)):
+- S0: worktree, fork and lock clean at bd9936f. Backups of the iPad's
+  SunPad 0.3.3 save, config and preferences and its SunPad Next card in
+  ~/.codex/scratch/backup-2026-11-28-ipad with SHA256SUMS. The iPhone 14 was
+  unavailable to the Mac, so its card is not backed up yet.
+- A1: passed in the iOS Simulator on a scratch card (SMS_SAVE_DIR): a new file
+  saved from the Delfino Plaza pause menu ("Save? Yes"), the card's .dat
+  changed, a relaunch showed file A with one Shine where it had shown New, a
+  load left the card unchanged, and the card went to a GCI and back with the
+  .dat byte-identical. Not checked on a device: the iPad stopped at iOS's
+  "Unable to Verify App" (it needs internet to recheck the developer
+  certificate), and the iPhone was unavailable. The device save check moves in
+  front of D2.
+- R1: docs/LEGACY-ENGINE.md, with the legacy recipe, catalog entry, lock and
+  .gitmodules copied verbatim into docs/legacy/.
+- R2: tag legacy-engine-final (annotated) and branch legacy-engine on 72c101a.
+- B1: the SunPadNext target became SunPad (com.sunpad.SunPad, SunPad, 0.4.0
+  build 22). Device and Simulator builds pass, and the Simulator played the
+  plaza route at 33.4 ms per frame under the new identity.
+- B2: not done. The iPad reaches the Mac but iOS cannot verify the developer
+  certificate without internet, so the app waits behind "Unable to Verify App".
+  B2 moves in front of D2 with the device save check.
+- B3: removed in separate commits (44a305e Apple TV, f2cc059 app code via
+  unifdef, d40ec83 scripts and tests, 9ead6ca gitlinks, lock and patches,
+  d7251ea CI, dd0c46f renames). check-repository.sh passed after each. Links
+  in documents to removed files now point at legacy-engine-final.
+- B4: audit-ios-package.sh audits the engine layout and package-ios.sh runs
+  it. The audit caught build paths in the engine (assertion file names and the
+  debug map); build-engine.sh now maps them and strips the debug map. The
+  published app and a player copy (published app plus the device engine) pass.
+- C1: padmint.json is an upstream-engine recipe with the disc chosen in the
+  app, Mac only, Homebrew LLVM as a player tool. PadMint check-manifest passes.
+- C2: PadMint branch codex/sunpad-0.4.0-engine (328c5e8), PR padmint#299:
+  catalog entry for the new engine (iOS on Apple silicon Macs, the disc
+  imported in the app, brew install cmake ninja llvm) and the COMPATIBILITY
+  row. 0e4b696 drops ios_hosts, so Windows and Linux show SunPad under "Needs
+  Apple Silicon Mac" like other Mac-only games: with an explicit host list the
+  page had switched its headings, which failed test_later. audit-catalog
+  --recipe and all 539 tests pass on Apple's Python.
+- C3: player-check.sh from the C2 branch, Apple's Python 3.9 and an empty
+  PadMint folder. Run 1 stopped at packaging: the recipe bootstraps without
+  MoltenVK, which package-ios.sh wanted for its license. package-ios.sh now
+  reuses the license the published app carries (4f6f98b). Run 2 failed the
+  audit's MoltenVK check: nm piped into grep -q under pipefail fails when grep
+  stops early (CI showed the same, "IO failure on output stream: Broken pipe").
+  The audit reads each tool's output whole first (5de8a54). Run 3 passed at
+  5de8a54 and built a personal IPA (SHA-256 9c07c42f...6229).
+- D1: README and every current document rewritten for the new engine
+  (9553186), RELEASE-0.4.0.md written, legacy-era documents given a dated
+  history note with their links to rewritten pages moved to
+  legacy-engine-final. config/dependency-migration.json removed (c376fd7) and
+  app comments updated (5b831a5). check-repository.sh passes, and every local
+  link and anchor resolves.
+- B2 (part): the signed 0.4.0 Release build (engine bd9936f) installed over
+  SunPad 0.3.3 on the iPad after a fresh backup
+  (~/.codex/scratch/backup-2026-11-28-ipad-b2, save identical to S0). First
+  launch created Engine/card-a: its .dat and direntry match the 0.3.3 GCI byte
+  for byte, and the Dolphin card's hashes are unchanged. The app booted to the
+  engine, then paused behind iOS's "Unable to Verify App": the iPad's VPN
+  keeps it from checking the developer certificate. Not checked yet: loading
+  the save in game, settings and Remove Stored Game Data.
+- The published app built from 9553186 passes its audit and release_gate.py
+  (0 address-named functions).
+- A3 (Simulator part): every area from a new game in the iOS Simulator
+  (SMS_WARP=0..9,0 with SMS_WARP_DIRECT=1, a scratch card, 55 s each): the
+  Airstrip, Delfino Plaza, Bianco Hills, Ricco Harbor, Gelato Beach, Pinna
+  Park, Sirena Beach, the Delfino Hotel, Pianta Village and Noki Bay load and
+  draw correctly with no fault (screenshots in ~/.codex/scratch/a3-sim). All
+  hold 33.4 ms per frame except Sirena Beach: 47 to 69 ms, up to 122 render
+  passes per frame, the game waiting up to 365 ms on the renderer thread.
+  Sirena Beach is on every playthrough's path, so it is measured on a device
+  before D2. The engine's Mac build (scratch card, settings and cache) held
+  33.4 ms in the same scene on the M3 Max with 105 to 118 render passes and
+  0.08 ms of GPU wait per frame, which points at the Simulator's graphics path.
+  The iPhone 14 is still unavailable for the device part.
+- C3 again: player-check.sh from PadMint 0e4b696 passed at 0439e8f, the commit
+  to merge apart from these notes. Its personal IPA (SHA-256 6d80fd2c...8f14)
+  is kept for the device check.
+- B2: passed on the iPad once it could verify the developer again (19:22).
+  File select showed the migrated files (1 and 94 Shines), and the 94-Shine
+  file loaded into Delfino Plaza at 30 FPS (94 Shines, 59 blue coins, 24
+  lives) with the iPad's touch layout and its 2x setting. The engine card and
+  the Dolphin card kept their hashes. Remove Stored Game Data wasn't tapped,
+  to keep the iPad's game data: GameData holds the image and the 0.3.x
+  extracted tree (415 files under GameData/GMSE01), and the action deletes the
+  whole GameData folder (gameOverlayRequestsGameDataRemoval).
+- A1 on the iPad: on a scratch card in tmp (SMS_SAVE_DIR), a new file warped to
+  Delfino Plaza, saved from the pause menu (CONTINUE, SAVE, "Saving file...",
+  devicectl screenshots), the card's .dat changed, and a relaunch showed file A
+  with 1 Shine where the card had shown New. The reload left the scratch card
+  unchanged, and the player's card kept its hash.
+- A3 on the iPad: Sirena Beach (SMS_WARP=6,0, scratch card) held 33.4 ms per
+  frame at 2x with 110 to 119 render passes and a nominal thermal state, so
+  the Simulator's 47 to 69 ms was the Simulator. The other areas ran only in
+  the Simulator and, for the plaza and Bianco Hills, on both devices on 23
+  November. The iPhone 14 stayed unavailable all day.
+- D2 preparation: main's branch protection still required the removed jobs
+  apple-build (ios) and apple-build (tvos), so PR #90 could never merge. The
+  required checks are now safety-and-tests, published-app and engine, recorded
+  in LEGACY-ENGINE.md for a revert.
+- CI passes on e0a2dca (safety-and-tests, published-app, engine). The two
+  earlier failures were the audit's grep -q under pipefail, fixed in 5de8a54.

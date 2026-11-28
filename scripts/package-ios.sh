@@ -1,66 +1,58 @@
 #!/usr/bin/env bash
+# Packages SunPad for iPhone and iPad.
+# usage: package-ios.sh APP ENGINE|none [OUTPUT.ipa]
+#   APP     a built SunPad.app, or the published SunPad IPA
+#   ENGINE  the player's libsms_embed.dylib, or "none" for the published app,
+#           which carries no game code
+# Both are audited (audit-ios-package.sh); the IPA is unsigned and must be
+# signed before installing.
 set -euo pipefail
-
 ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
-# APP: a built SunPad.app, or the published SunPad IPA (the app without game code).
-# MODULE: the player's gGMSE01_recomp.dylib, or "none" for the published app itself.
-APP="${1:-/tmp/SunPadReleaseData/Build/Products/Release-iphoneos/SunPad.app}"
-MODULE="${2:-$ROOT/build/ios-module-device/gGMSE01_recomp.dylib}"
-OUTPUT="${3:-$ROOT/artifacts/SunPad-v$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["version"])' "$ROOT/version.json")-ios-personal-unsigned.ipa}"
+APP="${1:?usage: package-ios.sh APP ENGINE|none [OUTPUT.ipa]}"
+ENGINE="${2:?usage: package-ios.sh APP ENGINE|none [OUTPUT.ipa]}"
+VERSION="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["version"])' "$ROOT/version.json")"
+KIND="$([[ "$ENGINE" = none ]] && echo unsigned || echo personal-unsigned)"
+OUTPUT="${3:-$ROOT/artifacts/SunPad-v$VERSION-ios-$KIND.ipa}"
+MOLTENVK_LICENSE="$ROOT/ref/moltenvk/MoltenVK/LICENSE"
+WORK="$(mktemp -d "${TMPDIR:-/tmp}/sunpad-package.XXXXXX")"
+trap 'rm -rf "$WORK"' EXIT
+fail() { echo "package-ios: $*" >&2; exit 1; }
 
-[[ "$APP" = /* ]] || APP="$ROOT/$APP"
-[[ "$MODULE" = none || "$MODULE" = /* ]] || MODULE="$ROOT/$MODULE"
-[[ "$OUTPUT" = /* ]] || OUTPUT="$ROOT/$OUTPUT"
-work_root="$(mktemp -d /tmp/sunpad-package.XXXXXX)"
-trap 'rm -rf "$work_root"' EXIT
 if [[ "$APP" = *.ipa ]]; then
-  [[ -f "$APP" ]] || { echo "published app not found: $APP" >&2; exit 1; }
-  ditto -x -k "$APP" "$work_root/published"
-  APP="$work_root/published/Payload/SunPad.app"
-  [[ ! -e "$APP/gGMSE01_recomp.dylib" ]] || { echo "the published app already contains a game module" >&2; exit 1; }
+  ditto -x -k "$APP" "$WORK/published"
+  APP="$WORK/published/Payload/SunPad.app"
+  [[ ! -e "$APP/Frameworks/libsms_embed.dylib" ]] || fail "the published app already contains an engine"
 fi
-[[ -d "$APP" ]] || { echo "app not found: $APP" >&2; exit 1; }
-if [[ "$MODULE" = none ]]; then
-  python3 "$ROOT/scripts/package-output.py" preflight "$OUTPUT" "$APP"
-  export SUNPAD_APP_ONLY=1
+[[ -d "$APP" ]] || fail "app not found: $APP"
+[[ "$ENGINE" = none || -f "$ENGINE" ]] || fail "engine not found: $ENGINE"
+# A player's Mac has no ref/moltenvk: the published app already carries the license.
+[[ -f "$MOLTENVK_LICENSE" ]] || MOLTENVK_LICENSE="$APP/SourceNotices/licenses/MoltenVK/LICENSE"
+[[ -f "$MOLTENVK_LICENSE" ]] || fail "run scripts/fetch-moltenvk.sh first"
+
+STAGED="$WORK/package/Payload/SunPad.app"
+mkdir -p "$(dirname "$STAGED")"
+ditto "$APP" "$STAGED"
+rm -rf "$STAGED/_CodeSignature" "$STAGED/embedded.mobileprovision" "$STAGED/SourceNotices"
+rm -f "$STAGED/Frameworks/libsms_embed.dylib"  # a development build's own copy (embed-engine-dev.sh)
+if [[ "$ENGINE" != none ]]; then
+  mkdir -p "$STAGED/Frameworks"
+  ditto "$ENGINE" "$STAGED/Frameworks/libsms_embed.dylib"
+  codesign --remove-signature "$STAGED/Frameworks/libsms_embed.dylib" 2>/dev/null || true
+fi
+codesign --remove-signature "$STAGED" 2>/dev/null || true
+cp "$ROOT/LICENSE" "$ROOT/THIRD_PARTY_NOTICES.md" "$ROOT/docs/INSTALL_IPA.md" "$STAGED/"
+"$ROOT/scripts/package-notices.sh" "$STAGED/SourceNotices"
+mkdir -p "$STAGED/SourceNotices/licenses/MoltenVK"
+cp "$MOLTENVK_LICENSE" "$STAGED/SourceNotices/licenses/MoltenVK/LICENSE"
+
+find "$WORK/package" -exec touch -h -t 200001010000 {} +
+mkdir -p "$(dirname "$OUTPUT")"
+(cd "$WORK/package" && find Payload \( -type f -o -type l \) -print | LC_ALL=C sort | zip -X -q -y "$WORK/SunPad.ipa" -@)
+mv "$WORK/SunPad.ipa" "$OUTPUT"
+if [[ "$ENGINE" = none ]]; then
+  SUNPAD_APP_ONLY=1 "$ROOT/scripts/audit-ios-package.sh" "$OUTPUT"
 else
-  python3 "$ROOT/scripts/package-output.py" preflight "$OUTPUT" "$APP" "$MODULE"
-  [[ -f "$MODULE" ]] || { echo "module not found: $MODULE" >&2; exit 1; }
+  "$ROOT/scripts/audit-ios-package.sh" "$OUTPUT"
 fi
-
-package_root="$work_root/package"
-staged_app="$package_root/Payload/SunPad.app"
-mkdir -p "$(dirname "$staged_app")" "$(dirname "$OUTPUT")"
-ditto "$APP" "$staged_app"
-[[ "$MODULE" = none ]] || ditto "$MODULE" "$staged_app/gGMSE01_recomp.dylib"
-
-rm -rf "$staged_app/_CodeSignature"
-rm -f "$staged_app/embedded.mobileprovision"
-[[ "$MODULE" = none ]] || codesign --remove-signature "$staged_app/gGMSE01_recomp.dylib" 2>/dev/null || true
-codesign --remove-signature "$staged_app" 2>/dev/null || true
-
-# Keep only the device-relative module name; local host paths never belong in
-# a public package.
-if [[ -f "$staged_app/dev-config.plist" ]]; then
-  /usr/libexec/PlistBuddy -c 'Delete :DevGameRoot' "$staged_app/dev-config.plist" 2>/dev/null || true
-  /usr/libexec/PlistBuddy -c 'Delete :DevModulePath' "$staged_app/dev-config.plist" 2>/dev/null || true
-fi
-cp "$ROOT/LICENSE" "$staged_app/LICENSE"
-cp "$ROOT/THIRD_PARTY_NOTICES.md" "$staged_app/THIRD_PARTY_NOTICES.md"
-cp "$ROOT/docs/INSTALL_IPA.md" "$staged_app/INSTALL_IPA.md"
-
-rm -rf "$staged_app/SourceNotices"
-"$ROOT/scripts/package-notices.sh" "$staged_app/SourceNotices"
-
-find "$package_root" -exec touch -h -t 200001010000 {} +
-temporary_ipa="$package_root/SunPad.ipa"
-(
-  cd "$package_root"
-  find Payload \( -type f -o -type l \) -print | LC_ALL=C sort |
-    zip -X -q -y "$temporary_ipa" -@
-)
-"$ROOT/scripts/audit-ios-package.sh" "$temporary_ipa"
-python3 "$ROOT/scripts/package-output.py" publish "$OUTPUT" "$temporary_ipa"
 echo "IPA: $OUTPUT"
 shasum -a 256 "$OUTPUT"
-echo "This unsigned IPA must be re-signed before installation."

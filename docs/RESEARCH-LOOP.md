@@ -1,5 +1,11 @@
 # Comparative research loop
 
+> [!NOTE]
+> **Updated 28 November 2026.** This loop was written for the legacy engine
+> (0.3.x). Its source rules still apply. SunPad 0.4.0 runs the decompilation
+> engine ([ARCHITECTURE.md](ARCHITECTURE.md)), and gaps worth doing now become
+> task cards in [DECOMP-ENGINE-PLAN.md](DECOMP-ENGINE-PLAN.md#follow-up-after-040).
+
 - **Started:** 2026-10-11
 - **Feeds:** [improvement plan](IMPROVEMENT-PLAN.md) through its
   [candidate intake](IMPROVEMENT-PLAN.md#adding-new-work)
@@ -19,8 +25,9 @@ look for features or fixes to learn from, or to refresh the inventory below.
 
 | Source | License | Read | Reuse in SunPad |
 | --- | --- | --- | --- |
-| [sms-pc-port](https://github.com/chasem-dev/sms-pc-port) | None (all rights reserved) | README, docs, commit messages, issues; source only to locate a game behavior | Nothing. No code, patches, data tables or assets |
-| [SMS Launcher](https://github.com/chasem-dev/sms-launcher) | MIT | Everything | Code only with its MIT notice in [THIRD_PARTY_NOTICES](../THIRD_PARTY_NOTICES.md). It is an Electron app, so treat it as a behavior reference |
+| [sms-pc-port](https://github.com/chasem-dev/sms-pc-port) | MIT since 2026-10-13 | Everything | Through the maintained engine fork only, with its notice ([engine plan](DECOMP-ENGINE-PLAN.md)) |
+| [sms-iphone-ipad](https://github.com/chasem-dev/sms-iphone-ipad) and [sms-android](https://github.com/chasem-dev/sms-android) | None (all rights reserved) | README, docs, commit messages, issues | Nothing. Facts they publish, such as a working address, may be cited |
+| [SMS Launcher](https://github.com/chasem-dev/sms-launcher) | MIT | Everything | Code only with its MIT notice in [THIRD_PARTY_NOTICES](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/THIRD_PARTY_NOTICES.md). It is an Electron app, so treat it as a behavior reference |
 | [sms-english](https://github.com/chasem-dev/sms-english) and [doldecomp/sms](https://github.com/doldecomp/sms) | CC0 | Everything | Yes, with the revision cited |
 | [Dolphin](https://github.com/dolphin-emu/dolphin) | GPL-2.0-or-later | Everything | Yes, through the maintained runtime forks |
 | Community texture packs, cutscene packs, artwork | Their authors' terms | Format and behavior | Never bundled or downloaded by SunPad |
@@ -103,7 +110,7 @@ Their features are listed for comparison; their platforms set different limits.
 | Capability | SMS Launcher / sms-pc-port | SunPad today | Class | Next |
 | --- | --- | --- | --- | --- |
 | Widescreen with the HUD kept 4:3 or at the edges | Yes | 16:9 with Sunshine's widescreen code; open defects ([#23](https://github.com/chrissotraidis/sunpad/issues/23)) | Plan | Task 9.1 |
-| Heat-wave effect on/off | Separate setting | Turned off only with widescreen; the patch sends a 16 KiB chunk to the interpreter ([known issues](KNOWN_ISSUES.md)) | Measure | Ideas: a bypass that does not change code bytes |
+| Heat-wave effect on/off | Separate setting | Turned off only with widescreen; the patch sends a 16 KiB chunk to the interpreter ([known issues](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/docs/KNOWN_ISSUES.md)) | Measure | Ideas: a bypass that does not change code bytes |
 | Internal resolution | Yes | Render Resolution menu | Have | |
 | MSAA, FXAA, anisotropic filtering, sharpening, FSR, HDR, presets | Yes | None | Not now | Needs GPU headroom iPhones lack; revisit for Macs and M-series iPads after goal 2 |
 | HD texture packs | Dolphin-format packs with load policies | None | Plan | Task 7.1, with pass 1 loading findings |
@@ -114,7 +121,7 @@ Their features are listed for comparison; their platforms set different limits.
 | Capability | SMS Launcher / sms-pc-port | SunPad today | Class | Next |
 | --- | --- | --- | --- | --- |
 | 60 and 120 FPS | 60 by default; 42 frame-rate patches and two timing write-ups | Original 30 FPS; unstable 60 FPS Gecko patch | Plan | Tasks 8.1-8.2, with pass 1 audit entries |
-| No stutter in a stage's first moments | Compiles each stage's recorded shader programs while it loads | Hybrid ubershaders on iOS; targeted warmup suggested in [technical debt](TECH-DEBT.md) | Measure | Ideas: per-stage pipeline warmup |
+| No stutter in a stage's first moments | Compiles each stage's recorded shader programs while it loads | Hybrid ubershaders on iOS; targeted warmup suggested in [technical debt](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/docs/TECH-DEBT.md) | Measure | Ideas: per-stage pipeline warmup |
 | Clean audio after slow frames | Fixed replayed and dropped audio blocks; grows the queue after an underrun | Dolphin audio path; see [audio issue](AUDIO_ISSUE.md) | Measure | Ideas: check for replayed blocks and underruns |
 | Frame-time overlay | Per-subsystem breakdown | FPS counter; diagnostic report | Plan | Task 2.3 |
 | Skip cutscenes | Yes | None | Not now | Changes game code; low player value against the cost |
@@ -125,7 +132,7 @@ Their features are listed for comparison; their platforms set different limits.
 | --- | --- | --- | --- | --- |
 | Guided setup | Disc choice, downloads, build | Files import; PadMint builds | Have | |
 | Logs for support | Activity log, copy and save | Report a Problem… shares a diagnostic report with the app version | Have | |
-| In-app changelog, automatic updates, Beta channel | Yes | None; releases are paused ([AGENTS.md](../AGENTS.md)) | Not now | Revisit when releases resume |
+| In-app changelog, automatic updates, Beta channel | Yes | None; releases are paused ([AGENTS.md](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/AGENTS.md)) | Not now | Revisit when releases resume |
 | Steam, Steam Deck, Discord presence | Yes | Not applicable on Apple devices | Not now | |
 | Cheat menu | Dear ImGui menu | None | Not now | Low priority; Gecko codes slow chunks down |
 | Super Mario Eclipse | Patches the user's disc into the mod | None | Not now | A different program: it would need its own module, and code it loads at run time would use the interpreter |

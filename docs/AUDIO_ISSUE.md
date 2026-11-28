@@ -1,5 +1,12 @@
 # Game-Engine Audio Investigation
 
+> [!NOTE]
+> **History (28 November 2026).** This document describes the legacy engine,
+> the game's PowerPC code translated ahead of time on a Dolphin-derived runtime,
+> which SunPad used through 0.3.x. SunPad 0.4.0 replaced it with the
+> decompilation engine. See the [legacy engine record](LEGACY-ENGINE.md) and,
+> for the current app, [ARCHITECTURE.md](ARCHITECTURE.md).
+
 Last updated: 2026-08-09
 
 ## Status
@@ -22,7 +29,7 @@ tick-delta busy-waits during audio bring-up (doldecomp/sms:
 `JASDSPChannel.cpp`, `dolphin/ai/ai.c`, `os/OSAudioSystem.c`).
 
 The fix is included in the complete
-[`0001-sunpad-ios-runtime.patch`](../patches/ModernGekko-dolphin/0001-sunpad-ios-runtime.patch)
+[`0001-sunpad-ios-runtime.patch`](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/patches/ModernGekko-dolphin/0001-sunpad-ios-runtime.patch)
 snapshot:
 
 - advance `ctx->timebase` as `tb_at_SyncIn + charged_cycles / TIMER_RATIO`

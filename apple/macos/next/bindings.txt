@@ -1,0 +1,24 @@
+# SunPad Next key bindings for controller 1: SunPad's Mac layout. Each line
+# replaces that control's keys; the format is the engine's (bindings.txt in
+# sms-pc-port lists every control and key name). Controllers keep the
+# engine's defaults.
+STICK_UP = W
+STICK_DOWN = S
+STICK_LEFT = A
+STICK_RIGHT = D
+CSTICK_UP = UP
+CSTICK_DOWN = DOWN
+CSTICK_LEFT = LEFT
+CSTICK_RIGHT = RIGHT
+A = J
+B = K
+X = U
+Y = I
+Z = O
+L = Q
+R = E
+START = ENTER
+DPAD_UP = T
+DPAD_DOWN = G
+DPAD_LEFT = F
+DPAD_RIGHT = H

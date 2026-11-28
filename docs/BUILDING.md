@@ -1,278 +1,124 @@
-> Dependency maintenance changed on September 14, 2026. Use the
-> [pinned fork source graph](DEPENDENCIES.md) in a fresh checkout. Bootstrap no
-> longer applies historical patches and refuses modified old dependency trees.
-
 # Building
 
-Last updated: 2026-10-25
+Last updated: 28 November 2026, for SunPad 0.4.0.
+
+Players don't build SunPad by hand: [PadMint](https://github.com/chrissotraidis/padmint)
+does it (see the [README](../README.md#get-sunpad)). This page is for
+development. The legacy engine's build is in the
+[legacy engine record](LEGACY-ENGINE.md#how-a-players-copy-was-built).
 
 ## Prerequisites
 
-Apple Silicon Mac with Xcode 26.x, CMake, Ninja, pkg-config, Git, Python 3,
-and a legally obtained Super Mario Sunshine USA ISO (`GMSE01`).
+- An Apple silicon Mac with full Xcode and its iOS platform. Versions checked
+  are in [DEPENDENCIES.md](DEPENDENCIES.md#build-tools).
+- `brew install cmake ninja llvm`. The engine is compiled with Homebrew's
+  LLVM, because its game code needs a pass plugin Apple's Clang can't load.
+  `SUNPAD_LLVM=/path/to/llvm` names another LLVM with `clang` and
+  `llvm-config`.
+- Your own GMSE01 disc image, imported in the app. No build step reads it.
 
-## Clean-clone preparation
-
-Prepare the pinned fork dependency tree:
-
-```sh
-./scripts/bootstrap-dependencies.sh
-```
-
-The bootstrap script initializes ModernGekko's Apple and tvOS lanes, their
-RecompCore/DolRecomp submodules and ModernGekko-Template. It verifies exact commits,
-URLs, gitlinks and source cleanliness without applying patches. It never downloads
-game data. Modified old checkouts are preserved. Use a fresh checkout to migrate.
-See the [dependency guide](DEPENDENCIES.md).
-
-Validate and prepare the supported local image:
+## Preparing a clean checkout
 
 ```sh
-./scripts/prepare-game.sh /path/to/GMSE01.iso
+git clone https://github.com/chrissotraidis/sunpad.git
+cd sunpad
+./scripts/bootstrap-dependencies.sh   # engine sources and MoltenVK
+./scripts/check-repository.sh
 ```
 
-`prepare-game.sh` also calls the bootstrap safely, checks the image against the
-documented SHA-256 for `GMSE01` USA revision 0, builds the recursively pinned
-DolRecomp tool and desktop ModernGekko tools,
-extracts into
-`ref/ModernGekko-Template/extracted/Super-Mario-Sunshine`, and writes generated
-module output below `ref/ModernGekko-Template/build/modules-macos14`. These inputs and
-outputs are ignored. The command rejects another revision before extraction.
+Bootstrap refuses to overwrite a dependency checkout with local changes. Use a
+fresh checkout or worktree instead of resetting one.
 
-To run the prepared desktop development build directly:
+## The engine
 
 ```sh
-ref/ModernGekko/build-desktop-tools-public/moderngekko-run \
-  --game ref/ModernGekko-Template/extracted/Super-Mario-Sunshine \
-  --module "$(cat ref/ModernGekko-Template/build/modules-macos14/GMSE01/active-module.txt)" \
-  --graphics Metal
+./scripts/build-engine.sh iphonesimulator   # build/engine-iphonesimulator/libsms_embed.dylib
+./scripts/build-engine.sh iphoneos          # build/engine-iphoneos/libsms_embed.dylib
 ```
 
-Package the proven desktop outputs as a local Apple Silicon app:
+A clean device build takes two to four minutes on an M3 Max and makes an 11 MB
+library. The script maps source and build paths to relative names and strips
+debug information, so the library carries no paths from the Mac that built
+it. The debug information stays in the build folder.
+
+## A development app
+
+The `SunPad` scheme's "Embed Engine" phase copies the engine for the SDK being
+built into the app when `SUNPAD_EMBED_ENGINE=YES`. Without it the app has no
+engine and asks for a PadMint copy at launch.
+
+**Simulator:**
 
 ```sh
-./scripts/package-macos-app.sh
-open build-macos/SunPad.app
-```
-
-This local bundle includes the locally generated module but no disc image or
-save. It is gitignored and must not be distributed.
-
-## Experimental PadMint module builds on Linux
-
-The personal iPhone/iPad recipe accepts Linux ARM64 and x86-64 hosts as well
-as Apple silicon Macs. Linux builds the game module and inserts it into the
-published app using PadMint's open-source iPhone SDK. Building the Apple app
-or runtime from source still requires a Mac with Xcode.
-
-Use current [PadMint](https://github.com/chrissotraidis/padmint) and a clean
-SunPad checkout. Linux needs a native C/C++ compiler and the dependencies for
-ModernGekko's desktop tools. The Ubuntu 24.04 validation environment used
-`build-essential`, `ca-certificates`, `cmake`, `curl`, `git`, `ninja-build`,
-`pkg-config`, `python3`, `ripgrep`, `perl`, `zip`, `unzip`, `xz-utils`,
-`libasound2-dev`, `libbluetooth-dev`, `libcurl4-openssl-dev`, `libegl-dev`,
-`libevdev-dev`, `libgl-dev`, `liblzma-dev`, `libpulse-dev`, `libsystemd-dev`,
-`libudev-dev`, `libusb-1.0-0-dev`, `libx11-dev`, `libxi-dev`, `libxrandr-dev`,
-`libxml2`, `libzstd-dev` and `zlib1g-dev`. PadMint installs its pinned module
-compiler and SDK inputs separately.
-
-With PadMint's CLI available, run these from the SunPad checkout:
-
-```sh
-python3 -m padmint tools sunpad --repo . --target ios
-python3 -m padmint build sunpad --repo . --revision "$(git rev-parse HEAD)" \
-  --disc /path/to/GMSE01.iso --target ios \
-  --app /path/to/SunPad-v0.2.1-ios-unsigned.ipa --jobs 6
-```
-
-Use the published base app and verify it against its release checksums first.
-PadMint checks the module's imports and the completed IPA. Follow the
-[installation guide](INSTALL_IPA.md) to sign and install the personal result,
-including its nested module. Keep the generated module and IPA private.
-Host build checks do not establish gameplay, audio or device compatibility.
-Do not reuse one checkout's native build caches across host architectures.
-
-## Experimental PadMint module builds on Windows
-
-Windows PCs build the same personal module. The recipe's Windows steps run
-`scripts/windows/build.py`, which does what `bootstrap-dependencies.sh` and
-`prepare-game.sh` do on other hosts, using Visual Studio's C++ compiler for
-ModernGekko's desktop tools. Its module step is the same `{ios_toolchain}`
-build that Macs and Linux run. The recorded preparation produces the same
-224 translated text files and copied `main.dol` as the prior Mac/ARM build.
-
-Both Windows host labels are experimental in this draft. Windows on ARM has a
-recorded normal PadMint build using native ARM64 Python. Native Windows x64 CI
-builds the desktop tools and checks PadMint's module pipeline. A private proof
-also built the x64 MSVC tools, translated the original disc, compiled with x64
-LLVM and packaged the result under Windows ARM64 emulation using bundled x64
-Python. It reused managed tools and preserved extraction after a failed attempt;
-it is not an empty-cache player run or a private build on native x64 hardware.
-
-That proof used a private harness to select the x64 target on the ARM VM. CMake's
-runtime probes actually executed; diagnostic mode retained their temporary files
-after a cleanup failure, without supplying test answers or changing VM settings.
-The packaged module matches the existing StaticRecomp ABI and iOS 16 minimum,
-passes import checks and preserves all 2,797 base-app entries. Device startup,
-gameplay, audio and saves still need validation. The result qualifies this source
-draft, not a new published release.
-
-One-time setup: install the free
-[Build Tools for Visual Studio](https://visualstudio.microsoft.com/visual-cpp-build-tools/)
-2022 or newer with the "Desktop development with C++" workload. On an ARM PC,
-keep "MSVC ARM64 build tools" ticked. PadMint downloads Git, CMake, Ninja, its
-module compiler and the SDK parts. Allow about 30 GB, and keep the checkout on
-a local NTFS drive: a network share gives `\\server\...` paths, which the
-linker's `cmd.exe` steps cannot use as their working folder. With PadMint's
-CLI available, run these from the SunPad checkout:
-
-```bat
-py -m padmint tools sunpad --repo . --target ios
-py -m padmint build sunpad --repo . --revision <full commit> ^
-  --disc D:\path\to\GMSE01.iso --target ios ^
-  --app D:\path\to\SunPad-v0.2.2-ios-unsigned.ipa --jobs 6
-```
-
-Dolphin's Windows build writes its programs to `ref/ModernGekko/Binary`; the
-script marks that folder ignored in that checkout so the dependency check still
-passes. The same privacy, signing and device notes as for Linux apply.
-
-Windows preparation calls the pinned DolRecomp translator directly and keeps its
-output in `build/windows-generated`. This avoids building an unused desktop DLL
-whose nested cache paths can exceed Windows' path limit. The compiler flags and
-generated sources are unchanged; developer `DOLRECOMP_*` environment switches are
-ignored. If a future dependency enables default DOL patches, preparation stops for
-review rather than skipping them. The Mac route is unchanged.
-
-A completed receipt checks the input executable, translator, settings, source pins,
-builder and every output file before reuse. Failed generation leaves the previous
-output intact; a successful replacement preserves the previous folder alongside it.
-Older `modules-macos14` caches are also left intact. A separate module command refuses
-stale or incomplete prepared sources and asks you to rerun preparation.
-
-## iOS / iPadOS Simulator development build
-
-Run the clean-clone preparation above first. One command then provisions the
-whole app: the iOS Simulator core (ModernGekko +
-Dolphin runtime), the GMSE01 simulator module, and the merged static archive
-the Xcode project links.
-
-```sh
-./scripts/ios-build-core.sh
-```
-
-Then build the app with Xcode (or xcodebuild) for a simulator destination and
-run it:
-
-```sh
+./scripts/build-engine.sh iphonesimulator
 xcodebuild -project SunPad.xcodeproj -scheme SunPad -configuration Debug \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
-  -derivedDataPath /tmp/sunpad-ddp build
-xcrun simctl boot "iPhone 17 Pro"
-xcrun simctl install "iPhone 17 Pro" /tmp/sunpad-ddp/Build/Products/Debug-iphonesimulator/SunPad.app
-xcrun simctl launch "iPhone 17 Pro" com.sunpad.SunPad
+  -destination 'platform=iOS Simulator,name=iPhone 17e' \
+  -derivedDataPath build/xcode SUNPAD_EMBED_ENGINE=YES build
+xcrun simctl install booted build/xcode/Build/Products/Debug-iphonesimulator/SunPad.app
 ```
 
-Notes:
+Import the disc in the app (**••• → Game Data**), or drop it in the app's
+`Documents` folder and use **Import from SunPad Folder**.
 
-- The dev app reads the extracted game tree and module from host paths in
-  `apple/ios/Provisioned/dev-config.plist` (Simulator only; generated by
-  `ios-provision.sh`, gitignored).
-- Only one Simulator should run at a time on this machine.
-- The merged `libSunPadCore.a` is a build product; rerun `ios-provision.sh`
-  after any core change.
-
-## Simulator module (what it is)
-
-`scripts/ios-build-core.sh` recompiles the locally generated DolRecomp C
-chunks next to the active macOS 14 module artifact for the
-Simulator using the iOS toolchain, producing `/tmp/sunpad-module-ios-simulator/gGMSE01_recomp.dylib`
-(platform IOSSIMULATOR). The app loads it via `dlopen`; a statically linked
-module is the documented App Store-compatible follow-up.
-
-## Physical iOS / iPadOS device build (development only)
-
-Run the clean-clone preparation above first. The physical-device core and
-matching GMSE01 module use the separate arm64 iPhoneOS toolchain:
+**Your own iPhone or iPad:**
 
 ```sh
-./scripts/ios-build-core-device.sh
-xcodebuild -project SunPad.xcodeproj -scheme SunPad -configuration Debug \
-  -destination 'platform=iOS,id=<device-udid>' \
-  -derivedDataPath /tmp/SunPadDerivedData \
-  DEVELOPMENT_TEAM=<team-id> CODE_SIGN_STYLE=Automatic \
-  -allowProvisioningUpdates build
+./scripts/build-engine.sh iphoneos
+xcodebuild -project SunPad.xcodeproj -scheme SunPad -configuration Release \
+  -sdk iphoneos -derivedDataPath build/xcode \
+  SUNPAD_EMBED_ENGINE=YES CODE_SIGNING_ALLOWED=NO build
+./scripts/sign-dev-app.sh build/xcode/Build/Products/Release-iphoneos/SunPad.app \
+  "IDENTITY" path/to/profile.mobileprovision
+xcrun devicectl device install app --device DEVICE_ID \
+  build/xcode/Build/Products/Release-iphoneos/SunPad.app
 ```
 
-The script produces the device core archive, device module, and
-`apple/ios/Provisioned/dev-config.plist`. Installing user-owned game data and
-the generated module into a development device container remains a local
-provisioning step; neither is bundled or tracked. This path has booted on a
-physical iPad. The guest-timebase audio defect is fixed on desktop and the
-Simulator, but fresh physical-device audio acceptance remains as documented in
-[AUDIO_ISSUE.md](AUDIO_ISSUE.md).
+`sign-dev-app.sh` signs the app and its libraries with an Apple Development
+identity and a profile covering `com.sunpad.SunPad`. Installing over an
+existing SunPad keeps its data only with the same bundle identifier and team.
+Back up the app's container first when it holds a save you care about.
 
-Sign the generated module with the same Apple Development identity as the app,
-then copy it to the root of the app container's temporary directory:
+## Scripted routes
 
 ```sh
-codesign --force --sign <development-identity> --timestamp=none \
-  --identifier gGMSE01_recomp build/ios-module-device/gGMSE01_recomp.dylib
-xcrun devicectl device copy to --device <device-udid> \
-  --domain-type appDataContainer --domain-identifier com.sunpad.SunPad \
-  --source build/ios-module-device/gGMSE01_recomp.dylib \
-  --destination tmp/gGMSE01_recomp.dylib
+./scripts/run-engine-route.sh DEVICE_OR_SIMULATOR_ID plaza|bianco|ricco|gelato [SECONDS]
 ```
 
-Before updating a device, complete the verified backup in the
-[device session protocol](IMPROVEMENT-PLAN.md#device-session-protocol). For a
-recorded save-preservation session, install, read data back and launch as
-separate steps.
+The route starts a new file on file A with `SMS_AUTOPRESS` input, warps to the
+area with `SMS_WARP` and prints the engine's frame-time statistics from
+`Engine.log`. Other `SMS_*` variables already set, such as
+`SMS_FRAME_RATE=60`, are passed on. A route on a new file writes that file to
+the app's card: use `SMS_SAVE_DIR` to point the engine at a scratch card
+when the device holds a real save.
 
-For repeat development deployments, `scripts/deploy-ios-device.sh` performs the
-in-place app update, provisions the signed module at that exact path, and then
-launches SunPad. Installing the app alone clears its temporary module and will
-leave the build unable to start.
+## The published app and a player's copy
 
-This produces a locally signed source/developer build, not a distributable
-IPA. The runtime module is generated from the user's local disc-derived inputs
-and provisioned separately into the development app container.
+```sh
+./scripts/build-ios-app.sh                                  # artifacts/SunPad-v0.4.0-ios-unsigned.ipa
+./scripts/package-ios.sh artifacts/SunPad-v0.4.0-ios-unsigned.ipa \
+  build/engine-iphoneos/libsms_embed.dylib                  # artifacts/SunPad-v0.4.0-ios-personal-unsigned.ipa
+```
 
-## Deployment targets and verification boundary
+`build-ios-app.sh` builds the Release app without an engine and packages it.
+`package-ios.sh` adds an engine to the published app, as PadMint does, and both
+run `audit-ios-package.sh` on what they make. The published app must have no
+engine and no game code. A player's copy must have an arm64 engine for iOS 16
+that exports only `sms_embed_*` and links only libSystem, libc++ and
+CoreFoundation. Neither may hold game data, saves, logs, signing material or
+personal paths. Both IPAs are unsigned. A player's copy is personal and must
+never be published.
 
-The Xcode app, iOS core and iOS module configurations set iOS 16.0. The signed
-iOS app plist and app/module Mach-O metadata have been inspected and record
-iOS 16.0; runtime acceptance on iOS 16 hardware remains open. The desktop core,
-generated module and macOS package configuration set macOS 14.0, but the final
-macOS artifact still needs equivalent inspection and oldest-target runtime
-acceptance. Do not describe either oldest-OS compatibility boundary as
-physically accepted yet.
+## Through PadMint
 
-### Windows paths outside the current code page
+PadMint reads [padmint.json](../padmint.json): it bootstraps the engine sources
+(`--sources-only`), runs `build-engine.sh iphoneos`, then `package-ios.sh` on
+the published IPA from the release. To check a candidate as a player would,
+run PadMint's `scripts/player-check.sh sunpad ios - SUNPAD_CHECKOUT
+PUBLISHED.ipa` from PadMint's `main` (see [TESTING.md](TESTING.md)).
 
-The Windows builder prints UTF-8, preserves Unicode values when loading Visual
-Studio's environment, and decodes Git metadata paths as UTF-8. Its dependency
-Python child explicitly enables UTF-8. A project-specific CMake hook embeds a
-UTF-8 manifest in `dolrecomp` without changing pinned compiler sources, flags,
-ModernGekko's source-root layout, or the Mac build scripts. Native host CMake
-commands receive a private hidden UTF-8 console: MSVC otherwise writes `?` into
-Ninja's header dependencies and breaks the next build. The caller's console,
-compiler flags and system settings are unchanged.
+## Deployment targets
 
-The pinned generator passed a public two-instruction DOL fixture with Unicode
-input/output/cwd and TEMP paths under bundled Windows Python with UTF-8 mode
-disabled. Its generated C/header bytes matched the control; manifest readback
-retained `asInvoker`. Adding the hook to a cached standalone generator build
-required only relinking; an unchanged repeat did no work. The actual
-ModernGekko nested generator target also passed from a separate public build.
-A public header fixture also verifies the second build does no work, literal
-command arguments stay intact, and failed children remain failures.
-These local checks used x64 MSVC tools under Windows ARM64 emulation. They do not
-execute the emitted PowerPC code or repeat the earlier private module build.
-The previous private build caches and outputs are preserved.
-
-After `python scripts/windows/build.py tools`, run
-`python tests/check-windows-host.py` for the public fixture. Hosted Windows CI
-builds the complete desktop tool graph before running this check. The default
-prepared-source repository suite and the portable Windows encoding/cache tests
-remain separate required checks.
+The app and engine require iOS and iPadOS 16 on arm64. The engine's Simulator
+build runs on Apple silicon Simulators only. Apple TV and Mac builds of the
+engine exist as development work and aren't part of 0.4.0 (see
+[TVOS.md](TVOS.md) and [MACOS.md](MACOS.md)).

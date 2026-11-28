@@ -1,5 +1,12 @@
 # SunPad 0.3.2 — get touch controls back with a controller connected
 
+> [!NOTE]
+> **History (28 November 2026).** This document describes the legacy engine,
+> the game's PowerPC code translated ahead of time on a Dolphin-derived runtime,
+> which SunPad used through 0.3.x. SunPad 0.4.0 replaced it with the
+> decompilation engine. See the [legacy engine record](LEGACY-ENGINE.md) and,
+> for the current app, [ARCHITECTURE.md](ARCHITECTURE.md).
+
 Version 0.3.2, build 20, changes how SunPad's on-screen touch controls behave
 when a game controller is connected (sunpad#86).
 

@@ -1,5 +1,12 @@
 # SunPad upstream integration review
 
+> [!NOTE]
+> **History (28 November 2026).** This document describes the legacy engine,
+> the game's PowerPC code translated ahead of time on a Dolphin-derived runtime,
+> which SunPad used through 0.3.x. SunPad 0.4.0 replaced it with the
+> decompilation engine. See the [legacy engine record](LEGACY-ENGINE.md) and,
+> for the current app, [ARCHITECTURE.md](ARCHITECTURE.md).
+
 September 14, 2026. Baseline: SunPad `ec20f8d`. Reference: GalaxyPad's
 [engineering review](https://github.com/chrissotraidis/galaxypad/blob/f4c719e2f1425d1af054fc6dff96855a562af33d/docs/UPSTREAM-REVIEW.md),
 [README attribution change](https://github.com/chrissotraidis/galaxypad/commit/65f1ef5)
@@ -27,7 +34,7 @@ full-game certification.
 ## Source and JIT evidence
 
 The [lock](../config/dependencies.lock.json) records exact fork commits and upstream
-bases. The [migration record](../config/dependency-migration.json) maps all five
+bases. The [migration record](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/config/dependency-migration.json) maps all five
 historical snapshots to source commits. Each lane preserves the corresponding
 applied source tree. Deliberate graph-only changes select maintained RecompCore and
 DolRecomp URLs and nested commits. Upstream history, licenses and contributor

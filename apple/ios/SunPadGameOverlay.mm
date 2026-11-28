@@ -428,68 +428,35 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
     [self addSubview:_menuButton];
 }
 
+// The three-dot menu: Display, Controls, Saves, Game Data, Report a Problem.
 - (UIMenu *)buildMenu {
     __weak SunPadGameOverlay *weakSelf = self;
     SunPadSettings *settings = [SunPadSettings sharedSettings];
 
-    UIMenu *renderMenu = [UIMenu menuWithTitle:@"Render Resolution" children:@[
+    UIMenu *renderMenu = [UIMenu menuWithTitle:@"Render Resolution" image:nil identifier:nil
+                                       options:UIMenuOptionsSingleSelection children:@[
         [self renderAction:@"1× (Native)" scale:1],
         [self renderAction:@"2×" scale:2],
         [self renderAction:@"3×" scale:3],
         [self renderAction:@"4×" scale:4],
     ]];
+    renderMenu.subtitle = [NSString stringWithFormat:@"%ld×", (long)settings.renderScale];
 
-    UIMenu *aspectMenu = [UIMenu menuWithTitle:@"Aspect Ratio" children:@[
-        [self aspectRatioAction:@"Original 4:3 (Restart Required)"
-                           mode:SunPadAspectRatioOriginal],
-        [self aspectRatioAction:@"16:9 (Experimental, Restart Required)"
-                           mode:SunPadAspectRatioWidescreen],
-        [self aspectRatioAction:@"Fill Screen (Experimental, Restart Required)"
-                           mode:SunPadAspectRatioFillScreen],
-    ]];
+    NSArray<UIAction *> *aspectActions = @[
+        [self aspectRatioAction:@"Original 4:3" mode:SunPadAspectRatioOriginal],
+        [self aspectRatioAction:@"16:9 (Experimental)" mode:SunPadAspectRatioWidescreen],
+        [self aspectRatioAction:@"Fill Screen (Experimental)" mode:SunPadAspectRatioFillScreen],
+    ];
+    UIMenu *aspectMenu = [UIMenu menuWithTitle:@"Aspect Ratio" image:nil identifier:nil
+                                       options:UIMenuOptionsSingleSelection children:aspectActions];
+    aspectMenu.subtitle = aspectActions[MAX(0, MIN(2, settings.aspectRatioMode))].title;
 
-    UIMenu *displayMenu = [UIMenu menuWithTitle:@"Display"
-                                          image:[UIImage systemImageNamed:@"display"]
-                                     identifier:nil
-                                        options:0
-                                       children:@[renderMenu, aspectMenu]];
-
-    UIMenu *dataMenu = [UIMenu menuWithTitle:@"Game Data & Saves"
-                                       image:[UIImage systemImageNamed:@"internaldrive"]
-                                  identifier:nil
-                                     options:0
-                                    children:@[
-        [UIAction actionWithTitle:@"Import or Reimport Game Data"
-                            image:[UIImage systemImageNamed:@"arrow.triangle.2.circlepath"]
-                       identifier:nil handler:^(__kindof UIAction *action) {
-            (void)action;
-            [weakSelf.delegate gameOverlayRequestsGameDataChange:weakSelf];
-        }],
-        [UIAction actionWithTitle:@"Import from SunPad Folder"
-                            image:[UIImage systemImageNamed:@"folder"]
-                       identifier:nil handler:^(__kindof UIAction *action) {
-            (void)action;
-            [weakSelf.delegate gameOverlayRequestsGameDataFolderImport:weakSelf];
-        }],
-        [UIAction actionWithTitle:@"Import Dolphin Save (.gci)…"
-                            image:[UIImage systemImageNamed:@"square.and.arrow.down"]
-                       identifier:nil handler:^(__kindof UIAction *action) {
-            (void)action;
-            [weakSelf.delegate gameOverlayRequestsSaveImport:weakSelf];
-        }],
-        [UIAction actionWithTitle:@"Export Saves…"
-                            image:[UIImage systemImageNamed:@"square.and.arrow.up"]
-                       identifier:nil handler:^(__kindof UIAction *action) {
-            (void)action;
-            [weakSelf exportSaves];
-        }],
-        [UIAction actionWithTitle:@"Remove Stored Game Data"
-                            image:[UIImage systemImageNamed:@"trash"]
-                       identifier:nil handler:^(__kindof UIAction *action) {
-            (void)action;
-            [weakSelf confirmGameDataRemoval];
-        }],
-    ]];
+    UIAction *thirtyFPSAction = [self frameRateAction:@"30 FPS (Original)" sixtyFPS:NO];
+    UIAction *sixtyFPSAction = [self frameRateAction:@"60 FPS (Experimental)" sixtyFPS:YES];
+    UIMenu *frameRateMenu = [UIMenu menuWithTitle:@"Frame Rate" image:nil identifier:nil
+                                          options:UIMenuOptionsSingleSelection
+                                         children:@[thirtyFPSAction, sixtyFPSAction]];
+    frameRateMenu.subtitle = settings.experimental60FPS ? sixtyFPSAction.title : thirtyFPSAction.title;
 
     UIAction *fpsAction = [UIAction actionWithTitle:@"Show FPS Counter"
                                               image:[UIImage systemImageNamed:@"speedometer"]
@@ -503,117 +470,17 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
     }];
     fpsAction.state = settings.showFPSCounter ? UIMenuElementStateOn : UIMenuElementStateOff;
 
-    UIAction *sixtyFPSAction =
-        [UIAction actionWithTitle:@"60 FPS Patch (Unstable, Restart Required)"
-                            image:[UIImage systemImageNamed:@"speedometer"]
-                       identifier:nil handler:^(__kindof UIAction *action) {
-        (void)action;
-        SunPadSettings *currentSettings = [SunPadSettings sharedSettings];
-        currentSettings.experimental60FPS = !currentSettings.experimental60FPS;
-        [currentSettings synchronize];
-        [[[UISelectionFeedbackGenerator alloc] init] selectionChanged];
-        [weakSelf refreshMenuButton];
-
-        NSString *message = currentSettings.experimental60FPS ?
-            @"This patch is diagnostic only. It is not a performance boost and is known to be unsuitable for normal play. It can cause severe slowdown and game-timing, physics, animation, or audio problems. Close and reopen SunPad to enable it." :
-            @"The supported original 30 FPS mode is selected. Close and reopen SunPad to apply it.";
-        UIAlertController *alert =
-            [UIAlertController alertControllerWithTitle:@"Restart Required"
-                                                message:message
-                                         preferredStyle:UIAlertControllerStyleAlert];
-        [alert addAction:[UIAlertAction actionWithTitle:@"OK"
-                                                  style:UIAlertActionStyleDefault
-                                                handler:nil]];
-        [weakSelf.window.rootViewController presentViewController:alert
-                                                         animated:YES
-                                                       completion:nil];
-    }];
-    sixtyFPSAction.state = settings.experimental60FPS ?
-        UIMenuElementStateOn : UIMenuElementStateOff;
-
-    UIAction *performanceAction =
-        [UIAction actionWithTitle:@"Reduced CPU Clock 90% (Unstable, Restart Required)"
-                            image:[UIImage systemImageNamed:@"gauge.with.dots.needle.67percent"]
-                       identifier:nil handler:^(__kindof UIAction *action) {
-        (void)action;
-        SunPadSettings *currentSettings = [SunPadSettings sharedSettings];
-        currentSettings.experimentalPerformanceMode =
-            !currentSettings.experimentalPerformanceMode;
-        [currentSettings synchronize];
-        [[[UISelectionFeedbackGenerator alloc] init] selectionChanged];
-        [weakSelf refreshMenuButton];
-
-        NSString *message = currentSettings.experimentalPerformanceMode ?
-            @"This diagnostic mode reduces the emulated CPU clock. It is not a speed boost and can make Sunshine much slower. Severe rendering corruption has been reported while it is enabled. Close and reopen SunPad to enable it." :
-            @"The supported full CPU clock is selected. Close and reopen SunPad to apply it.";
-        UIAlertController *alert =
-            [UIAlertController alertControllerWithTitle:@"Restart Required"
-                                                message:message
-                                         preferredStyle:UIAlertControllerStyleAlert];
-        [alert addAction:[UIAlertAction actionWithTitle:@"OK"
-                                                  style:UIAlertActionStyleDefault
-                                                handler:nil]];
-        [weakSelf.window.rootViewController presentViewController:alert
-                                                         animated:YES
-                                                       completion:nil];
-    }];
-    performanceAction.state = settings.experimentalPerformanceMode ?
-        UIMenuElementStateOn : UIMenuElementStateOff;
-
-    BOOL supportedModeSelected = !settings.experimentalPerformanceMode &&
-        !settings.experimental60FPS;
-    UIAction *supportedModeAction =
-        [UIAction actionWithTitle:@"Use Supported 30 FPS Mode (Restart Required)"
-                            image:[UIImage systemImageNamed:@"checkmark.shield"]
-                       identifier:nil handler:^(__kindof UIAction *action) {
-        (void)action;
-        SunPadSettings *currentSettings = [SunPadSettings sharedSettings];
-        BOOL changed = currentSettings.experimentalPerformanceMode ||
-            currentSettings.experimental60FPS;
-        currentSettings.experimentalPerformanceMode = NO;
-        currentSettings.experimental60FPS = NO;
-        [currentSettings synchronize];
-        [[[UISelectionFeedbackGenerator alloc] init] selectionChanged];
-        [weakSelf refreshMenuButton];
-
-        UIAlertController *alert = [UIAlertController
-            alertControllerWithTitle:changed ? @"Supported Mode Selected" : @"Supported Mode Active"
-                             message:changed ?
-                @"Full CPU clock and the original 30 FPS mode are selected. Close and reopen SunPad to apply them." :
-                @"Full CPU clock and the original 30 FPS mode are already selected."
-                      preferredStyle:UIAlertControllerStyleAlert];
-        [alert addAction:[UIAlertAction actionWithTitle:@"OK"
-                                                  style:UIAlertActionStyleDefault
-                                                handler:nil]];
-        [weakSelf.window.rootViewController presentViewController:alert
-                                                         animated:YES
-                                                       completion:nil];
-    }];
-    supportedModeAction.state = supportedModeSelected ?
-        UIMenuElementStateOn : UIMenuElementStateOff;
-
-    NSString *experimentsTitle = supportedModeSelected ?
-        @"Unstable Experiments (Off)" : @"⚠︎ Unstable Experiments Enabled";
-    UIMenu *experimentsMenu = [UIMenu menuWithTitle:experimentsTitle
-                                              image:[UIImage systemImageNamed:@"exclamationmark.triangle"]
-                                         identifier:nil
-                                            options:UIMenuOptionsDisplayInline
-                                           children:@[
-        supportedModeAction,
-        [UIMenu menuWithTitle:@"Diagnostic Options, Not for Normal Play"
-                         image:[UIImage systemImageNamed:@"wrench.and.screwdriver"]
-                    identifier:nil
-                       options:0
-                      children:@[performanceAction, sixtyFPSAction]],
+    UIMenu *displayMenu = [UIMenu menuWithTitle:@"Display"
+                                          image:[UIImage systemImageNamed:@"display"]
+                                     identifier:nil
+                                        options:0
+                                       children:@[
+        renderMenu,
+        aspectMenu,
+        frameRateMenu,
+        [UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline
+                     children:@[fpsAction]],
     ]];
-
-    UIAction *reportProblemAction =
-        [UIAction actionWithTitle:@"Report a Problem…"
-                            image:[UIImage systemImageNamed:@"exclamationmark.bubble"]
-                       identifier:nil handler:^(__kindof UIAction *action) {
-        (void)action;
-        [weakSelf reportProblem];
-    }];
 
     UIAction *rumbleAction =
         [UIAction actionWithTitle:@"Controller Rumble"
@@ -661,6 +528,63 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
         rumbleAction,
     ]];
 
+    UIMenu *savesMenu = [UIMenu menuWithTitle:@"Saves"
+                                        image:[UIImage systemImageNamed:@"square.and.arrow.up.on.square"]
+                                   identifier:nil
+                                      options:0
+                                     children:@[
+        [UIAction actionWithTitle:@"Export Saves…"
+                            image:[UIImage systemImageNamed:@"square.and.arrow.up"]
+                       identifier:nil handler:^(__kindof UIAction *action) {
+            (void)action;
+            [weakSelf exportSaves];
+        }],
+        [UIAction actionWithTitle:@"Import Dolphin Save (.gci)…"
+                            image:[UIImage systemImageNamed:@"square.and.arrow.down"]
+                       identifier:nil handler:^(__kindof UIAction *action) {
+            (void)action;
+            [weakSelf.delegate gameOverlayRequestsSaveImport:weakSelf];
+        }],
+    ]];
+
+    UIAction *removeDataAction =
+        [UIAction actionWithTitle:@"Remove Stored Game Data"
+                            image:[UIImage systemImageNamed:@"trash"]
+                       identifier:nil handler:^(__kindof UIAction *action) {
+        (void)action;
+        [weakSelf confirmGameDataRemoval];
+    }];
+    removeDataAction.attributes = UIMenuElementAttributesDestructive;
+
+    UIMenu *dataMenu = [UIMenu menuWithTitle:@"Game Data"
+                                       image:[UIImage systemImageNamed:@"internaldrive"]
+                                  identifier:nil
+                                     options:0
+                                    children:@[
+        [UIAction actionWithTitle:@"Import or Reimport Game Data"
+                            image:[UIImage systemImageNamed:@"arrow.triangle.2.circlepath"]
+                       identifier:nil handler:^(__kindof UIAction *action) {
+            (void)action;
+            [weakSelf.delegate gameOverlayRequestsGameDataChange:weakSelf];
+        }],
+        [UIAction actionWithTitle:@"Import from SunPad Folder"
+                            image:[UIImage systemImageNamed:@"folder"]
+                       identifier:nil handler:^(__kindof UIAction *action) {
+            (void)action;
+            [weakSelf.delegate gameOverlayRequestsGameDataFolderImport:weakSelf];
+        }],
+        [UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline
+                     children:@[removeDataAction]],
+    ]];
+
+    UIAction *reportProblemAction =
+        [UIAction actionWithTitle:@"Report a Problem…"
+                            image:[UIImage systemImageNamed:@"exclamationmark.bubble"]
+                       identifier:nil handler:^(__kindof UIAction *action) {
+        (void)action;
+        [weakSelf reportProblem];
+    }];
+
     NSMutableArray<UIMenuElement *> *rootItems = [NSMutableArray array];
     if (_touchControlsHidden) {
         [rootItems addObject:[UIAction actionWithTitle:@"Show Touch Controls"
@@ -673,14 +597,48 @@ static CGFloat SunPadDefaultSizeScaleForControl(UIView *view, NSString *identifi
     }
     [rootItems addObjectsFromArray:@[
         displayMenu,
-        fpsAction,
-        experimentsMenu,
         controlsMenu,
+        savesMenu,
         dataMenu,
-        reportProblemAction,
+        [UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline
+                     children:@[reportProblemAction]],
     ]];
     return [UIMenu menuWithTitle:@"SunPad" children:rootItems];
 }
+
+// Frame Rate: one of two choices, applied when SunPad next opens.
+- (UIAction *)frameRateAction:(NSString *)title sixtyFPS:(BOOL)sixtyFPS {
+    __weak SunPadGameOverlay *weakSelf = self;
+    UIAction *action = [UIAction actionWithTitle:title image:nil identifier:nil
+                                         handler:^(__kindof UIAction *selected) {
+        (void)selected;
+        SunPadSettings *currentSettings = [SunPadSettings sharedSettings];
+        if (currentSettings.experimental60FPS == sixtyFPS)
+            return;
+        currentSettings.experimental60FPS = sixtyFPS;
+        [currentSettings synchronize];
+        [[[UISelectionFeedbackGenerator alloc] init] selectionChanged];
+        [weakSelf refreshMenuButton];
+        NSString *sixtyMessage = @"The engine runs the game at 60 frames a second with its timing corrected. It needs about twice the work each second, so a device that cannot keep up plays slower. Close and reopen SunPad to apply it.";
+        [weakSelf presentRestartAlert:sixtyFPS ? sixtyMessage :
+            @"The original 30 FPS mode is selected. Close and reopen SunPad to apply it."];
+    }];
+    action.state = [SunPadSettings sharedSettings].experimental60FPS == sixtyFPS ?
+        UIMenuElementStateOn : UIMenuElementStateOff;
+    return action;
+}
+
+- (void)presentRestartAlert:(NSString *)message {
+    UIAlertController *alert =
+        [UIAlertController alertControllerWithTitle:@"Restart Required"
+                                            message:message
+                                     preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:@"OK"
+                                              style:UIAlertActionStyleDefault
+                                            handler:nil]];
+    [self.window.rootViewController presentViewController:alert animated:YES completion:nil];
+}
+
 
 - (void)exportSaves {
     UIViewController *presenter = self.window.rootViewController;

@@ -7,65 +7,34 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		AA0000000000000000000101 /* SunPadAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000201 /* SunPadAppDelegate.mm */; };
-		AA0000000000000000000102 /* SunPadGameViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000202 /* SunPadGameViewController.mm */; };
-		AA0000000000000000000103 /* SunPadGameOverlay.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000203 /* SunPadGameOverlay.mm */; };
-		AA0000000000000000000104 /* SunPadSettings.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000204 /* SunPadSettings.mm */; };
-		AA0000000000000000000105 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000205 /* Assets.xcassets */; };
-		AA0000000000000000000106 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000206 /* UIKit.framework */; };
-		AA0000000000000000000107 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000207 /* Metal.framework */; };
-		AA0000000000000000000108 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000208 /* MetalKit.framework */; };
-		AA0000000000000000000109 /* GameController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000209 /* GameController.framework */; };
-		AA0000000000000000000110 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000216 /* CoreGraphics.framework */; };
-		AA0000000000000000000111 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000217 /* QuartzCore.framework */; };
-		AA0000000000000000000112 /* SunPadCoreHost.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000218 /* SunPadCoreHost.mm */; };
-		AA0000000000000000000113 /* libSunPadCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000219 /* libSunPadCore.a */; };
-		AA0000000000000000000114 /* dev-config.plist in Resources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000220 /* dev-config.plist */; };
-		AA0000000000000000000115 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000221 /* CoreText.framework */; };
-		AA0000000000000000000116 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000222 /* Security.framework */; };
-		AA0000000000000000000117 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000223 /* AudioToolbox.framework */; };
-		AA0000000000000000000118 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000224 /* SystemConfiguration.framework */; };
-		AA0000000000000000000119 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000225 /* CoreMedia.framework */; };
-		AA000000000000000000011A /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000226 /* CoreVideo.framework */; };
-		AA000000000000000000011B /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000227 /* CoreMotion.framework */; };
-		AA000000000000000000011C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000228 /* Foundation.framework */; };
-		AA000000000000000000011D /* CoreHaptics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000000000000000000022A /* CoreHaptics.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		AA000000000000000000011E /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000000000000000000022B /* UniformTypeIdentifiers.framework */; };
-		AA000000000000000000011F /* SunPadDiscExtractor.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000022C /* SunPadDiscExtractor.mm */; };
-		AA0000000000000000000120 /* SunPadInputMixer.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000022E /* SunPadInputMixer.mm */; };
-		AA0000000000000000000121 /* Sys in Resources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000230 /* Sys */; };
-		AA0000000000000000000122 /* SunPadDiagnostics.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000231 /* SunPadDiagnostics.mm */; };
-		AA0000000000000000000123 /* SunPadInputPipeEncoder.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000233 /* SunPadInputPipeEncoder.mm */; };
-		AA0000000000000000000124 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000235 /* PrivacyInfo.xcprivacy */; };
-		AA0000000000000000000125 /* SunPadControllerMapping.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000236 /* SunPadControllerMapping.mm */; };
-		AA0000000000000000000126 /* SunPadSaveTransfer.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000238 /* SunPadSaveTransfer.mm */; };
-		AA0000000000000000000127 /* SunPadControllerRumble.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000023A /* SunPadControllerRumble.mm */; };
-		BB0000000000000000000101 /* SunPadTVAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = BB0000000000000000000201 /* SunPadTVAppDelegate.mm */; };
-		BB0000000000000000000102 /* SunPadCoreHost.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000218 /* SunPadCoreHost.mm */; };
-		BB0000000000000000000103 /* SunPadSettings.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000204 /* SunPadSettings.mm */; };
-		BB0000000000000000000104 /* SunPadDiagnostics.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000231 /* SunPadDiagnostics.mm */; };
-		BB0000000000000000000105 /* SunPadInputPipeEncoder.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000233 /* SunPadInputPipeEncoder.mm */; };
-		BB0000000000000000000106 /* SunPadInputMixer.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000022E /* SunPadInputMixer.mm */; };
-		BB0000000000000000000107 /* SunPadControllerMapping.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000236 /* SunPadControllerMapping.mm */; };
-		BB0000000000000000000108 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BB0000000000000000000202 /* Assets.xcassets */; };
-		BB0000000000000000000109 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = BB0000000000000000000204 /* PrivacyInfo.xcprivacy */; };
-		BB000000000000000000010A /* Sys in Resources */ = {isa = PBXBuildFile; fileRef = BB0000000000000000000207 /* tvOS Sys */; };
-		BB000000000000000000010B /* libSunPadCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000219 /* libSunPadCore.a */; };
-		BB000000000000000000010C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000206 /* UIKit.framework */; };
-		BB000000000000000000010D /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000207 /* Metal.framework */; };
-		BB000000000000000000010E /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000208 /* MetalKit.framework */; };
-		BB000000000000000000010F /* GameController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000209 /* GameController.framework */; };
-		BB0000000000000000000110 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000216 /* CoreGraphics.framework */; };
-		BB0000000000000000000111 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000217 /* QuartzCore.framework */; };
-		BB0000000000000000000112 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000221 /* CoreText.framework */; };
-		BB0000000000000000000113 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000222 /* Security.framework */; };
-		BB0000000000000000000114 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000223 /* AudioToolbox.framework */; };
-		BB0000000000000000000115 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000224 /* SystemConfiguration.framework */; };
-		BB0000000000000000000116 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000225 /* CoreMedia.framework */; };
-		BB0000000000000000000117 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000226 /* CoreVideo.framework */; };
-		BB0000000000000000000118 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000228 /* Foundation.framework */; };
-		BB0000000000000000000119 /* CoreHaptics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000000000000000000022A /* CoreHaptics.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		BB000000000000000000011A /* gGMSE01_recomp.dylib in Copy Module */ = {isa = PBXBuildFile; fileRef = BB0000000000000000000205 /* gGMSE01_recomp.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		CC0000000000000000000101 /* SunPadDiagnostics.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000231 /* SunPadDiagnostics.mm */; };
+		CC0000000000000000000102 /* SunPadControllerMapping.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000236 /* SunPadControllerMapping.mm */; };
+		CC0000000000000000000103 /* SunPadSaveTransfer.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000238 /* SunPadSaveTransfer.mm */; };
+		CC0000000000000000000104 /* SunPadControllerRumble.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000023A /* SunPadControllerRumble.mm */; };
+		CC0000000000000000000105 /* SunPadInputMixer.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000022E /* SunPadInputMixer.mm */; };
+		CC0000000000000000000107 /* SunPadEngineHost.mm in Sources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000201 /* SunPadEngineHost.mm */; };
+		CC0000000000000000000108 /* SunPadEngineBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000202 /* SunPadEngineBridge.mm */; };
+		CC0000000000000000000109 /* SunPadAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000201 /* SunPadAppDelegate.mm */; };
+		CC000000000000000000010A /* SunPadGameViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000202 /* SunPadGameViewController.mm */; };
+		CC000000000000000000010B /* SunPadGameOverlay.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000203 /* SunPadGameOverlay.mm */; };
+		CC000000000000000000010C /* SunPadSettings.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000204 /* SunPadSettings.mm */; };
+		CC000000000000000000010D /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000000000000000000022B /* UniformTypeIdentifiers.framework */; };
+		CC000000000000000000010E /* CoreHaptics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000000000000000000022A /* CoreHaptics.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		CC000000000000000000010F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000228 /* Foundation.framework */; };
+		CC0000000000000000000110 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000227 /* CoreMotion.framework */; };
+		CC0000000000000000000111 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000226 /* CoreVideo.framework */; };
+		CC0000000000000000000112 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000225 /* CoreMedia.framework */; };
+		CC0000000000000000000113 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000223 /* AudioToolbox.framework */; };
+		CC0000000000000000000114 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000221 /* CoreText.framework */; };
+		CC0000000000000000000115 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000217 /* QuartzCore.framework */; };
+		CC0000000000000000000116 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000216 /* CoreGraphics.framework */; };
+		CC0000000000000000000117 /* GameController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000209 /* GameController.framework */; };
+		CC0000000000000000000118 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000207 /* Metal.framework */; };
+		CC0000000000000000000119 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000206 /* UIKit.framework */; };
+		CC000000000000000000011A /* IOSurface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000204 /* IOSurface.framework */; };
+		CC000000000000000000011B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000205 /* Assets.xcassets */; };
+		CC000000000000000000011C /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000235 /* PrivacyInfo.xcprivacy */; };
+		CC0000000000000000000140 /* SunPadEngineSaves.mm in Sources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000206 /* SunPadEngineSaves.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -83,12 +52,8 @@
 		AA0000000000000000000212 /* SunPadSettings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SunPadSettings.h; sourceTree = "<group>"; };
 		AA0000000000000000000213 /* SunPadInputState.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SunPadInputState.h; sourceTree = "<group>"; };
 		AA0000000000000000000214 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		AA0000000000000000000215 /* SunPad.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SunPad.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA0000000000000000000216 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		AA0000000000000000000217 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
-		AA0000000000000000000218 /* SunPadCoreHost.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SunPadCoreHost.mm; sourceTree = "<group>"; };
-		AA0000000000000000000219 /* libSunPadCore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libSunPadCore.a; sourceTree = "<group>"; };
-		AA0000000000000000000220 /* dev-config.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = dev-config.plist; path = Provisioned/dev-config.plist; sourceTree = "<group>"; };
 		AA0000000000000000000221 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
 		AA0000000000000000000222 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		AA0000000000000000000223 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
@@ -100,15 +65,10 @@
 		AA0000000000000000000229 /* SunPadCoreHost.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SunPadCoreHost.h; sourceTree = "<group>"; };
 		AA000000000000000000022A /* CoreHaptics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreHaptics.framework; path = System/Library/Frameworks/CoreHaptics.framework; sourceTree = SDKROOT; };
 		AA000000000000000000022B /* UniformTypeIdentifiers.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UniformTypeIdentifiers.framework; path = System/Library/Frameworks/UniformTypeIdentifiers.framework; sourceTree = SDKROOT; };
-		AA000000000000000000022C /* SunPadDiscExtractor.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SunPadDiscExtractor.mm; sourceTree = "<group>"; };
-		AA000000000000000000022D /* SunPadDiscExtractor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SunPadDiscExtractor.h; sourceTree = "<group>"; };
 		AA000000000000000000022E /* SunPadInputMixer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SunPadInputMixer.mm; sourceTree = "<group>"; };
 		AA000000000000000000022F /* SunPadInputMixer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SunPadInputMixer.h; sourceTree = "<group>"; };
-		AA0000000000000000000230 /* Sys */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Sys; path = ref/ModernGekko/vendor/dolphin/Data/Sys; sourceTree = SOURCE_ROOT; };
 		AA0000000000000000000231 /* SunPadDiagnostics.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SunPadDiagnostics.mm; sourceTree = "<group>"; };
 		AA0000000000000000000232 /* SunPadDiagnostics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SunPadDiagnostics.h; sourceTree = "<group>"; };
-		AA0000000000000000000233 /* SunPadInputPipeEncoder.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SunPadInputPipeEncoder.mm; sourceTree = "<group>"; };
-		AA0000000000000000000234 /* SunPadInputPipeEncoder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SunPadInputPipeEncoder.h; sourceTree = "<group>"; };
 		AA0000000000000000000235 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		AA0000000000000000000238 /* SunPadSaveTransfer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SunPadSaveTransfer.mm; sourceTree = "<group>"; };
 		AA0000000000000000000239 /* SunPadSaveTransfer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SunPadSaveTransfer.h; sourceTree = "<group>"; };
@@ -116,73 +76,37 @@
 		AA000000000000000000023B /* SunPadControllerRumble.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SunPadControllerRumble.h; sourceTree = "<group>"; };
 		AA0000000000000000000236 /* SunPadControllerMapping.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SunPadControllerMapping.mm; sourceTree = "<group>"; };
 		AA0000000000000000000237 /* SunPadControllerMapping.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SunPadControllerMapping.h; sourceTree = "<group>"; };
-		BB0000000000000000000201 /* SunPadTVAppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SunPadTVAppDelegate.mm; sourceTree = "<group>"; };
-		BB0000000000000000000202 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		BB0000000000000000000203 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		BB0000000000000000000204 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		BB0000000000000000000205 /* gGMSE01_recomp.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = gGMSE01_recomp.dylib; path = "Provisioned/$(PLATFORM_NAME)/gGMSE01_recomp.dylib"; sourceTree = "<group>"; };
-		BB0000000000000000000206 /* SunPadTV.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SunPadTV.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		BB0000000000000000000207 /* tvOS Sys */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Sys; path = ref/ModernGekko-tvOS/vendor/dolphin/Data/Sys; sourceTree = SOURCE_ROOT; };
+		CC0000000000000000000201 /* SunPadEngineHost.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SunPadEngineHost.mm; sourceTree = "<group>"; };
+		CC0000000000000000000202 /* SunPadEngineBridge.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SunPadEngineBridge.mm; sourceTree = "<group>"; };
+		CC0000000000000000000203 /* SunPadEngineBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SunPadEngineBridge.h; sourceTree = "<group>"; };
+		CC0000000000000000000204 /* IOSurface.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOSurface.framework; path = System/Library/Frameworks/IOSurface.framework; sourceTree = SDKROOT; };
+		CC0000000000000000000205 /* SunPad.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SunPad.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CC0000000000000000000206 /* SunPadEngineSaves.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SunPadEngineSaves.mm; sourceTree = "<group>"; };
+		CC0000000000000000000207 /* SunPadEngineSaves.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SunPadEngineSaves.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		BB0000000000000000000302 /* Copy Module */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 1;
-			files = (
-				BB000000000000000000011A /* gGMSE01_recomp.dylib in Copy Module */,
-			);
-			name = "Copy Module";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		AA0000000000000000000301 /* Frameworks */ = {
+		CC0000000000000000000301 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AA000000000000000000011E /* UniformTypeIdentifiers.framework in Frameworks */,
-				AA000000000000000000011D /* CoreHaptics.framework in Frameworks */,
-				AA000000000000000000011C /* Foundation.framework in Frameworks */,
-				AA000000000000000000011B /* CoreMotion.framework in Frameworks */,
-				AA000000000000000000011A /* CoreVideo.framework in Frameworks */,
-				AA0000000000000000000119 /* CoreMedia.framework in Frameworks */,
-				AA0000000000000000000118 /* SystemConfiguration.framework in Frameworks */,
-				AA0000000000000000000117 /* AudioToolbox.framework in Frameworks */,
-				AA0000000000000000000116 /* Security.framework in Frameworks */,
-				AA0000000000000000000115 /* CoreText.framework in Frameworks */,
-				AA0000000000000000000113 /* libSunPadCore.a in Frameworks */,
-				AA0000000000000000000111 /* QuartzCore.framework in Frameworks */,
-				AA0000000000000000000110 /* CoreGraphics.framework in Frameworks */,
-				AA0000000000000000000109 /* GameController.framework in Frameworks */,
-				AA0000000000000000000108 /* MetalKit.framework in Frameworks */,
-				AA0000000000000000000107 /* Metal.framework in Frameworks */,
-				AA0000000000000000000106 /* UIKit.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		BB0000000000000000000301 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				BB0000000000000000000119 /* CoreHaptics.framework in Frameworks */,
-				BB0000000000000000000118 /* Foundation.framework in Frameworks */,
-				BB0000000000000000000117 /* CoreVideo.framework in Frameworks */,
-				BB0000000000000000000116 /* CoreMedia.framework in Frameworks */,
-				BB0000000000000000000115 /* SystemConfiguration.framework in Frameworks */,
-				BB0000000000000000000114 /* AudioToolbox.framework in Frameworks */,
-				BB0000000000000000000113 /* Security.framework in Frameworks */,
-				BB0000000000000000000112 /* CoreText.framework in Frameworks */,
-				BB000000000000000000010B /* libSunPadCore.a in Frameworks */,
-				BB0000000000000000000111 /* QuartzCore.framework in Frameworks */,
-				BB0000000000000000000110 /* CoreGraphics.framework in Frameworks */,
-				BB000000000000000000010F /* GameController.framework in Frameworks */,
-				BB000000000000000000010E /* MetalKit.framework in Frameworks */,
-				BB000000000000000000010D /* Metal.framework in Frameworks */,
-				BB000000000000000000010C /* UIKit.framework in Frameworks */,
+				CC000000000000000000010D /* UniformTypeIdentifiers.framework in Frameworks */,
+				CC000000000000000000010E /* CoreHaptics.framework in Frameworks */,
+				CC000000000000000000010F /* Foundation.framework in Frameworks */,
+				CC0000000000000000000110 /* CoreMotion.framework in Frameworks */,
+				CC0000000000000000000111 /* CoreVideo.framework in Frameworks */,
+				CC0000000000000000000112 /* CoreMedia.framework in Frameworks */,
+				CC0000000000000000000113 /* AudioToolbox.framework in Frameworks */,
+				CC0000000000000000000114 /* CoreText.framework in Frameworks */,
+				CC0000000000000000000115 /* QuartzCore.framework in Frameworks */,
+				CC0000000000000000000116 /* CoreGraphics.framework in Frameworks */,
+				CC0000000000000000000117 /* GameController.framework in Frameworks */,
+				CC0000000000000000000118 /* Metal.framework in Frameworks */,
+				CC0000000000000000000119 /* UIKit.framework in Frameworks */,
+				CC000000000000000000011A /* IOSurface.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -193,7 +117,6 @@
 			isa = PBXGroup;
 			children = (
 				AA0000000000000000000402 /* apple */,
-				AA0000000000000000000230 /* Sys */,
 				AA0000000000000000000403 /* Frameworks */,
 				AA0000000000000000000404 /* Products */,
 			);
@@ -204,38 +127,22 @@
 			children = (
 				AA0000000000000000000405 /* ios */,
 				AA0000000000000000000406 /* shared */,
-				BB0000000000000000000401 /* tvos */,
 			);
 			path = apple;
-			sourceTree = "<group>";
-		};
-		BB0000000000000000000401 /* tvos */ = {
-			isa = PBXGroup;
-			children = (
-				BB0000000000000000000201 /* SunPadTVAppDelegate.mm */,
-				BB0000000000000000000202 /* Assets.xcassets */,
-				BB0000000000000000000203 /* Info.plist */,
-				BB0000000000000000000204 /* PrivacyInfo.xcprivacy */,
-				BB0000000000000000000205 /* gGMSE01_recomp.dylib */,
-			);
-			path = tvos;
 			sourceTree = "<group>";
 		};
 		AA0000000000000000000405 /* ios */ = {
 			isa = PBXGroup;
 			children = (
 				AA0000000000000000000201 /* SunPadAppDelegate.mm */,
-				AA0000000000000000000218 /* SunPadCoreHost.mm */,
 				AA0000000000000000000229 /* SunPadCoreHost.h */,
-				AA000000000000000000022C /* SunPadDiscExtractor.mm */,
-				AA000000000000000000022D /* SunPadDiscExtractor.h */,
+				CC0000000000000000000201 /* SunPadEngineHost.mm */,
 				AA0000000000000000000202 /* SunPadGameViewController.mm */,
 				AA0000000000000000000211 /* SunPadGameViewController.h */,
 				AA0000000000000000000203 /* SunPadGameOverlay.mm */,
 				AA0000000000000000000210 /* SunPadGameOverlay.h */,
 				AA0000000000000000000205 /* Assets.xcassets */,
 				AA0000000000000000000214 /* Info.plist */,
-				AA0000000000000000000220 /* dev-config.plist */,
 				AA0000000000000000000235 /* PrivacyInfo.xcprivacy */,
 			);
 			path = ios;
@@ -250,8 +157,10 @@
 				AA0000000000000000000237 /* SunPadControllerMapping.h */,
 				AA000000000000000000023A /* SunPadControllerRumble.mm */,
 				AA000000000000000000023B /* SunPadControllerRumble.h */,
-				AA0000000000000000000233 /* SunPadInputPipeEncoder.mm */,
-				AA0000000000000000000234 /* SunPadInputPipeEncoder.h */,
+				CC0000000000000000000202 /* SunPadEngineBridge.mm */,
+				CC0000000000000000000203 /* SunPadEngineBridge.h */,
+				CC0000000000000000000206 /* SunPadEngineSaves.mm */,
+				CC0000000000000000000207 /* SunPadEngineSaves.h */,
 				AA0000000000000000000238 /* SunPadSaveTransfer.mm */,
 				AA0000000000000000000239 /* SunPadSaveTransfer.h */,
 				AA0000000000000000000204 /* SunPadSettings.mm */,
@@ -276,13 +185,13 @@
 				AA0000000000000000000223 /* AudioToolbox.framework */,
 				AA0000000000000000000222 /* Security.framework */,
 				AA0000000000000000000221 /* CoreText.framework */,
-				AA0000000000000000000219 /* libSunPadCore.a */,
 				AA0000000000000000000217 /* QuartzCore.framework */,
 				AA0000000000000000000216 /* CoreGraphics.framework */,
 				AA0000000000000000000206 /* UIKit.framework */,
 				AA0000000000000000000207 /* Metal.framework */,
 				AA0000000000000000000208 /* MetalKit.framework */,
 				AA0000000000000000000209 /* GameController.framework */,
+				CC0000000000000000000204 /* IOSurface.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -290,8 +199,7 @@
 		AA0000000000000000000404 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				AA0000000000000000000215 /* SunPad.app */,
-				BB0000000000000000000206 /* SunPadTV.app */,
+				CC0000000000000000000205 /* SunPad.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -299,13 +207,14 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		AA0000000000000000000501 /* SunPad */ = {
+		CC0000000000000000000501 /* SunPad */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = AA0000000000000000000801 /* Build configuration list for PBXNativeTarget "SunPad" */;
+			buildConfigurationList = CC0000000000000000000801 /* Build configuration list for PBXNativeTarget "SunPad" */;
 			buildPhases = (
-				AA0000000000000000000601 /* Sources */,
-				AA0000000000000000000301 /* Frameworks */,
-				AA0000000000000000000602 /* Resources */,
+				CC0000000000000000000601 /* Sources */,
+				CC0000000000000000000301 /* Frameworks */,
+				CC0000000000000000000602 /* Resources */,
+				CC0000000000000000000303 /* Embed Engine */,
 			);
 			buildRules = (
 			);
@@ -313,25 +222,7 @@
 			);
 			name = SunPad;
 			productName = SunPad;
-			productReference = AA0000000000000000000215 /* SunPad.app */;
-			productType = "com.apple.product-type.application";
-		};
-		BB0000000000000000000501 /* SunPadTV */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = BB0000000000000000000801 /* Build configuration list for PBXNativeTarget "SunPadTV" */;
-			buildPhases = (
-				BB0000000000000000000601 /* Sources */,
-				BB0000000000000000000301 /* Frameworks */,
-				BB0000000000000000000602 /* Resources */,
-				BB0000000000000000000302 /* Copy Module */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = SunPadTV;
-			productName = SunPadTV;
-			productReference = BB0000000000000000000206 /* SunPadTV.app */;
+			productReference = CC0000000000000000000205 /* SunPad.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -343,10 +234,7 @@
 				BuildIndependentTargetsInParallel = 1;
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
-					AA0000000000000000000501 = {
-						CreatedOnToolsVersion = 16.0;
-					};
-					BB0000000000000000000501 = {
+					CC0000000000000000000501 = {
 						CreatedOnToolsVersion = 16.0;
 					};
 				};
@@ -364,67 +252,58 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				AA0000000000000000000501 /* SunPad */,
-				BB0000000000000000000501 /* SunPadTV */,
+				CC0000000000000000000501 /* SunPad */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		AA0000000000000000000602 /* Resources */ = {
+		CC0000000000000000000602 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AA0000000000000000000121 /* Sys in Resources */,
-				AA0000000000000000000114 /* dev-config.plist in Resources */,
-				AA0000000000000000000105 /* Assets.xcassets in Resources */,
-				AA0000000000000000000124 /* PrivacyInfo.xcprivacy in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		BB0000000000000000000602 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				BB000000000000000000010A /* Sys in Resources */,
-				BB0000000000000000000108 /* Assets.xcassets in Resources */,
-				BB0000000000000000000109 /* PrivacyInfo.xcprivacy in Resources */,
+				CC000000000000000000011B /* Assets.xcassets in Resources */,
+				CC000000000000000000011C /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXSourcesBuildPhase section */
-		AA0000000000000000000601 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
+/* Begin PBXShellScriptBuildPhase section */
+		CC0000000000000000000303 /* Embed Engine */ = {
+			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AA0000000000000000000122 /* SunPadDiagnostics.mm in Sources */,
-				AA0000000000000000000123 /* SunPadInputPipeEncoder.mm in Sources */,
-				AA0000000000000000000125 /* SunPadControllerMapping.mm in Sources */,
-				AA0000000000000000000126 /* SunPadSaveTransfer.mm in Sources */,
-				AA0000000000000000000127 /* SunPadControllerRumble.mm in Sources */,
-				AA0000000000000000000120 /* SunPadInputMixer.mm in Sources */,
-				AA000000000000000000011F /* SunPadDiscExtractor.mm in Sources */,
-				AA0000000000000000000112 /* SunPadCoreHost.mm in Sources */,
-				AA0000000000000000000101 /* SunPadAppDelegate.mm in Sources */,
-				AA0000000000000000000102 /* SunPadGameViewController.mm in Sources */,
-				AA0000000000000000000103 /* SunPadGameOverlay.mm in Sources */,
-				AA0000000000000000000104 /* SunPadSettings.mm in Sources */,
+			);
+			inputPaths = (
+			);
+			name = "Embed Engine";
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/scripts/embed-engine-dev.sh\"\n";
+			showEnvVarsInLog = 0;
 		};
-		BB0000000000000000000601 /* Sources */ = {
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		CC0000000000000000000601 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BB0000000000000000000104 /* SunPadDiagnostics.mm in Sources */,
-				BB0000000000000000000105 /* SunPadInputPipeEncoder.mm in Sources */,
-				BB0000000000000000000107 /* SunPadControllerMapping.mm in Sources */,
-				BB0000000000000000000106 /* SunPadInputMixer.mm in Sources */,
-				BB0000000000000000000102 /* SunPadCoreHost.mm in Sources */,
-				BB0000000000000000000101 /* SunPadTVAppDelegate.mm in Sources */,
-				BB0000000000000000000103 /* SunPadSettings.mm in Sources */,
+				CC0000000000000000000101 /* SunPadDiagnostics.mm in Sources */,
+				CC0000000000000000000102 /* SunPadControllerMapping.mm in Sources */,
+				CC0000000000000000000103 /* SunPadSaveTransfer.mm in Sources */,
+				CC0000000000000000000104 /* SunPadControllerRumble.mm in Sources */,
+				CC0000000000000000000105 /* SunPadInputMixer.mm in Sources */,
+				CC0000000000000000000107 /* SunPadEngineHost.mm in Sources */,
+				CC0000000000000000000108 /* SunPadEngineBridge.mm in Sources */,
+				CC0000000000000000000140 /* SunPadEngineSaves.mm in Sources */,
+				CC0000000000000000000109 /* SunPadAppDelegate.mm in Sources */,
+				CC000000000000000000010A /* SunPadGameViewController.mm in Sources */,
+				CC000000000000000000010B /* SunPadGameOverlay.mm in Sources */,
+				CC000000000000000000010C /* SunPadSettings.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -489,41 +368,31 @@
 			};
 			name = Release;
 		};
-		AA0000000000000000000703 /* Debug */ = {
+		CC0000000000000000000703 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 13;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				CURRENT_PROJECT_VERSION = 22;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/ref/ModernGekko/include",
-					"$(SRCROOT)/ref/ModernGekko/vendor/dolphin/Source/Core",
-					"$(SRCROOT)/ref/ModernGekko/vendor/dolphin/GXRuntime/include",
-					"$(SRCROOT)/ref/ModernGekko/build-ios-$(PLATFORM_NAME)-public",
-					"$(SRCROOT)/ref/ModernGekko/build-ios-$(PLATFORM_NAME)-public/vendor/dolphin/Source/Core",
-					"$(SRCROOT)/ref/ModernGekko/vendor/fmt/fmt/include",
-					"$(SRCROOT)/ref/ModernGekko/vendor/dolphin/Externals/picojson",
+					"$(SRCROOT)/apple/ios",
+					"$(SRCROOT)/apple/shared",
+					"$(SRCROOT)/ref/sms-pc-port/platform",
 				);
 				INFOPLIST_FILE = apple/ios/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SRCROOT)/apple/ios/Provisioned/$(PLATFORM_NAME)/libs",
-				);
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.4.0;
+				"MOLTENVK_SLICE[sdk=iphoneos*]" = "ios-arm64";
+				"MOLTENVK_SLICE[sdk=iphonesimulator*]" = "ios-arm64_x86_64-simulator";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
-					"-lz",
-					"-lbz2",
-					"-liconv",
-					"-lresolv",
-					"-lcompression",
+					"$(SRCROOT)/ref/moltenvk/MoltenVK/MoltenVK/static/MoltenVK.xcframework/$(MOLTENVK_SLICE)/libMoltenVK.a",
 					"-framework AVFAudio",
 				);
 				OTHER_CFLAGS = (
@@ -537,46 +406,38 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.sunpad.SunPad;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUNPAD_DISPLAY_NAME = SunPad;
+				SUNPAD_EMBED_ENGINE = NO;
 				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
-		AA0000000000000000000704 /* Release */ = {
+		CC0000000000000000000704 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 13;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				CURRENT_PROJECT_VERSION = 22;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/ref/ModernGekko/include",
-					"$(SRCROOT)/ref/ModernGekko/vendor/dolphin/Source/Core",
-					"$(SRCROOT)/ref/ModernGekko/vendor/dolphin/GXRuntime/include",
-					"$(SRCROOT)/ref/ModernGekko/build-ios-$(PLATFORM_NAME)-public",
-					"$(SRCROOT)/ref/ModernGekko/build-ios-$(PLATFORM_NAME)-public/vendor/dolphin/Source/Core",
-					"$(SRCROOT)/ref/ModernGekko/vendor/fmt/fmt/include",
-					"$(SRCROOT)/ref/ModernGekko/vendor/dolphin/Externals/picojson",
+					"$(SRCROOT)/apple/ios",
+					"$(SRCROOT)/apple/shared",
+					"$(SRCROOT)/ref/sms-pc-port/platform",
 				);
 				INFOPLIST_FILE = apple/ios/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SRCROOT)/apple/ios/Provisioned/$(PLATFORM_NAME)/libs",
-				);
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.4.0;
+				"MOLTENVK_SLICE[sdk=iphoneos*]" = "ios-arm64";
+				"MOLTENVK_SLICE[sdk=iphonesimulator*]" = "ios-arm64_x86_64-simulator";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
-					"-lz",
-					"-lbz2",
-					"-liconv",
-					"-lresolv",
-					"-lcompression",
+					"$(SRCROOT)/ref/moltenvk/MoltenVK/MoltenVK/static/MoltenVK.xcframework/$(MOLTENVK_SLICE)/libMoltenVK.a",
 					"-framework AVFAudio",
 				);
 				OTHER_CFLAGS = (
@@ -590,133 +451,16 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.sunpad.SunPad;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUNPAD_DISPLAY_NAME = SunPad;
+				SUNPAD_EMBED_ENGINE = NO;
 				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		BB0000000000000000000703 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = arm64;
-				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 13;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GENERATE_INFOPLIST_FILE = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/apple/ios",
-					"$(SRCROOT)/apple/shared",
-					"$(SRCROOT)/ref/ModernGekko-tvOS/include",
-					"$(SRCROOT)/ref/ModernGekko-tvOS/vendor/dolphin/Source/Core",
-					"$(SRCROOT)/ref/ModernGekko-tvOS/vendor/dolphin/GXRuntime/include",
-					"$(SRCROOT)/ref/ModernGekko-tvOS/build-tvos-$(PLATFORM_NAME)-public",
-					"$(SRCROOT)/ref/ModernGekko-tvOS/vendor/fmt/fmt/include",
-					"$(SRCROOT)/ref/ModernGekko-tvOS/vendor/dolphin/Externals/picojson",
-				);
-				INFOPLIST_FILE = apple/tvos/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SRCROOT)/apple/tvos/Provisioned/$(PLATFORM_NAME)/libs",
-				);
-				MARKETING_VERSION = 0.1.0;
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-lz",
-					"-lbz2",
-					"-liconv",
-					"-lresolv",
-					"-lcompression",
-					"-framework AVFAudio",
-				);
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-ffile-prefix-map=$(SRCROOT)=.",
-				);
-				OTHER_CPLUSPLUSFLAGS = (
-					"$(inherited)",
-					"-ffile-prefix-map=$(SRCROOT)=.",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.sunpad.SunPad.tv;
-				PRODUCT_NAME = SunPadTV;
-				SDKROOT = appletvos;
-				SUPPORTED_PLATFORMS = "appletvos appletvsimulator";
-				TARGETED_DEVICE_FAMILY = 3;
-				TVOS_DEPLOYMENT_TARGET = 17.0;
-			};
-			name = Debug;
-		};
-		BB0000000000000000000704 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = arm64;
-				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 13;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GENERATE_INFOPLIST_FILE = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/apple/ios",
-					"$(SRCROOT)/apple/shared",
-					"$(SRCROOT)/ref/ModernGekko-tvOS/include",
-					"$(SRCROOT)/ref/ModernGekko-tvOS/vendor/dolphin/Source/Core",
-					"$(SRCROOT)/ref/ModernGekko-tvOS/vendor/dolphin/GXRuntime/include",
-					"$(SRCROOT)/ref/ModernGekko-tvOS/build-tvos-$(PLATFORM_NAME)-public",
-					"$(SRCROOT)/ref/ModernGekko-tvOS/vendor/fmt/fmt/include",
-					"$(SRCROOT)/ref/ModernGekko-tvOS/vendor/dolphin/Externals/picojson",
-				);
-				INFOPLIST_FILE = apple/tvos/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SRCROOT)/apple/tvos/Provisioned/$(PLATFORM_NAME)/libs",
-				);
-				MARKETING_VERSION = 0.1.0;
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-lz",
-					"-lbz2",
-					"-liconv",
-					"-lresolv",
-					"-lcompression",
-					"-framework AVFAudio",
-				);
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-ffile-prefix-map=$(SRCROOT)=.",
-				);
-				OTHER_CPLUSPLUSFLAGS = (
-					"$(inherited)",
-					"-ffile-prefix-map=$(SRCROOT)=.",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.sunpad.SunPad.tv;
-				PRODUCT_NAME = SunPadTV;
-				SDKROOT = appletvos;
-				SUPPORTED_PLATFORMS = "appletvos appletvsimulator";
-				TARGETED_DEVICE_FAMILY = 3;
-				TVOS_DEPLOYMENT_TARGET = 17.0;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		AA0000000000000000000801 /* Build configuration list for PBXNativeTarget "SunPad" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				AA0000000000000000000703 /* Debug */,
-				AA0000000000000000000704 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		AA0000000000000000000802 /* Build configuration list for PBXProject "SunPad" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -726,11 +470,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		BB0000000000000000000801 /* Build configuration list for PBXNativeTarget "SunPadTV" */ = {
+		CC0000000000000000000801 /* Build configuration list for PBXNativeTarget "SunPad" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				BB0000000000000000000703 /* Debug */,
-				BB0000000000000000000704 /* Release */,
+				CC0000000000000000000703 /* Debug */,
+				CC0000000000000000000704 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

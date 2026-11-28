@@ -5,10 +5,10 @@
 #import "SunPadControllerRumble.h"
 #import "SunPadControllerSlots.h"
 #import "SunPadDiagnostics.h"
-#import "SunPadDiscExtractor.h"
 #import "SunPadGameOverlay.h"
 #import "SunPadInputMixer.h"
 #import "SunPadSaveTransfer.h"
+#import "SunPadEngineSaves.h"
 #import "SunPadSettings.h"
 #import "SunPadTouchControlsVisibility.h"
 
@@ -218,8 +218,8 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
     return count;
 }
 
-/* UIView whose backing layer is a CAMetalLayer: the ModernGekko Metal video
- * backend renders directly into this layer (Dolphin owns the drawable). */
+/* UIView whose backing layer is a CAMetalLayer: the engine draws into it
+ * through MoltenVK (VK_EXT_metal_surface) and owns its drawables. */
 @interface SunPadMetalSurfaceView : UIView
 + (Class)layerClass;
 @end
@@ -234,7 +234,7 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
 - (void)configureController:(GCController *)controller playerSlot:(NSInteger)slot;
 - (nullable GCController *)controllerForPlayerSlot:(NSInteger)slot;
 - (NSArray<NSURL *> *)gameImagesInDocumentsDirectory;
-- (NSString *)modulePathFromConfiguration:(NSDictionary *)configuration;
+- (NSString *)enginePath;
 - (void)presentGameDataImport;
 - (void)presentGameDataFolderImport;
 - (void)publishInputFromController:(GCController *)controller
@@ -413,34 +413,14 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
     return requestedPath;
 }
 
-- (NSString *)modulePathFromConfiguration:(NSDictionary *)configuration {
-    NSString *hostPath = configuration[@"DevModulePath"];
-    if (hostPath.length > 0 && [[NSFileManager defaultManager] fileExistsAtPath:hostPath])
-        return hostPath;
-
-    NSString *deviceRelativePath = configuration[@"DeviceModuleRelativePath"];
-#if !TARGET_OS_SIMULATOR
-    // Simulator and device provisioning share a generated development plist.
-    // A Simulator build may therefore leave DevModulePath pointing at the Mac.
-    // Device installs always use this stable, sandbox-relative module name.
-    if (deviceRelativePath.length == 0)
-        deviceRelativePath = @"gGMSE01_recomp.dylib";
-#endif
-    if (deviceRelativePath.length > 0) {
-        NSString *temporaryPath =
-            [NSTemporaryDirectory() stringByAppendingPathComponent:deviceRelativePath];
-        if ([[NSFileManager defaultManager] fileExistsAtPath:temporaryPath])
-            return temporaryPath;
-
-        // Local device builds can carry the signed, user-generated module in
-        // the app bundle when CoreDevice temporary-file uploads are unavailable.
-        NSString *bundledPath =
-            [NSBundle.mainBundle.bundlePath stringByAppendingPathComponent:deviceRelativePath];
-        if ([[NSFileManager defaultManager] fileExistsAtPath:bundledPath])
-            return bundledPath;
-        return temporaryPath;
-    }
-    return hostPath;
+- (NSString *)enginePath {
+    // PadMint builds the engine on the player's computer and adds it to the
+    // app's Frameworks; a development install may put it in tmp.
+    NSString *engine = [NSBundle.mainBundle.privateFrameworksPath
+        stringByAppendingPathComponent:@"libsms_embed.dylib"];
+    if (![[NSFileManager defaultManager] fileExistsAtPath:engine])
+        engine = [NSTemporaryDirectory() stringByAppendingPathComponent:@"libsms_embed.dylib"];
+    return engine;
 }
 
 - (void)startFPSMonitor {
@@ -777,14 +757,9 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
     [_bootActivityIndicator startAnimating];
     NSBundle *bundle = NSBundle.mainBundle;
     NSString *configPath = [bundle pathForResource:@"dev-config" ofType:@"plist"];
-    if (configPath == nil) {
-        SunPadLog(@"boot skipped reason=dev config missing");
-        _bootStatusLabel.text = @"SunPad needs its local game data before it can start.";
-        _bootStatusLabel.accessibilityLabel = _bootStatusLabel.text;
-        [_bootActivityIndicator stopAnimating];
-        return; // Not a dev-provisioned build; import flow is a later stage.
-    }
-    NSDictionary *config = [NSDictionary dictionaryWithContentsOfFile:configPath];
+    // The decompilation engine needs no provisioned module or extracted files,
+    // so a development configuration is optional.
+    NSDictionary *config = configPath ? [NSDictionary dictionaryWithContentsOfFile:configPath] : @{};
     SunPadSettings *settings = [SunPadSettings sharedSettings];
     NSFileManager *fileManager = [NSFileManager defaultManager];
     // App updates can relocate the data-container UUID. On physical devices,
@@ -842,68 +817,16 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
         return;
     }
 
-    NSString *currentContainerRoot = [gameDataDirectory stringByAppendingPathComponent:@"GMSE01"];
-    BOOL currentRootExists = [fileManager fileExistsAtPath:currentContainerRoot];
-    NSString *gameRoot = currentContainerRoot;
-#if TARGET_OS_SIMULATOR
-    if (!currentRootExists) {
-        NSString *developmentRoot = config[@"DevGameRoot"];
-        if (developmentRoot.length > 0)
-            gameRoot = developmentRoot;
-    }
-#else
-    // A side-by-side diagnostic build can be made self-contained when the
-    // CoreDevice data-container transfer service is unavailable. Production
-    // builds omit this key and continue to require imported sandbox data.
-    if (!currentRootExists) {
-        NSString *bundledRootRelativePath = config[@"DeviceBundledGameRootRelativePath"];
-        NSString *bundledRoot = bundledRootRelativePath.length > 0
-            ? [bundle.bundlePath stringByAppendingPathComponent:bundledRootRelativePath] : nil;
-        if (bundledRoot.length > 0 && [fileManager fileExistsAtPath:bundledRoot])
-            gameRoot = bundledRoot;
-    }
-#endif
-    if (![settings.extractedGameRoot isEqualToString:gameRoot]) {
-        settings.extractedGameRoot = gameRoot;
-        [settings synchronize];
-    }
-    SunPadLog(@"boot data support=%@ root=%@ rootExists=%d persistedRoot=%@",
-              supportRoot, gameRoot, currentRootExists,
-              settings.extractedGameRoot ?: @"none");
+    SunPadLog(@"boot data support=%@", supportRoot);
 
-#if !TARGET_OS_SIMULATOR
-    // The published app carries no game code: PadMint adds the module
-    // translated from the player's own disc.
-    NSString *requiredModulePath = [self modulePathFromConfiguration:config];
-    if (requiredModulePath.length > 0 && ![fileManager fileExistsAtPath:requiredModulePath]) {
-        SunPadLog(@"boot waiting for the game module");
-        _bootStatusLabel.text = @"This copy of SunPad has no game code yet. PadMint makes it on a Mac "
-                                 "from your own disc and adds it to SunPad; install the SunPad it makes "
+    // The published app carries no game code: PadMint builds the engine on the
+    // player's Mac and adds it.
+    NSString *modulePath = [self enginePath];
+    if (![fileManager fileExistsAtPath:modulePath]) {
+        SunPadLog(@"boot waiting for the game engine");
+        _bootStatusLabel.text = @"This copy of SunPad has no game engine yet. PadMint builds it on your Mac "
+                                 "and adds it to SunPad. Install the SunPad it makes "
                                  "(github.com/chrissotraidis/padmint).";
-        _bootStatusLabel.accessibilityLabel = _bootStatusLabel.text;
-        [_bootActivityIndicator stopAnimating];
-        return;
-    }
-#endif
-
-    BOOL gameRootIsDirectory = NO;
-    BOOL gameRootExists =
-        [fileManager fileExistsAtPath:gameRoot isDirectory:&gameRootIsDirectory];
-    BOOL gameRootReadable = gameRootExists && gameRootIsDirectory &&
-                            [fileManager isReadableFileAtPath:gameRoot];
-    if (!gameRootReadable) {
-        SunPadLog(@"boot waiting for game data rootExists=%d directory=%d readable=%d",
-                  gameRootExists, gameRootIsDirectory,
-                  gameRootExists && [fileManager isReadableFileAtPath:gameRoot]);
-        [self showGameDataSetupState];
-        return;
-    }
-
-    NSString *modulePath = [self modulePathFromConfiguration:config];
-    if (gameRoot.length == 0 || modulePath.length == 0) {
-        SunPadLog(@"boot skipped gameRoot=%d modulePath=%d",
-                  gameRoot.length > 0, modulePath.length > 0);
-        _bootStatusLabel.text = @"SunPad could not find its local game data.";
         _bootStatusLabel.accessibilityLabel = _bootStatusLabel.text;
         [_bootActivityIndicator stopAnimating];
         return;
@@ -915,10 +838,9 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
                                                attributes:nil
                                                     error:nil];
 
-    // Boot from the retained image so Dolphin sees the exact FST, physical
-    // file offsets, and streaming layout from the user's disc. In-place app
-    // installs preserve the file but change the container UUID, so rebase the
-    // persisted absolute path when necessary.
+    // The engine reads the retained disc image. In-place app installs keep the
+    // file but change the container UUID, so rebase the persisted absolute path
+    // when necessary.
     NSString *discFileName = settings.retainedGameDataPath.lastPathComponent;
     if (discFileName.length == 0) {
         NSArray<NSString *> *entries = [fileManager contentsOfDirectoryAtPath:gameDataDirectory
@@ -956,16 +878,20 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
     SunPadLog(@"boot disc path=%@ exists=%d", discImagePath.length > 0
               ? discImagePath.lastPathComponent : @"none",
               discImagePath.length > 0 && [fileManager fileExistsAtPath:discImagePath]);
+    if (discImagePath.length == 0 || ![fileManager fileExistsAtPath:discImagePath]) {
+        SunPadLog(@"boot waiting for the disc image");
+        [self showGameDataSetupState];
+        return;
+    }
 
     CAMetalLayer *layer = (CAMetalLayer *)_gameView.layer;
-    SunPadLog(@"boot requested gameRootExists=%d discImage=%d moduleExists=%d drawable=%@",
-              [fileManager fileExistsAtPath:gameRoot], discImagePath.length > 0,
+    SunPadLog(@"boot requested discImage=%d engine=%d drawable=%@", discImagePath.length > 0,
               [fileManager fileExistsAtPath:modulePath], NSStringFromCGSize(layer.drawableSize));
     _coreHost = [[SunPadCoreHost alloc] initWithLayer:layer];
     __weak SunPadGameViewController *weakSelf = self;
     _bootStatusLabel.text = @"Starting game…";
     _bootStatusLabel.accessibilityLabel = @"Starting game";
-    [_coreHost startWithGameRoot:gameRoot
+    [_coreHost startWithGameRoot:@""
                    discImagePath:discImagePath ?: @""
                       modulePath:modulePath
                    userDirectory:userDirectory
@@ -1152,6 +1078,8 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
     (void)overlay;
     NSString *destination = [NSTemporaryDirectory()
         stringByAppendingPathComponent:@"SunPad Saves"];
+    if (!SunPadEngineCardToGCIFolder([self engineCardDirectory], [self saveCardDirectory], error))
+        return nil;
     NSArray<NSURL *> *saves =
         SunPadCopySavesForExport([self saveCardDirectory], destination, error);
     SunPadLog(@"save export files=%lu", (unsigned long)saves.count);
@@ -1401,6 +1329,11 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
     return [[self sunPadSupportRoot] stringByAppendingPathComponent:@"GC/USA/Card A"];
 }
 
+// The decompilation engine's memory card (SunPadEngineHost sets SMS_SAVE_DIR to it).
+- (NSString *)engineCardDirectory {
+    return [[self sunPadSupportRoot] stringByAppendingPathComponent:@"Engine/card-a"];
+}
+
 - (NSString *)saveImportStagingPath {
     return [[self sunPadSupportRoot] stringByAppendingPathComponent:@"SaveImport/pending.gci"];
 }
@@ -1471,9 +1404,20 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
 - (BOOL)applyStagedSaveImport {
     NSString *backup = nil;
     NSError *error = nil;
+    // The Dolphin card is the import's format: bring the engine's progress to it
+    // first, so the backup holds it, and rebuild the engine's card afterwards.
+    const BOOL pending = [NSFileManager.defaultManager fileExistsAtPath:[self saveImportStagingPath]];
+    if (pending && !SunPadEngineCardToGCIFolder([self engineCardDirectory], [self saveCardDirectory], &error)) {
+        [self presentSaveMessageWithTitle:@"Save Import Failed"
+                                  message:error.localizedDescription ?: @"SunPad could not read its saves."];
+        return NO;
+    }
     SunPadSaveImportResult result = SunPadApplyStagedSaveImport(
         [self saveImportStagingPath], [self saveCardDirectory], [self saveBackupsRoot],
         [NSDate date], &backup, &error);
+    if (result == SunPadSaveImportApplied &&
+        !SunPadGCIFolderToEngineCard([self saveCardDirectory], [self engineCardDirectory], &error))
+        result = SunPadSaveImportFailed;
     if (result == SunPadSaveImportNothingPending)
         return YES;
     SunPadLog(@"save import result=%ld backup=%@", (long)result,
@@ -1555,48 +1499,12 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
                 return;
             }
 
-            progressAlert.message = @"Extracting the disc…";
-            [SunPadDiscExtractor extractImageAtPath:stagedImage
-                                       toDirectory:stagedRoot
-                                           progress:^(NSString *status, double fraction) {
-                progressAlert.message = [NSString stringWithFormat:@"%@ (%.0f%%)",
-                                         status, fraction * 100.0];
-            }
-                                         completion:^(BOOL ok, NSString *error) {
+            // The staged image (and, for the compatibility runtime, its extracted
+            // files) replaces the current game data.
+            void (^activateImport)(void) = ^{
                 SunPadGameViewController *completedSelf = weakSelf;
                 if (completedSelf == nil)
                     return;
-                if (!ok) {
-                    [[NSFileManager defaultManager] removeItemAtPath:stagingDirectory error:nil];
-                    [progressAlert dismissViewControllerAnimated:YES completion:^{
-                        [completedSelf presentBootError:error ?: @"Extraction failed."];
-                    }];
-                    return;
-                }
-
-                NSArray<NSString *> *required = @[
-                    @"sys/boot.bin", @"sys/bi2.bin", @"sys/apploader.img",
-                    @"sys/fst.bin", @"sys/main.dol", @"files/opening.bnr",
-                    @"files/AudioRes/mSound.asn", @"files/data/common.szs",
-                ];
-                for (NSString *relative in required) {
-                    if (![[NSFileManager defaultManager] fileExistsAtPath:
-                          [stagedRoot stringByAppendingPathComponent:relative]]) {
-                        [[NSFileManager defaultManager] removeItemAtPath:stagingDirectory error:nil];
-                        [progressAlert dismissViewControllerAnimated:YES completion:^{
-                            [completedSelf presentBootError:@"The extracted game data is incomplete."];
-                        }];
-                        return;
-                    }
-                }
-                if (SunPadRegularFileCount([stagedRoot stringByAppendingPathComponent:@"files"]) != 174) {
-                    [[NSFileManager defaultManager] removeItemAtPath:stagingDirectory error:nil];
-                    [progressAlert dismissViewControllerAnimated:YES completion:^{
-                        [completedSelf presentBootError:@"The extracted game file count is incomplete."];
-                    }];
-                    return;
-                }
-
                 if (completedSelf->_coreHost != nil) {
                     [completedSelf->_coreHost stop];
                     completedSelf->_coreHost = nil;
@@ -1625,16 +1533,18 @@ static NSUInteger SunPadRegularFileCount(NSString *directory) {
                 }
 
                 NSString *destination = [dataDirectory stringByAppendingPathComponent:@"GMSE01.iso"];
-                NSString *extractRoot = [dataDirectory stringByAppendingPathComponent:@"GMSE01"];
                 SunPadSettings *settings = [SunPadSettings sharedSettings];
                 settings.retainedGameDataPath = destination;
-                settings.extractedGameRoot = extractRoot;
+                settings.extractedGameRoot = nil;
                 [settings synchronize];
                 SunPadLog(@"game data import activated filename=%@", destination.lastPathComponent);
                 [progressAlert dismissViewControllerAnimated:YES completion:^{
                     [completedSelf startGameIfProvisioned];
                 }];
-            }];
+            };
+            // The decompilation engine reads the retained image itself: the SHA-256
+            // check above is its whole validation, and nothing is extracted.
+            activateImport();
         });
     });
 }

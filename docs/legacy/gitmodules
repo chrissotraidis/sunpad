@@ -1,0 +1,9 @@
+[submodule "ref/ModernGekko"]
+	path = ref/ModernGekko
+	url = https://github.com/chrissotraidis/ModernGekko.git
+[submodule "ref/ModernGekko-tvOS"]
+	path = ref/ModernGekko-tvOS
+	url = https://github.com/chrissotraidis/ModernGekko.git
+[submodule "ref/ModernGekko-Template"]
+	path = ref/ModernGekko-Template
+	url = https://github.com/ExpansionPak/ModernGekko-Template.git

@@ -68,6 +68,20 @@ static NSString *SunPadSingleLine(NSString *value, NSUInteger maximumLength) {
     return SunPadRedactedString(single);
 }
 
+// The decompilation engine's stderr (SunPadEngineHost). Absent with the
+// compatibility runtime, whose events arrive through SunPadLogRuntimeEvent.
+static NSString *SunPadDiagnosticsEngineLogPath(void) {
+    return [SunPadDiagnosticsDirectory() stringByAppendingPathComponent:@"Engine.log"];
+}
+
+// The engine log's last lines, redacted, for a problem report.
+static NSString *SunPadEngineLogTail(NSString *log, NSUInteger maximumLines) {
+    NSArray<NSString *> *lines = [log componentsSeparatedByString:@"\n"];
+    const NSUInteger start = lines.count > maximumLines ? lines.count - maximumLines : 0;
+    NSArray<NSString *> *tail = [lines subarrayWithRange:NSMakeRange(start, lines.count - start)];
+    return SunPadRedactedString([tail componentsJoinedByString:@"\n"]);
+}
+
 static NSString *SunPadHardwareModel(void) {
     char model[128] = {};
     size_t size = sizeof(model);
@@ -231,6 +245,15 @@ NSURL *SunPadDiagnosticsReportURL(
             [report appendString:@"\n"];
         [report appendString:@"\n[Previous Session]\n"];
         [report appendString:previous];
+        NSString *engineLog = [NSString stringWithContentsOfFile:SunPadDiagnosticsEngineLogPath()
+                                                        encoding:NSUTF8StringEncoding
+                                                           error:nil];
+        if (engineLog != nil) {
+            if (![report hasSuffix:@"\n"])
+                [report appendString:@"\n"];
+            [report appendString:@"\n[Engine Log]\n"];
+            [report appendString:SunPadEngineLogTail(engineLog, 200)];
+        }
 
         NSString *documents = [NSSearchPathForDirectoriesInDomains(
             NSDocumentDirectory, NSUserDomainMask, YES) firstObject];

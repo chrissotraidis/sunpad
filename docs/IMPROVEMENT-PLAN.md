@@ -1,5 +1,12 @@
 # SunPad improvement plan
 
+> [!NOTE]
+> **History (28 November 2026).** This document describes the legacy engine,
+> the game's PowerPC code translated ahead of time on a Dolphin-derived runtime,
+> which SunPad used through 0.3.x. SunPad 0.4.0 replaced it with the
+> decompilation engine. See the [legacy engine record](LEGACY-ENGINE.md) and,
+> for the current app, [ARCHITECTURE.md](ARCHITECTURE.md).
+
 - **Date:** 2026-10-07
 - **Status:** source work in passes 1 and 10 has landed; device acceptance and
   performance measurements remain open. See the status table and run log.
@@ -7,7 +14,7 @@
   (ModernGekko `8f49c55`, RecompCore `da96175`, DolRecomp `fa0cf61` on the Apple lane)
 - **Research inputs:** [sms-pc-port review](SMS-PC-PORT-REVIEW.md),
   [Apple performance research](APPLE-PERFORMANCE-RESEARCH.md),
-  [performance technical debt](TECH-DEBT.md),
+  [performance technical debt](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/docs/TECH-DEBT.md),
   [comparative research loop](RESEARCH-LOOP.md)
 - **Run log:** [IMPROVEMENT-LOG.md](IMPROVEMENT-LOG.md)
 
@@ -26,7 +33,7 @@ specific request.
 
 **First session:**
 
-1. Read [AGENTS.md](../AGENTS.md), [CONTRIBUTING.md](../CONTRIBUTING.md), this
+1. Read [AGENTS.md](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/AGENTS.md), [CONTRIBUTING.md](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/CONTRIBUTING.md), this
    plan, and the newest entries in [IMPROVEMENT-LOG.md](IMPROVEMENT-LOG.md).
 2. Check access: `gh auth status`, and push rights to the forks you will touch,
    for example `gh api repos/chrissotraidis/RecompCore --jq .permissions.push`.
@@ -77,7 +84,7 @@ When asked to compare SunPad with another Sunshine project or to look for
 features to learn from, run the [research loop](RESEARCH-LOOP.md) instead.
 
 "Candidate build" in this plan means an internal build for testing only. Public
-releases follow the release rules in [AGENTS.md](../AGENTS.md).
+releases follow the release rules in [AGENTS.md](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/AGENTS.md).
 
 ## Goals
 
@@ -115,16 +122,18 @@ holds; move to goal 4 or to measured defects.
 
 ## Ground rules
 
-- **No sms-pc-port code.** It has no license. Use its documented findings and
-  re-derive behavior from the CC0 decompilation, Dolphin and SunPad's own
-  measurements. Cite the port where a finding came from.
+- **sms-pc-port code goes through the engine fork.** sms-pc-port has been MIT
+  licensed since 2026-10-13. Its code enters SunPad only through the maintained
+  fork described in the [engine plan](DECOMP-ENGINE-PLAN.md). Work on the
+  0.3.x engine keeps re-deriving behavior from the CC0 decompilation, Dolphin
+  and SunPad's own measurements.
 - **Retail behavior is the reference.** Every native replacement and code
   generation change must match the generated original or the interpreter bit
   for bit, including CPU state the caller can observe. No fast-math, no removed
   exception paths, no blessed SMC hashes.
 - **Owning forks.** Compiler changes go to DolRecomp, runtime changes to
   RecompCore or ModernGekko, app changes here. Update pins, gitlinks and the
-  lock together ([CONTRIBUTING](../CONTRIBUTING.md)).
+  lock together ([CONTRIBUTING](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/CONTRIBUTING.md)).
 - **Evidence is separate.** Unit tests, desktop lockstep, Simulator, device
   telemetry and hands-on play are separate gates. A task is done only when its
   own gate passes.
@@ -227,7 +236,7 @@ that, mark it `skipped` with the number.
 
 ## Environment
 
-**Isolation.** Follow [AGENTS.md](../AGENTS.md): work in a worktree under
+**Isolation.** Follow [AGENTS.md](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/AGENTS.md): work in a worktree under
 `~/.codex/worktrees`, not a new clone in the GitHub folder. The primary
 checkout's `ref/` trees may be dirty or behind; do not reset or clean them.
 For fork work, clone or worktree the fork under the task's scratch directory.
@@ -278,7 +287,7 @@ so a device run can be launched without anyone playing.
 ./scripts/deploy-ios-device.sh <device-id>       # in-place install, module copy, launch
 ```
 
-Never use a removing CoreDevice copy for updates ([known issue 12](KNOWN_ISSUES.md)).
+Never use a removing CoreDevice copy for updates ([known issue 12](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/docs/KNOWN_ISSUES.md)).
 
 **CI.** Pull requests to SunPad `main` must pass `safety-and-tests`,
 `apple-build (ios)` and `apple-build (tvos)`.
@@ -329,7 +338,7 @@ Never use a removing CoreDevice copy for updates ([known issue 12](KNOWN_ISSUES.
    first.
 3. SunPad: update the gitlink, the matching entries in
    `config/dependencies.lock.json` and the table in
-   [DEPENDENCIES](DEPENDENCIES.md#maintained-source-graph). Run
+   [DEPENDENCIES](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/docs/DEPENDENCIES.md#maintained-source-graph). Run
    `python3 scripts/dependency-lock.py` and `./scripts/check-repository.sh`.
 4. The tvOS lane has its own pins. Change it only when the task says so.
 
@@ -415,7 +424,7 @@ device session: make an in-game save, background the app and terminate it
 from the Xcode or `devicectl` side during the flush window, relaunch, and
 confirm the save loads. Gates: C1, the [device session
 protocol](#device-session-protocol), and a log entry with save hashes. Then
-update [known issue 22](KNOWN_ISSUES.md) as fixed.
+update [known issue 22](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/docs/KNOWN_ISSUES.md) as fixed.
 
 **Stop if** `RenameSync` fails on iOS inside the app container. Record the
 error and ask a human.
@@ -432,7 +441,7 @@ depends on this data.
 
 1. Download `config/GMSE01/symbols.txt` and `config/GMSE01/build.sha1` from
    `https://github.com/chasem-dev/sms-english` at the commit recorded in
-   [DEPENDENCIES](DEPENDENCIES.md#research-references-not-build-inputs)
+   [DEPENDENCIES](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/docs/DEPENDENCIES.md#research-references-not-build-inputs)
    (`d5f4eb3...`).
 2. Check `symbols.txt` against SHA-256
    `c75a8f35c1d51e7978cc66aeaa86c1d4e2d16c5603576183e0cd49e66a8d98ff`.
@@ -705,7 +714,7 @@ decompilation before listing it.
 from `SMSGetVSyncTimesPerSec`, keep movement on its 120 Hz ticks, and patch
 each audited object. Disable the Gecko code in this mode so no chunk is demoted.
 Keep it default-off and restart-required. Gate: the
-[60 FPS support gate](TECH-DEBT.md#60-fps-support-gate), including C5 with a
+[60 FPS support gate](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/docs/TECH-DEBT.md#60-fps-support-gate), including C5 with a
 written verdict per scene.
 
 ## Pass 9: widescreen polish
@@ -827,9 +836,17 @@ base-relative pointer layout runs on arm64 without low-memory mappings; a Metal
 GX backend exists; and the licensing of any reused port code is clear. That
 would be a new multi-month project with its own plan.
 
+**2026-11-23:** the maintainer approved the
+[decompilation engine plan](DECOMP-ENGINE-PLAN.md), which replaces this track.
+sms-pc-port is MIT licensed, runs natively on Apple silicon through a
+pointer-rebasing pass, and renders through Vulkan and MoltenVK. Passes 3-6 and
+8 of this plan are suspended because they optimize the engine being replaced.
+Pass 1 and pass 10 results keep serving the 0.3.x line until the new engine
+ships.
+
 ## Not in this plan
 
-- Copying sms-pc-port code or patches.
+- Copying sms-pc-port code or patches into the 0.3.x engine.
 - A PowerPC JIT or runtime code generation on iOS.
 - Fast-math, removed exception checks or blessed SMC hashes.
 - Splitting CPU and video threads (rejected after a confirmed FIFO
