@@ -1,8 +1,0 @@
-{
-  "info" : { "author" : "xcode", "version" : 1 },
-  "layers" : [
-    { "filename" : "Mark.imagestacklayer" },
-    { "filename" : "Circuit.imagestacklayer" },
-    { "filename" : "Background.imagestacklayer" }
-  ]
-}

@@ -17,10 +17,11 @@ The selected square artwork was resized without cropping to this opaque
 1024×1024 PNG using macOS `sips`. It is the canonical icon master. Derived uses:
 
 - iOS/iPadOS app icon and the README.
-- `SunPadBrand.imageset` in the iOS and tvOS catalogs: 256×256 startup/setup art.
+- `SunPadBrand.imageset` in the iOS catalog: 256×256 startup/setup art.
 - `apple/macos/AppIcon.icns`: 16, 32, 128, 256 and 512 point entries at 1×/2×,
   generated with `sips` and `iconutil` for Finder, Dock and app identity.
-- Apple TV layered icons and Top Shelf: see the [tvOS record](../../../tvos/Assets.xcassets/PROVENANCE.md).
+- Apple TV layered icons and Top Shelf: retired with the legacy Apple TV app, see the
+  [tvOS record at legacy-engine-final](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/apple/tvos/Assets.xcassets/PROVENANCE.md).
 - PadMint's `art/sunpad.png`: a 144×144 copy of this master, used by the library
   and game detail views on all PadMint hosts.
 

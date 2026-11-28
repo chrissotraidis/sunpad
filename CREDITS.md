@@ -39,6 +39,7 @@ upstream participation or endorsement.
 
 The app icon is AI-generated. Its retained provenance is in the
 [iOS asset record](apple/ios/Assets.xcassets/AppIcon.appiconset/PROVENANCE.md).
-The [tvOS asset record](apple/tvos/Assets.xcassets/PROVENANCE.md) describes the
-Apple TV artwork. Gameplay screenshots document the original game, whose
+The Apple TV artwork, retired with the legacy Apple TV app, is recorded at the
+[legacy-engine-final](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/apple/tvos/Assets.xcassets/PROVENANCE.md)
+tag. Gameplay screenshots document the original game, whose
 characters, artwork and trademarks remain the property of their rights holders.
