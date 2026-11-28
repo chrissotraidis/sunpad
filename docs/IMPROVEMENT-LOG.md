@@ -806,5 +806,26 @@ Cards, in the order done ([FINALIZE-NEW-ENGINE.md](FINALIZE-NEW-ENGINE.md)):
   apple-build (ios) and apple-build (tvos), so PR #90 could never merge. The
   required checks are now safety-and-tests, published-app and engine, recorded
   in LEGACY-ENGINE.md for a revert.
+- D2: PR #90 merged as 44e8bf0 (merge commit, so the hashes in the legacy
+  record stay valid) and tagged v0.4.0. The published app was built from the
+  tag: SunPad-v0.4.0-ios-unsigned.ipa (fe6d4f92...0188), with
+  SunPad-v0.4.0-padmint.json (5c43d35e...248b) and SHA256SUMS. All three pass
+  release_gate.py and padmint audit, and the app passes its package audit.
+  The release is published (not a prerelease, so PadMint offers it).
+  PadMint's player check without a checkout passed against it, and the copy
+  it built, signed for development, installed over 0.4.0 on the iPad and loaded
+  the migrated 94-Shine save at 30 FPS with the card unchanged.
+- D2 (PadMint): PR padmint#299 gained "Prepare PadMint 0.6.11 with SunPad
+  0.4.0" (version, iOS library build 17, README, GUIDE, WINDOWS, REMAINING and
+  STATUS counts: 8 Windows games, KartPad on Linux, 11 Mac apps). Its tests,
+  catalog audit and package checks passed (the game-build matrix had passed on
+  0e4b696), and it merged as 9b14cbb, tagged v0.6.11. The downloads pass
+  PadMint's audit and release_gate.py, the packaged Mac app starts natively
+  and under Rosetta and carries SunPad's new entry, and PadMint 0.6.11 is
+  published. The player check passed again from PadMint's main after both
+  releases.
+- D3: the compatibility row went in with padmint#299, the after-today work is
+  task cards E8.1 to E8.9 in DECOMP-ENGINE-PLAN.md, and E6 and E7 there are
+  closed. Not done: anything on the iPhone 14, which stayed unavailable (E8.6).
 - CI passes on e0a2dca (safety-and-tests, published-app, engine). The two
   earlier failures were the audit's grep -q under pipefail, fixed in 5de8a54.
