@@ -24,14 +24,6 @@ source = open(sys.argv[1]).read()
 assert source.index("startAndReturnError") < source.index("createPlayerWithPattern")
 PY
 
-# The pinned Apple-lane runtime must call the host hook this file defines.
-gcpad="$ROOT/ref/ModernGekko/vendor/dolphin/Source/Core/Core/HW/GCPad.cpp"
-if [[ -f "$gcpad" ]]; then
-  grep -Fq 'SunPadSetRumble' "$gcpad" || {
-    echo "test-controller-rumble.sh: pinned RecompCore lacks the SunPadSetRumble hook" >&2
-    exit 1
-  }
-fi
 grep -Fq 'extern "C" bool SunPadSetRumble(bool enabled)' "$rumble"
 grep -Fq 'useController:playerOne' "$ROOT/apple/ios/SunPadGameViewController.mm"
 echo "SunPad controller rumble wiring checks passed"

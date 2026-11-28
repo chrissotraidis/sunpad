@@ -12,7 +12,6 @@ python3 tests/test_package_output.py
 python3 tests/test_gcpipe.py
 python3 tests/test_bench_route.py
 python3 tests/test_windows_build.py
-./tests/test-extraction-progress.sh
 ./tests/test-ipa-module.sh
 
 for script in scripts/*.sh tests/*.sh apple/macos/SunPad apple/macos/next/SunPadNext; do
@@ -27,16 +26,11 @@ plutil -lint apple/ios/Info.plist apple/macos/Info.plist apple/macos/next/Info.p
 [[ "$(plutil -extract GCSupportsGameMode raw apple/ios/Info.plist)" == "true" ]] || { echo "check-repository.sh: check failed (line 24)" >&2; exit 1; }
 ./scripts/check-markdown-links.py
 
-./tests/test-input-pipe-encoder.sh
 ./tests/test-save-transfer.sh
 ./tests/test-controller-rumble.sh
 ./tests/test-controller-mapping.sh
 ./tests/test-controller-slots.sh
-./tests/test-experimental-60fps-config.sh
-./tests/test-experimental-performance-config.sh
-./tests/test-ios-staticrecomp-config.sh
 ./tests/test-generated-gmse01-audit.sh
-./tests/test-widescreen-heatwave-fix.sh
 ./tests/test-diagnostics.sh
 ./tests/test-engine-bridge.sh
 ./tests/test-engine-saves.sh

@@ -15,17 +15,16 @@ end = source.index("- (void)showGameDataSetupState", start)
 startup = source[start:end]
 
 required = (
-    "fileExistsAtPath:gameRoot isDirectory:&gameRootIsDirectory",
-    "isReadableFileAtPath:gameRoot",
-    "if (!gameRootReadable)",
+    "![fileManager fileExistsAtPath:discImagePath]",
+    "boot waiting for the disc image",
     "[self showGameDataSetupState]",
 )
 for text in required:
     if text not in startup:
         raise SystemExit(f"missing game-data setup guard: {text}")
 
-if startup.index("if (!gameRootReadable)") > startup.index("_coreHost ="):
-    raise SystemExit("game-data setup guard must run before the runtime host is created")
+if startup.index("boot waiting for the disc image") > startup.index("_coreHost ="):
+    raise SystemExit("game-data setup guard must run before the engine host is created")
 
 if 'importConfiguration.title = @"Choose ISO or GCM"' not in source:
     raise SystemExit("missing visible first-run import action")

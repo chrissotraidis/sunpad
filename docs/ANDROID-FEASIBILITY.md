@@ -651,9 +651,9 @@ Repository and pinned-source evidence:
 
 - [`scripts/ios-build-core-device.sh`](../scripts/ios-build-core-device.sh) -
   current separate core/module cross-build shape
-- [`apple/ios/SunPadCoreHost.mm`](../apple/ios/SunPadCoreHost.mm) - runtime
+- [`apple/ios/SunPadCoreHost.mm`](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/apple/ios/SunPadCoreHost.mm) - runtime
   configuration, module loading, input pipe, lifecycle, and audio ownership
-- [`apple/ios/SunPadDiscExtractor.mm`](../apple/ios/SunPadDiscExtractor.mm) -
+- [`apple/ios/SunPadDiscExtractor.mm`](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/apple/ios/SunPadDiscExtractor.mm) -
   current DiscIO extraction wrapper
 - [`apple/ios/SunPadGameViewController.mm`](../apple/ios/SunPadGameViewController.mm) -
   current staged import, validation, storage, and boot contract
