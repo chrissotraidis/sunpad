@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "repositories": [
+    {
+      "name": "ModernGekko",
+      "lane": "apple",
+      "path": "ref/ModernGekko",
+      "parent": ".",
+      "submodulePath": "ref/ModernGekko",
+      "url": "https://github.com/chrissotraidis/ModernGekko.git",
+      "revision": "e29496fb1171f3e9803dad66f5052b1bab061597",
+      "upstreamUrl": "https://github.com/ExpansionPak/ModernGekko.git",
+      "upstreamRevision": "0514d9f03f8602809f66fc92fdca87d30e752997"
+    },
+    {
+      "name": "RecompCore",
+      "lane": "apple",
+      "path": "ref/ModernGekko/vendor/dolphin",
+      "parent": "ref/ModernGekko",
+      "submodulePath": "vendor/dolphin",
+      "url": "https://github.com/chrissotraidis/RecompCore.git",
+      "revision": "724054945a90eec23b7b94b8d14139525d962a24",
+      "upstreamUrl": "https://github.com/ExpansionPak/RecompCore.git",
+      "upstreamRevision": "13e492094902644b0d113c586300d358640f9e19"
+    },
+    {
+      "name": "DolRecomp",
+      "lane": "apple",
+      "path": "ref/ModernGekko/vendor/dolphin/DolRecomp",
+      "parent": "ref/ModernGekko/vendor/dolphin",
+      "submodulePath": "DolRecomp",
+      "url": "https://github.com/chrissotraidis/DolRecomp.git",
+      "revision": "fa0cf619e8d7eb8cba7eaf55267a12caaebb46aa",
+      "upstreamUrl": "https://github.com/ExpansionPak/DolRecomp.git",
+      "upstreamRevision": "fa0cf619e8d7eb8cba7eaf55267a12caaebb46aa"
+    },
+    {
+      "name": "ModernGekko",
+      "lane": "tvos",
+      "path": "ref/ModernGekko-tvOS",
+      "parent": ".",
+      "submodulePath": "ref/ModernGekko-tvOS",
+      "url": "https://github.com/chrissotraidis/ModernGekko.git",
+      "revision": "3982ff05bef91d9e87acd7ebdb3f3b058c53e7f8",
+      "upstreamUrl": "https://github.com/ExpansionPak/ModernGekko.git",
+      "upstreamRevision": "0514d9f03f8602809f66fc92fdca87d30e752997"
+    },
+    {
+      "name": "RecompCore",
+      "lane": "tvos",
+      "path": "ref/ModernGekko-tvOS/vendor/dolphin",
+      "parent": "ref/ModernGekko-tvOS",
+      "submodulePath": "vendor/dolphin",
+      "url": "https://github.com/chrissotraidis/RecompCore.git",
+      "revision": "6e8c569c4c579328907c5c12c0e63e07fd643df1",
+      "upstreamUrl": "https://github.com/ExpansionPak/RecompCore.git",
+      "upstreamRevision": "13e492094902644b0d113c586300d358640f9e19"
+    },
+    {
+      "name": "DolRecomp",
+      "lane": "tvos",
+      "path": "ref/ModernGekko-tvOS/vendor/dolphin/DolRecomp",
+      "parent": "ref/ModernGekko-tvOS/vendor/dolphin",
+      "submodulePath": "DolRecomp",
+      "url": "https://github.com/chrissotraidis/DolRecomp.git",
+      "revision": "fa0cf619e8d7eb8cba7eaf55267a12caaebb46aa",
+      "upstreamUrl": "https://github.com/ExpansionPak/DolRecomp.git",
+      "upstreamRevision": "fa0cf619e8d7eb8cba7eaf55267a12caaebb46aa"
+    },
+    {
+      "name": "ModernGekko-Template",
+      "lane": "shared",
+      "path": "ref/ModernGekko-Template",
+      "parent": ".",
+      "submodulePath": "ref/ModernGekko-Template",
+      "url": "https://github.com/ExpansionPak/ModernGekko-Template.git",
+      "revision": "1ee85bb5e09c38f493a09f5fa6e9dc8228b23e42"
+    }
+  ]
+}

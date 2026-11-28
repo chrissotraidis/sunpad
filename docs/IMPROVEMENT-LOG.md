@@ -705,3 +705,19 @@ Notes: the cold iPhone run before the change showed the cause: MoltenVK has
   maintainer saw was the first cold launch.
 Next: the maintainer's hands-on pass on both devices (menu, pop-in on a first
   visit, saves); then PadMint (E6).
+### 2026-11-28 SunPad 0.4.0 release loop
+Cards, in the order done ([FINALIZE-NEW-ENGINE.md](FINALIZE-NEW-ENGINE.md)):
+- S0: worktree, fork and lock clean at bd9936f. Backups of the iPad's
+  SunPad 0.3.3 save, config and preferences and its SunPad Next card in
+  ~/.codex/scratch/backup-2026-11-28-ipad with SHA256SUMS. The iPhone 14 was
+  unavailable to the Mac, so its card is not backed up yet.
+- A1: passed in the iOS Simulator on a scratch card (SMS_SAVE_DIR): a new file
+  saved from the Delfino Plaza pause menu ("Save? Yes"), the card's .dat
+  changed, a relaunch showed file A with one Shine where it had shown New, a
+  load left the card unchanged, and the card went to a GCI and back with the
+  .dat byte-identical. Not checked on a device: the iPad stopped at iOS's
+  "Unable to Verify App" (it needs internet to recheck the developer
+  certificate), and the iPhone was unavailable. The device save check moves in
+  front of D2.
+- R1: docs/LEGACY-ENGINE.md, with the legacy recipe, catalog entry, lock and
+  .gitmodules copied verbatim into docs/legacy/.

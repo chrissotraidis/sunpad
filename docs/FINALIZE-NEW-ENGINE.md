@@ -145,10 +145,10 @@ decision this document does not answer, or the next step is approval B.
 
 | ID | Card | Box | Needs | Status |
 | --- | --- | --- | --- | --- |
-| S0 | Start checks and backups | 30 min | — | ready |
-| A1 | Save cycle on a device | 1 h | S0 | ready |
+| S0 | Start checks and backups | 30 min | — | done (iPhone backup pending) |
+| A1 | Save cycle on a device | 1 h | S0 | done in the Simulator, device check before D2 |
 | A3 | Every area plays | 1 h | S0 | ready |
-| R1 | Legacy record | 1.5 h | S0 | ready |
+| R1 | Legacy record | 1.5 h | S0 | done |
 | R2 | Legacy tag and branch | 10 min | R1, approval A | waiting |
 | B1 | The engine becomes the SunPad app | 1 h | A1 | blocked |
 | B2 | Upgrade over 0.3.3 on the iPad | 30 min | B1 | blocked |
