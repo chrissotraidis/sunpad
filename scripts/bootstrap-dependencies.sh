@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# Prepare pinned forks without applying patches or discarding local work.
+# Prepares the pinned engine sources (ref/sms-pc-port with its decomp and sdk
+# submodules) without discarding local work. Without --sources-only it also
+# fetches MoltenVK, which building the SunPad app itself needs.
 set -euo pipefail
 ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
 [[ $# = 0 || ( $# = 1 && "$1" = --sources-only ) ]] || {
@@ -20,36 +22,10 @@ for pin in json.loads((root/'config/dependencies.lock.json').read_text())['repos
             sys.exit(f'Preserved modified dependency at {path}; use a fresh checkout.')
 PYCHECK
 git -C "$ROOT" submodule sync --recursive
-git -C "$ROOT" submodule update --init -- ref/ModernGekko ref/ModernGekko-tvOS ref/ModernGekko-Template ref/sms-pc-port
-# The decompilation engine (docs/DECOMP-ENGINE-PLAN.md) and its two submodules.
+git -C "$ROOT" submodule update --init -- ref/sms-pc-port
 git -C "$ROOT/ref/sms-pc-port" submodule update --init -- decomp sdk
-for MG in "$ROOT/ref/ModernGekko" "$ROOT/ref/ModernGekko-tvOS"; do
-  git -C "$MG" submodule update --init -- vendor/dolphin
-  git -C "$MG/vendor/dolphin" submodule update --init -- DolRecomp
-done
 if [[ "${1:-}" != --sources-only ]]; then
-REQUIRED_DOLPHIN_SUBMODULES=(
-  DolRecomp
-  Externals/SDL/SDL Externals/SFML/SFML Externals/bzip2/bzip2
-  Externals/cpp-optparse/cpp-optparse Externals/cubeb/cubeb
-  Externals/curl/curl Externals/enet/enet Externals/fmt/fmt
-  Externals/glslang/glslang Externals/hidapi/hidapi-src
-  Externals/imgui/imgui Externals/implot/implot Externals/libspng/libspng
-  Externals/libusb/libusb Externals/lz4/lz4
-  Externals/minizip-ng/minizip-ng Externals/pugixml/pugixml
-  Externals/spirv_cross/SPIRV-Cross Externals/tinygltf/tinygltf
-  Externals/watcher/watcher Externals/xxhash/xxHash
-  Externals/zlib-ng/zlib-ng Externals/zstd/zstd
-)
-# Dolphin's Linux build also needs cpp-ipc (PadMint builds the game module on Linux).
-if [[ "$(uname -s)" = Linux ]]; then
-  REQUIRED_DOLPHIN_SUBMODULES+=(Externals/cpp-ipc/cpp-ipc)
-fi
-for MG in "$ROOT/ref/ModernGekko" "$ROOT/ref/ModernGekko-tvOS"; do
- git -C "$MG/vendor/dolphin" submodule update --init "${REQUIRED_DOLPHIN_SUBMODULES[@]}"
-git -C "$MG/vendor/dolphin/Externals/cubeb/cubeb" submodule update --init --recursive
-
-done
+  "$ROOT/scripts/fetch-moltenvk.sh"
 fi
 python3 "$ROOT/scripts/dependency-lock.py"
-echo "SunPad pinned fork sources are ready; no patches were applied."
+echo "SunPad's pinned engine sources are ready."

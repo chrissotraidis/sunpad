@@ -22,7 +22,7 @@ tick-delta busy-waits during audio bring-up (doldecomp/sms:
 `JASDSPChannel.cpp`, `dolphin/ai/ai.c`, `os/OSAudioSystem.c`).
 
 The fix is included in the complete
-[`0001-sunpad-ios-runtime.patch`](../patches/ModernGekko-dolphin/0001-sunpad-ios-runtime.patch)
+[`0001-sunpad-ios-runtime.patch`](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/patches/ModernGekko-dolphin/0001-sunpad-ios-runtime.patch)
 snapshot:
 
 - advance `ctx->timebase` as `tb_at_SyncIn + charged_cycles / TIMER_RATIO`

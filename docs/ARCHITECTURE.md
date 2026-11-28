@@ -75,7 +75,7 @@ SunPadGameViewController
 `scripts/bootstrap-dependencies.sh` checks out the maintained ModernGekko,
 RecompCore and DolRecomp forks at the commits pinned in
 [DEPENDENCIES.md](DEPENDENCIES.md#maintained-source-graph). The iOS deltas live
-in those forks; the snapshots in [patches/README.md](../patches/README.md) are
+in those forks; the snapshots in [patches/README.md](https://github.com/chrissotraidis/sunpad/blob/legacy-engine-final/patches/README.md) are
 historical records and are no longer applied.
 
 - `PlatformIOS.mm` (CAMetalLayer platform), Metal backend AppKit guards,

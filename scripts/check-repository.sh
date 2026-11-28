@@ -42,7 +42,7 @@ for row in subprocess.check_output(['git','ls-files','--stage'],text=True).split
     if path.startswith('ref/'):
         assert path in allowed and meta.split()==['160000',allowed[path],'0'], 'Unexpected tracked reference material: '+path
 PYCHECK
-prohibited=$(git ls-files | grep -v -E '^ref/(ModernGekko|ModernGekko-tvOS|ModernGekko-Template|sms-pc-port)$' | grep -E '(^|/)(ref|DerivedData|Provisioned|build[^/]*)/|\.(iso|gcm|rvz|wia|wbfs|gcz|dylib|ipa|xcarchive|mobileprovision|p12|pem|key|gci|sav|raw)$' || true)
+prohibited=$(git ls-files | grep -v -E '^ref/sms-pc-port$' | grep -E '(^|/)(ref|DerivedData|Provisioned|build[^/]*)/|\.(iso|gcm|rvz|wia|wbfs|gcz|dylib|ipa|xcarchive|mobileprovision|p12|pem|key|gci|sav|raw)$' || true)
 if [[ -n "$prohibited" ]]; then
   echo "prohibited tracked material:" >&2
   echo "$prohibited" >&2
